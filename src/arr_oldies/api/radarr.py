@@ -148,3 +148,32 @@ class RadarrClient(BaseArrClient):
             page_num += 1
 
         return records
+
+    async def delete_movie_file(self, movie_file_id: int) -> bool:
+        """Delete a specific movie file from disk and database."""
+        endpoint = f"{RADARR_MOVIEFILE_ENDPOINT}/{movie_file_id}"
+        response = await self.delete(endpoint)
+        return response.status_code in (200, 204)
+
+    async def unmonitor_movie(self, movie_id: int) -> bool:
+        """Unmonitor a movie to prevent automatic redownload."""
+        endpoint = f"{RADARR_MOVIE_ENDPOINT}/editor"
+        payload = {"movieIds": [movie_id], "monitored": False}
+        response = await self.put(endpoint, json=payload)
+        return response.status_code in (200, 202)
+
+    async def delete_movie(
+        self,
+        movie_id: int,
+        delete_files: bool = False,
+        add_exclusion: bool = False,
+    ) -> bool:
+        """Delete a movie entry from library, optionally deleting files and adding import exclusion."""
+        endpoint = f"{RADARR_MOVIE_ENDPOINT}/{movie_id}"
+        params = {
+            "deleteFiles": str(delete_files).lower(),
+            "addImportExclusion": str(add_exclusion).lower(),
+        }
+        response = await self.delete(endpoint, params=params)
+        return response.status_code in (200, 204)
+

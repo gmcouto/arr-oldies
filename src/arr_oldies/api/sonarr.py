@@ -208,3 +208,39 @@ class SonarrClient(BaseArrClient):
             page_num += 1
 
         return records
+
+    async def delete_episode_file(self, episode_file_id: int) -> bool:
+        """Delete a specific episode file from disk and database."""
+        endpoint = f"{SONARR_EPISODEFILE_ENDPOINT}/{episode_file_id}"
+        response = await self.delete(endpoint)
+        return response.status_code in (200, 204)
+
+    async def unmonitor_series(self, series_id: int) -> bool:
+        """Unmonitor an entire series to prevent automatic redownloads."""
+        endpoint = f"{SONARR_SERIES_ENDPOINT}/editor"
+        payload = {"seriesIds": [series_id], "monitored": False}
+        response = await self.put(endpoint, json=payload)
+        return response.status_code in (200, 202)
+
+    async def unmonitor_episodes(self, episode_ids: list[int]) -> bool:
+        """Unmonitor specific episodes by their episode IDs."""
+        endpoint = f"{SONARR_EPISODE_ENDPOINT}/monitor"
+        payload = {"episodeIds": episode_ids, "monitored": False}
+        response = await self.put(endpoint, json=payload)
+        return response.status_code in (200, 202)
+
+    async def delete_series(
+        self,
+        series_id: int,
+        delete_files: bool = False,
+        add_exclusion: bool = False,
+    ) -> bool:
+        """Delete a series entry from library, optionally deleting files and adding import exclusion."""
+        endpoint = f"{SONARR_SERIES_ENDPOINT}/{series_id}"
+        params = {
+            "deleteFiles": str(delete_files).lower(),
+            "addImportListExclusion": str(add_exclusion).lower(),
+        }
+        response = await self.delete(endpoint, params=params)
+        return response.status_code in (200, 204)
+
