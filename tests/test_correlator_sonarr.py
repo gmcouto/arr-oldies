@@ -159,14 +159,14 @@ def test_correlate_sonarr_multi_episode_file():
 
 
 def test_correlate_sonarr_without_episodes_list():
-    """Verify fallback formatting 'S02' when episodes metadata is empty."""
+    """Verify fallback formatting 'S02' when episodes metadata is empty and no episode in filename."""
     series = SonarrSeries(id=20, title="Better Call Saul", year=2015, path="/tv/BCS")
     ep_file = SonarrEpisodeFile(
         id=401,
         series_id=20,
         season_number=2,
-        relative_path="BCS - S02.mkv",
-        path="/tv/BCS/BCS - S02.mkv",
+        relative_path="BCS - Season 2.mkv",
+        path="/tv/BCS/BCS - Season 2.mkv",
         size=1000000000,
         date_added=datetime(2024, 1, 1, 0, 0, 0, tzinfo=UTC),
     )
@@ -185,3 +185,31 @@ def test_correlate_sonarr_without_episodes_list():
     assert len(items) == 1
     assert items[0].formatted_episode == "S02"
     assert items[0].is_legacy is True
+
+
+def test_correlate_sonarr_filename_fallback():
+    """Verify fallback regex extraction from filename when episodes metadata is empty."""
+    series = SonarrSeries(id=30, title="The Bear", year=2022, path="/tv/The Bear")
+    ep_file = SonarrEpisodeFile(
+        id=501,
+        series_id=30,
+        season_number=3,
+        relative_path="The.Bear.S03E04.1080p.mkv",
+        path="/tv/The Bear/Season 03/The.Bear.S03E04.1080p.mkv",
+        size=1200000000,
+        date_added=datetime(2024, 6, 27, 0, 0, 0, tzinfo=UTC),
+    )
+    data = InstanceMediaData(
+        instance_name="sonarr-tv",
+        instance_type=InstanceType.SONARR,
+        series=[series],
+        episode_files=[ep_file],
+        episodes=[],
+        history_records=[],
+    )
+
+    correlator = HistoryCorrelator()
+    items = correlator.correlate_instance(data)
+
+    assert len(items) == 1
+    assert items[0].formatted_episode == "S03E04"

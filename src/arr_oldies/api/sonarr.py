@@ -75,6 +75,37 @@ class SonarrClient(BaseArrClient):
 
         return all_files
 
+    async def get_all_episodes(
+        self,
+        series_ids: list[int] | None = None,
+        concurrency: int = DEFAULT_SERIES_CONCURRENCY,
+    ) -> list[SonarrEpisode]:
+        """Fetch all episode metadata across multiple series, throttled with a semaphore."""
+        if series_ids is None:
+            series_list = await self.get_series()
+            series_ids = [s.id for s in series_list]
+
+        if not series_ids:
+            return []
+
+        semaphore = asyncio.Semaphore(concurrency)
+
+        async def _fetch_for_series(sid: int) -> list[SonarrEpisode]:
+            async with semaphore:
+                try:
+                    return await self.get_episodes(series_id=sid)
+                except Exception:  # noqa: BLE001
+                    return []
+
+        tasks = [_fetch_for_series(sid) for sid in series_ids]
+        results = await asyncio.gather(*tasks)
+
+        all_episodes: list[SonarrEpisode] = []
+        for ep_list in results:
+            all_episodes.extend(ep_list)
+
+        return all_episodes
+
     async def get_episodes(
         self,
         series_id: int | None = None,

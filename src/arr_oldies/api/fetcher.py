@@ -97,15 +97,20 @@ class MultiInstanceFetcher:
 
                 elif isinstance(client, SonarrClient):
                     series = await client.get_series()
-                    episode_files = await client.get_all_episode_files()
-                    sonarr_history = await client.fetch_all_history(
-                        page_size=history_page_size,
-                        progress_callback=_history_progress,
+                    series_ids = [s.id for s in series]
+                    episode_files, episodes, sonarr_history = await asyncio.gather(
+                        client.get_all_episode_files(series_ids=series_ids),
+                        client.get_all_episodes(series_ids=series_ids),
+                        client.fetch_all_history(
+                            page_size=history_page_size,
+                            progress_callback=_history_progress,
+                        ),
                     )
                     data = InstanceMediaData(
                         instance_name=instance.name,
                         instance_type=instance.type,
                         series=series,
+                        episodes=episodes,
                         episode_files=episode_files,
                         history_records=sonarr_history,
                     )

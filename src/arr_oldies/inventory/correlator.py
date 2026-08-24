@@ -1,5 +1,6 @@
 """History API timestamp correlation engine for Radarr and Sonarr libraries."""
 
+import re
 from collections import defaultdict
 from collections.abc import Sequence
 from datetime import UTC, datetime
@@ -277,7 +278,22 @@ class HistoryCorrelator:
             elif ep_numbers:
                 formatted_episode = f"S{ep_file.season_number:02d}E{ep_numbers[0]:02d}"
             else:
-                formatted_episode = f"S{ep_file.season_number:02d}"
+                # Fallback: parse SxxExx or SxEx from filename/path
+                path_to_check = ep_file.relative_path or ep_file.path or ""
+                match = re.search(
+                    r"[Ss](\d+)[Ee](\d+)(?:[ -]*[Ee](\d+))?",
+                    path_to_check,
+                )
+                if match:
+                    s_num = int(match.group(1))
+                    e_start = int(match.group(2))
+                    e_end = int(match.group(3)) if match.group(3) else None
+                    if e_end:
+                        formatted_episode = f"S{s_num:02d}E{e_start:02d}-E{e_end:02d}"
+                    else:
+                        formatted_episode = f"S{s_num:02d}E{e_start:02d}"
+                else:
+                    formatted_episode = f"S{ep_file.season_number:02d}"
 
             episode_title = (
                 episodes[0].title if (len(episodes) == 1 and episodes[0].title) else None

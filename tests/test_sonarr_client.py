@@ -149,6 +149,29 @@ async def test_sonarr_get_episodes(sonarr_instance: InstanceConfig):
 
 @pytest.mark.asyncio
 @respx.mock
+async def test_sonarr_get_all_episodes(sonarr_instance: InstanceConfig):
+    """Verify get_all_episodes retrieves episodes across multiple series."""
+    respx.get("http://sonarr.local:8989/api/v3/episode", params={"seriesId": 1}).mock(
+        return_value=httpx.Response(
+            200,
+            json=[{"id": 101, "seriesId": 1, "seasonNumber": 1, "episodeNumber": 1, "title": "Ep1"}],
+        )
+    )
+    respx.get("http://sonarr.local:8989/api/v3/episode", params={"seriesId": 2}).mock(
+        return_value=httpx.Response(
+            200,
+            json=[{"id": 102, "seriesId": 2, "seasonNumber": 1, "episodeNumber": 2, "title": "Ep2"}],
+        )
+    )
+
+    async with SonarrClient(sonarr_instance) as client:
+        all_eps = await client.get_all_episodes(series_ids=[1, 2], concurrency=2)
+        assert len(all_eps) == 2
+        assert {e.id for e in all_eps} == {101, 102}
+
+
+@pytest.mark.asyncio
+@respx.mock
 async def test_sonarr_get_series_history(sonarr_instance: InstanceConfig):
     """Verify get_series_history for a series."""
     respx.get("http://sonarr.local:8989/api/v3/history/series").mock(
