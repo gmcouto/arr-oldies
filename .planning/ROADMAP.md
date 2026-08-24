@@ -21,7 +21,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 7: Scope unmonitor to episodes and add unmonitor-series option** - Scope unmonitor to individual media items and add full series unmonitoring option (completed 2026-08-24)
 - [x] **Phase 8: Support --monitored and --unmonitored filter for scan and clean** - Filter inventory by monitored status to inspect or unmonitor only monitored items (completed 2026-08-24)
 - [x] **Phase 9: Docker Packaging and GitHub Actions Release Workflow** - Containerize arr-oldies and automate multi-platform Docker image build/publish to GHCR upon version release tags (completed 2026-08-24)
-- [ ] **Phase 10: Negative Language, Title, and Tag Filtering** - Filter media by excluding languages (`--!l`/`--not-audio-lang`), matching title substrings case-insensitively (`--title`), and including/excluding named tags (`--tag`, `--!tag`) with dynamic tag label resolution
+- [x] **Phase 10: Negative Language, Title, and Tag Filtering** - Filter media by excluding languages (`--!l`/`--not-audio-lang`), matching title substrings case-insensitively (`--title`), and including/excluding named tags (`--tag`, `--!tag`) with dynamic tag label resolution (completed 2026-08-24)
 
 ## Phase Details
 
@@ -158,7 +158,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 7. Scope unmonitor to episodes and add unmonitor-series option | 1/1 | Complete   | 2026-08-24 |
 | 8. Support --monitored and --unmonitored filter for scan and clean | 1/1 | Complete    | 2026-08-24 |
 | 9. Docker Packaging and GitHub Actions Release Workflow | 1/1 | Complete   | 2026-08-24 |
-| 10. Negative Language, Title, and Tag Filtering | 0/2 | Not started | - |
+| 10. Negative Language, Title, and Tag Filtering | 2/2 | Complete    | 2026-08-24 |
 
 ### Phase 6: Support Composite Time Formats for Age Filters
 
@@ -255,13 +255,13 @@ Plans:
   4. All new filters are seamlessly available and consistent across both `scan` and `clean` commands.
   5. CLI table visualization, JSON export, dry-run simulation, and action execution accurately apply the new filtering criteria.
 
-**Plans**: 0/2 plans executed
+**Plans**: 2/2 plans executed
 
 Plans:
 **Wave 1**
 
-- [ ] 10-01-PLAN.md: Tag API Models, Client Endpoints, Resilient Fetcher & Dynamic Correlator Tag Resolution
+- [x] 10-01-PLAN.md: Tag API Models, Client Endpoints, Resilient Fetcher & Dynamic Correlator Tag Resolution
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 10-02-PLAN.md: Inventory Engine Multi-Filtering, CLI Scan/Clean Integration, Docs & End-to-End Test Suite
+- [x] 10-02-PLAN.md: Inventory Engine Multi-Filtering, CLI Scan/Clean Integration, Docs & End-to-End Test Suite

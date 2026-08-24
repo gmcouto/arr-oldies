@@ -28,6 +28,9 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **INVT-04**: Sort inventory items by oldest import date or oldest grab date
 - [x] **INVT-05**: Filter inventory items by audio language (`--audio-lang <lang>`), media type (movie vs episode), minimum size, and date/age cutoff
 - [x] **INVT-06**: Cleanly flag legacy media items that have no History API records without failing the scan
+- [x] **INVT-07**: Exclude media files by audio language using negative language filter (`--!l`, `--not-audio-lang`, `--exclude-audio-lang`, `--not-lang`) supporting ISO-639 codes and names (e.g., `pt-br`, `por`, `portuguese`)
+- [x] **INVT-08**: Filter media items by case-insensitive title substring matching (`ILIKE %...%`) across movie, series, and episode titles (`--title`)
+- [x] **INVT-09**: Filter media items by instance tags using alphanumeric tag labels for inclusion (`--tag`) and exclusion (`--!tag` / `--exclude-tag`), dynamically resolving tag label names to tag IDs across Radarr and Sonarr instances
 
 ### CLI Reporting & Visualization (CLI)
 
@@ -86,6 +89,9 @@ Deferred to future release. Tracked but not in current roadmap.
 | INVT-04 | Phase 3 | Complete |
 | INVT-05 | Phase 3 | Complete |
 | INVT-06 | Phase 3 | Complete |
+| INVT-07 | Phase 10 | Complete |
+| INVT-08 | Phase 10 | Complete |
+| INVT-09 | Phase 10 | Complete |
 | CLI-01 | Phase 4 | Complete |
 | CLI-02 | Phase 4 | Complete |
 | CLI-03 | Phase 4 | Complete |
@@ -102,10 +108,10 @@ Deferred to future release. Tracked but not in current roadmap.
 
 **Coverage:**
 
-- v1 requirements: 26 total
-- Mapped to phases: 26
+- v1 requirements: 29 total
+- Mapped to phases: 29
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-08-23*
-*Last updated: 2026-08-24 after Phase 9 completion*
+*Last updated: 2026-08-24 after adding Phase 10*
