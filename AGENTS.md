@@ -99,6 +99,14 @@ Arr-Oldies is a CLI tool and auditing engine that connects to multiple Radarr an
 
 ## Conventions
 
+### Code Quality & Pre-Commit Gates
+- **Mandatory Lint & Format Verification**: Always run and verify all CI checks before committing new code to prevent broken builds:
+  - `ruff check .` (linter)
+  - `ruff format --check .` (formatter check; run `ruff format .` to fix automatically)
+  - `mypy src/` (strict static type checking)
+  - `pytest` (full test suite)
+- **Zero Formatting Regressions**: Never commit code without verifying `ruff format --check .` succeeds with 0 unformatted files.
+
 ### Documentation Maintenance
 - **Keep README.md Synchronized**: Whenever adding, modifying, or removing CLI commands, flags/options, configuration settings, or core application workflows, ensure `README.md` is kept up to date to reflect the latest syntax, features, and examples.
 
