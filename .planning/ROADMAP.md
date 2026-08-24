@@ -156,7 +156,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 4. Rich CLI Visualization & Reporting | 2/2 | Complete    | 2026-08-24 |
 | 5. Safe Action Engine (Dry-Run, Deletion & Unmonitoring) | 2/2 | Complete    | 2026-08-24 |
 | 6. Support Composite Time Formats for Age Filters | 1/1 | Complete   | 2026-08-24 |
-| 7. Scope unmonitor to episodes and add unmonitor-series option | 0/1 | Planned    |  |
+| 7. Scope unmonitor to episodes and add unmonitor-series option | 1/1 | Complete   | 2026-08-24 |
 
 ### Phase 6: Support Composite Time Formats for Age Filters
 
@@ -192,10 +192,10 @@ Plans:
   4. Action executor, confirmation panels, dry-run simulation, and execution reports reflect the new unmonitor semantics.
   5. All unit and integration test suites are updated and passing.
 
-**Plans:** 0/1 plans executed
+**Plans:** 1/1 plans complete
 
 Plans:
 
-- [ ] 07-01-PLAN.md
+- [x] 07-01-PLAN.md
 
-- [ ] TBD (run /gsd-plan-phase 7 to break down)
+- [x] TBD (run /gsd-plan-phase 7 to break down) (completed 2026-08-24)
