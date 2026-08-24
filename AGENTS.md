@@ -99,7 +99,9 @@ Arr-Oldies is a CLI tool and auditing engine that connects to multiple Radarr an
 
 ## Conventions
 
-Conventions not yet established. Will populate as patterns emerge during development.
+### Documentation Maintenance
+- **Keep README.md Synchronized**: Whenever adding, modifying, or removing CLI commands, flags/options, configuration settings, or core application workflows, ensure `README.md` is kept up to date to reflect the latest syntax, features, and examples.
+
 <!-- GSD:conventions-end -->
 
 <!-- GSD:architecture-start source:ARCHITECTURE.md -->
