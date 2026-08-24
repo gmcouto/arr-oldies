@@ -15,10 +15,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### API Client & History Fetching (API)
 
-- [ ] **API-01**: Async HTTPX client for Radarr v3/v4 endpoints (`/api/v3/movie`, `/api/v3/moviefile`, `/api/v3/history`, `/api/v3/history/movie`)
-- [ ] **API-02**: Async HTTPX client for Sonarr v3/v4 endpoints (`/api/v3/series`, `/api/v3/episodefile`, `/api/v3/episode`, `/api/v3/history`, `/api/v3/history/series`)
-- [ ] **API-03**: Batch history pagination with optimized page size (500–1000) and connection concurrency limits to avoid *arr SQLite database locks
-- [ ] **API-04**: Resilient error handling per instance so unreachable or failing instances emit clear warnings without aborting scans of healthy instances
+- [x] **API-01**: Async HTTPX client for Radarr v3/v4 endpoints (`/api/v3/movie`, `/api/v3/moviefile`, `/api/v3/history`, `/api/v3/history/movie`)
+- [x] **API-02**: Async HTTPX client for Sonarr v3/v4 endpoints (`/api/v3/series`, `/api/v3/episodefile`, `/api/v3/episode`, `/api/v3/history`, `/api/v3/history/series`)
+- [x] **API-03**: Batch history pagination with optimized page size (500–1000) and connection concurrency limits to avoid *arr SQLite database locks
+- [x] **API-04**: Resilient error handling per instance so unreachable or failing instances emit clear warnings without aborting scans of healthy instances
 
 ### Inventory & History Engine (INVT)
 
@@ -71,10 +71,10 @@ Deferred to future release. Tracked but not in current roadmap.
 | CONF-01 | Phase 1 | Complete |
 | CONF-02 | Phase 1 | Complete |
 | CONF-03 | Phase 1 | Complete |
-| API-01 | Phase 2 | Pending |
-| API-02 | Phase 2 | Pending |
-| API-03 | Phase 2 | Pending |
-| API-04 | Phase 2 | Pending |
+| API-01 | Phase 2 | Complete |
+| API-02 | Phase 2 | Complete |
+| API-03 | Phase 2 | Complete |
+| API-04 | Phase 2 | Complete |
 | INVT-01 | Phase 3 | Pending |
 | INVT-02 | Phase 3 | Pending |
 | INVT-03 | Phase 3 | Pending |
