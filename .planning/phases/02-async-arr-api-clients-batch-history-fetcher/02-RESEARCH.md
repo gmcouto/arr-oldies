@@ -308,17 +308,17 @@ Radarr and Sonarr instances running on self-hosted servers (Synology, Unraid, Tr
 Recommended Client Configuration:
 ```python
 httpx.Limits(
-    max_connections=10,          # Maximum simultaneous TCP connections per instance
-    max_keepalive_connections=5, # Active connections kept warm in pool
-    keepalive_expiry=30.0,       # Keep-alive timeout in seconds
+    max_connections=10,  # Maximum simultaneous TCP connections per instance
+    max_keepalive_connections=5,  # Active connections kept warm in pool
+    keepalive_expiry=30.0,  # Keep-alive timeout in seconds
 )
 ```
 
 Timeout Configuration:
 ```python
 httpx.Timeout(
-    timeout=instance.timeout or 30.0, # Overall read/write timeout
-    connect=5.0,                      # Fast socket connect timeout
+    timeout=instance.timeout or 30.0,  # Overall read/write timeout
+    connect=5.0,  # Fast socket connect timeout
 )
 ```
 
@@ -350,7 +350,11 @@ Every request must automatically inject:
 def _is_sqlite_lock(response: httpx.Response) -> bool:
     if response.status_code in (500, 503):
         text = response.text.lower()
-        return "database is locked" in text or "sqlitebusyexception" in text or "sqlite error 5" in text
+        return (
+            "database is locked" in text
+            or "sqlitebusyexception" in text
+            or "sqlite error 5" in text
+        )
     return False
 ```
 
@@ -419,11 +423,13 @@ from pydantic import BaseModel, ConfigDict, Field
 
 class ApiBaseModel(BaseModel):
     """Base model configured to ignore extra fields for API forward compatibility."""
+
     model_config = ConfigDict(extra="ignore", populate_by_name=True)
 
 
 class MediaInfo(ApiBaseModel):
     """Media technical stream metadata extracted from media file."""
+
     audio_codec: str | None = Field(default=None, alias="audioCodec")
     audio_channels: float | None = Field(default=None, alias="audioChannels")
     audio_profile: str | None = Field(default=None, alias="audioProfile")
@@ -438,8 +444,10 @@ class MediaInfo(ApiBaseModel):
 
 # --- Radarr Models ---
 
+
 class RadarrMovieFile(ApiBaseModel):
     """Movie media file descriptor."""
+
     id: int
     movie_id: int = Field(alias="movieId")
     relative_path: str = Field(alias="relativePath")
@@ -452,6 +460,7 @@ class RadarrMovieFile(ApiBaseModel):
 
 class RadarrMovie(ApiBaseModel):
     """Radarr movie library entry."""
+
     id: int
     title: str
     year: int
@@ -466,6 +475,7 @@ class RadarrMovie(ApiBaseModel):
 
 class RadarrHistoryRecord(ApiBaseModel):
     """Radarr history event record."""
+
     id: int
     movie_id: int = Field(alias="movieId")
     source_title: str = Field(alias="sourceTitle")
@@ -477,6 +487,7 @@ class RadarrHistoryRecord(ApiBaseModel):
 
 class RadarrHistoryPage(ApiBaseModel):
     """Paginated history response from Radarr."""
+
     page: int
     page_size: int = Field(alias="pageSize")
     total_records: int = Field(alias="totalRecords")
@@ -485,8 +496,10 @@ class RadarrHistoryPage(ApiBaseModel):
 
 # --- Sonarr Models ---
 
+
 class SonarrSeason(ApiBaseModel):
     """Sonarr series season metadata."""
+
     season_number: int = Field(alias="seasonNumber")
     monitored: bool
     statistics: dict[str, Any] | None = Field(default=None)
@@ -494,6 +507,7 @@ class SonarrSeason(ApiBaseModel):
 
 class SonarrSeries(ApiBaseModel):
     """Sonarr series library entry."""
+
     id: int
     title: str
     year: int
@@ -504,6 +518,7 @@ class SonarrSeries(ApiBaseModel):
 
 class SonarrEpisodeFile(ApiBaseModel):
     """Sonarr episode media file descriptor."""
+
     id: int
     series_id: int = Field(alias="seriesId")
     season_number: int = Field(alias="seasonNumber")
@@ -516,6 +531,7 @@ class SonarrEpisodeFile(ApiBaseModel):
 
 class SonarrEpisode(ApiBaseModel):
     """Sonarr episode metadata."""
+
     id: int
     series_id: int = Field(alias="seriesId")
     episode_file_id: int | None = Field(default=None, alias="episodeFileId")
@@ -529,6 +545,7 @@ class SonarrEpisode(ApiBaseModel):
 
 class SonarrHistoryRecord(ApiBaseModel):
     """Sonarr history event record."""
+
     id: int
     series_id: int = Field(alias="seriesId")
     episode_id: int = Field(alias="episodeId")
@@ -541,6 +558,7 @@ class SonarrHistoryRecord(ApiBaseModel):
 
 class SonarrHistoryPage(ApiBaseModel):
     """Paginated history response from Sonarr."""
+
     page: int
     page_size: int = Field(alias="pageSize")
     total_records: int = Field(alias="totalRecords")
@@ -554,29 +572,38 @@ class SonarrHistoryPage(ApiBaseModel):
 ```python
 """Exception hierarchy for arr-oldies API operations."""
 
+
 class ArrClientError(ArrOldiesError):
     """Base exception for all *arr API client communication failures."""
+
 
 class ArrConnectionError(ArrClientError):
     """Network connection failure, host unreachable, or DNS failure."""
 
+
 class ArrTimeoutError(ArrClientError):
     """HTTP request or connection timeout exceeded."""
+
 
 class ArrAuthenticationError(ArrClientError):
     """HTTP 401 or 403: Invalid API key or unauthorized access."""
 
+
 class ArrNotFoundError(ArrClientError):
     """HTTP 404: Endpoint, movie, series, or resource not found."""
 
+
 class ArrResponseError(ArrClientError):
     """Server returned an unexpected HTTP 4xx or 5xx status code."""
+
     def __init__(self, status_code: int, message: str) -> None:
         self.status_code = status_code
         super().__init__(f"HTTP {status_code}: {message}")
 
+
 class ArrDatabaseLockedError(ArrResponseError):
     """Server SQLite database is locked (SQLiteBusyException / error 5)."""
+
     def __init__(self, message: str = "Instance database is locked") -> None:
         super().__init__(status_code=500, message=message)
 ```

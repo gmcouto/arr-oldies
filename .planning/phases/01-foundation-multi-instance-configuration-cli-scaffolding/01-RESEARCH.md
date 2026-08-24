@@ -262,7 +262,9 @@ async def probe_single_instance(
     start_time = time.perf_counter()
     should_close_client = False
     if client is None:
-        client = httpx.AsyncClient(verify=instance.verify_ssl if instance.verify_ssl is not None else True)
+        client = httpx.AsyncClient(
+            verify=instance.verify_ssl if instance.verify_ssl is not None else True
+        )
         should_close_client = True
 
     try:
@@ -363,7 +365,7 @@ def resolve_target_instances(
     instance_names: list[str] | None = None,
 ) -> list[InstanceConfig]:
     instances_by_name = {inst.name.lower(): inst for inst in config.instances}
-    
+
     # 1. If explicit instance names provided, validate existence
     selected_instances: list[InstanceConfig] = []
     if instance_names:
@@ -386,7 +388,9 @@ def resolve_target_instances(
                 raise InstanceConflictError(
                     f"Conflicting target flags: Instance '{inst.name}' is Sonarr, but --radarr flag was specified."
                 )
-        selected_instances = [inst for inst in selected_instances if inst.type == InstanceType.RADARR]
+        selected_instances = [
+            inst for inst in selected_instances if inst.type == InstanceType.RADARR
+        ]
     elif sonarr and not radarr:
         # Check if user explicitly selected Radarr instances while passing --sonarr
         for inst in selected_instances:
@@ -394,7 +398,9 @@ def resolve_target_instances(
                 raise InstanceConflictError(
                     f"Conflicting target flags: Instance '{inst.name}' is Radarr, but --sonarr flag was specified."
                 )
-        selected_instances = [inst for inst in selected_instances if inst.type == InstanceType.SONARR]
+        selected_instances = [
+            inst for inst in selected_instances if inst.type == InstanceType.SONARR
+        ]
     # If both --radarr and --sonarr are passed, all instances of both types remain selected
 
     return selected_instances

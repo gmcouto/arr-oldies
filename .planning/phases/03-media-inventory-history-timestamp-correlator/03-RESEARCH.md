@@ -205,6 +205,7 @@ from collections import defaultdict
 from typing import Any
 from arr_oldies.api.models import RadarrHistoryRecord
 
+
 class RadarrHistoryIndex:
     """In-memory multi-key index for Radarr history records."""
 
@@ -252,12 +253,14 @@ class RadarrHistoryIndex:
 import re
 from dataclasses import dataclass
 
+
 @dataclass(frozen=True)
 class LanguageEntry:
     code_2: str | None  # e.g. "ja"
-    code_3: str         # e.g. "jpn"
-    name: str           # e.g. "Japanese"
+    code_3: str  # e.g. "jpn"
+    name: str  # e.g. "Japanese"
     synonyms: tuple[str, ...]
+
 
 class LanguageNormalizer:
     """Canonical ISO-639 language resolver and normalizer."""
@@ -294,7 +297,7 @@ class LanguageNormalizer:
         """Check if any of the item's languages match the user target query."""
         clean_target = target_query.strip().lower()
         target_entry = self._lookup.get(clean_target)
-        
+
         target_identifiers: set[str] = {clean_target}
         if target_entry:
             if target_entry.code_2:
@@ -329,6 +332,7 @@ class LanguageNormalizer:
 ```python
 # [VERIFIED: Pattern designed from .planning/REQUIREMENTS.md §INVT-04, INVT-05]
 from arr_oldies.inventory.models import MediaInventoryItem, InventoryFilter, SortKey, SortDirection
+
 
 def filter_items(
     items: list[MediaInventoryItem],
@@ -468,33 +472,43 @@ from enum import StrEnum
 from pydantic import BaseModel, ConfigDict, Field
 from arr_oldies.models import InstanceType
 
+
 class MediaType(StrEnum):
     """Media item classification."""
+
     MOVIE = "movie"
     EPISODE = "episode"
 
+
 class HistoryStatus(StrEnum):
     """History correlation status."""
+
     IMPORTED = "imported"
     GRABBED_AND_IMPORTED = "grabbed_and_imported"
     LEGACY = "legacy"
     UNINDEXED = "unindexed"
 
+
 class SortKey(StrEnum):
     """Inventory sort ordering key."""
+
     IMPORT_DATE = "import_date"
     GRAB_DATE = "grab_date"
     SIZE = "size"
     TITLE = "title"
     AGE = "age"
 
+
 class SortDirection(StrEnum):
     """Sort direction."""
+
     ASC = "asc"
     DESC = "desc"
 
+
 class MediaInventoryItem(BaseModel):
     """Unified inventory record for a movie or TV episode file."""
+
     model_config = ConfigDict(extra="ignore", populate_by_name=True)
 
     id: str = Field(description="Unique inventory item identifier")
@@ -539,8 +553,10 @@ import re
 from datetime import datetime, timezone
 from arr_oldies.exceptions import ArrOldiesError
 
+
 class ParseError(ArrOldiesError):
     """Raised when parsing human size, age, or date filter strings fails."""
+
 
 SIZE_REGEX = re.compile(r"^\s*([0-9]+(?:\.[0-9]+)?)\s*([a-zA-Z]*)\s*$")
 AGE_REGEX = re.compile(r"^\s*([0-9]+)\s*([a-zA-Z]*)\s*$")
@@ -562,11 +578,14 @@ SIZE_MULTIPLIERS: dict[str, int] = {
     "tib": 1024**4,
 }
 
+
 def parse_size(size_str: str) -> int:
     """Parse human size string (e.g. '500MB', '2GB', '1.5GiB', '100M') into integer bytes."""
     match = SIZE_REGEX.match(size_str)
     if not match:
-        raise ParseError(f"Invalid size specification: '{size_str}'. Examples: '500MB', '2GB', '1.5GiB'.")
+        raise ParseError(
+            f"Invalid size specification: '{size_str}'. Examples: '500MB', '2GB', '1.5GiB'."
+        )
 
     val_str, unit_raw = match.groups()
     unit = unit_raw.lower()
@@ -577,11 +596,14 @@ def parse_size(size_str: str) -> int:
 
     return int(float(val_str) * multiplier)
 
+
 def parse_age_cutoff(age_str: str) -> int:
     """Parse human age interval (e.g. '30d', '6m', '1y', '2w', '90') into integer days."""
     match = AGE_REGEX.match(age_str)
     if not match:
-        raise ParseError(f"Invalid age specification: '{age_str}'. Examples: '30d', '6m', '1y', '2w'.")
+        raise ParseError(
+            f"Invalid age specification: '{age_str}'. Examples: '30d', '6m', '1y', '2w'."
+        )
 
     val_str, unit_raw = match.groups()
     val = int(val_str)

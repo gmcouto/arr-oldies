@@ -38,7 +38,11 @@
 ```python
 """Media inventory indexing, History API correlation, and filtering engine."""
 
-from arr_oldies.inventory.correlator import HistoryCorrelator, RadarrHistoryIndex, SonarrHistoryIndex
+from arr_oldies.inventory.correlator import (
+    HistoryCorrelator,
+    RadarrHistoryIndex,
+    SonarrHistoryIndex,
+)
 from arr_oldies.inventory.engine import InventoryEngine
 from arr_oldies.inventory.languages import LanguageEntry, LanguageNormalizer
 from arr_oldies.inventory.models import (
@@ -224,8 +228,8 @@ class LanguageEntry:
     """Canonical ISO-639 language specification and lookup aliases."""
 
     code_2: str | None  # e.g., "en", "ja", "fr"
-    code_3: str         # e.g., "eng", "jpn", "fre"/"fra"
-    name: str           # e.g., "English", "Japanese", "French"
+    code_3: str  # e.g., "eng", "jpn", "fre"/"fra"
+    name: str  # e.g., "English", "Japanese", "French"
     synonyms: tuple[str, ...] = ()
 
 
@@ -358,14 +362,18 @@ def parse_size(size_str: str) -> int:
     """Parse human size string (e.g., '500MB', '2GB', '1.5GiB', '100M') into integer bytes."""
     match = SIZE_REGEX.match(size_str)
     if not match:
-        raise ParseError(f"Invalid size specification: '{size_str}'. Examples: '500MB', '2GB', '1.5GiB'.")
+        raise ParseError(
+            f"Invalid size specification: '{size_str}'. Examples: '500MB', '2GB', '1.5GiB'."
+        )
 
     val_str, unit_raw = match.groups()
     unit = unit_raw.lower()
 
     multiplier = SIZE_MULTIPLIERS.get(unit)
     if multiplier is None:
-        raise ParseError(f"Unknown size unit '{unit_raw}' in '{size_str}'. Supported: B, KB, KiB, MB, MiB, GB, GiB, TB, TiB.")
+        raise ParseError(
+            f"Unknown size unit '{unit_raw}' in '{size_str}'. Supported: B, KB, KiB, MB, MiB, GB, GiB, TB, TiB."
+        )
 
     return int(float(val_str) * multiplier)
 
@@ -374,7 +382,9 @@ def parse_age_cutoff(age_str: str) -> int:
     """Parse human age interval (e.g., '30d', '6m', '1y', '2w', '90') into integer days."""
     match = AGE_REGEX.match(age_str)
     if not match:
-        raise ParseError(f"Invalid age specification: '{age_str}'. Examples: '30d', '6m', '1y', '2w'.")
+        raise ParseError(
+            f"Invalid age specification: '{age_str}'. Examples: '30d', '6m', '1y', '2w'."
+        )
 
     val_str, unit_raw = match.groups()
     val = int(val_str)
@@ -389,7 +399,9 @@ def parse_age_cutoff(age_str: str) -> int:
     elif unit in ("y", "year", "years", "yr"):
         return val * 365
     else:
-        raise ParseError(f"Unknown age unit '{unit_raw}' in '{age_str}'. Supported units: d (days), w (weeks), m (months), y (years).")
+        raise ParseError(
+            f"Unknown age unit '{unit_raw}' in '{age_str}'. Supported units: d (days), w (weeks), m (months), y (years)."
+        )
 
 
 def parse_date_cutoff(date_str: str) -> datetime:
@@ -404,7 +416,9 @@ def parse_date_cutoff(date_str: str) -> datetime:
             dt = dt.replace(tzinfo=timezone.utc)
         return dt.astimezone(timezone.utc)
     except ValueError as exc:
-        raise ParseError(f"Invalid date format: '{date_str}'. Expected 'YYYY-MM-DD' or ISO-8601 format.") from exc
+        raise ParseError(
+            f"Invalid date format: '{date_str}'. Expected 'YYYY-MM-DD' or ISO-8601 format."
+        ) from exc
 ```
 
 ---
@@ -599,7 +613,9 @@ class InventoryEngine:
 
             # 7. Audio Language Filter
             if criteria.audio_langs:
-                if not any(self.normalizer.matches(item.audio_languages, q) for q in criteria.audio_langs):
+                if not any(
+                    self.normalizer.matches(item.audio_languages, q) for q in criteria.audio_langs
+                ):
                     continue
 
             filtered.append(item)
@@ -646,7 +662,9 @@ class InventoryEngine:
 
         instances_breakdown: dict[str, int] = {}
         for item in items:
-            instances_breakdown[item.instance_name] = instances_breakdown.get(item.instance_name, 0) + 1
+            instances_breakdown[item.instance_name] = (
+                instances_breakdown.get(item.instance_name, 0) + 1
+            )
 
         return InventorySummary(
             total_items=len(items),
@@ -752,7 +770,9 @@ def test_extract_languages_none_or_empty(normalizer: LanguageNormalizer):
         ("spa", ["English"], False),
     ],
 )
-def test_language_matching(normalizer: LanguageNormalizer, query: str, item_langs: list[str], expected: bool):
+def test_language_matching(
+    normalizer: LanguageNormalizer, query: str, item_langs: list[str], expected: bool
+):
     """Verify bidirectional ISO code and name matching."""
     assert normalizer.matches(item_langs, query) is expected
 ```
@@ -1001,8 +1021,22 @@ def test_correlate_sonarr_multi_episode_file():
         media_info=MediaInfo(audio_languages="eng"),
     )
     episodes = [
-        SonarrEpisode(id=301, series_id=10, episode_file_id=201, season_number=1, episode_number=1, title="Pilot"),
-        SonarrEpisode(id=302, series_id=10, episode_file_id=201, season_number=1, episode_number=2, title="Cat's in the Bag"),
+        SonarrEpisode(
+            id=301,
+            series_id=10,
+            episode_file_id=201,
+            season_number=1,
+            episode_number=1,
+            title="Pilot",
+        ),
+        SonarrEpisode(
+            id=302,
+            series_id=10,
+            episode_file_id=201,
+            season_number=1,
+            episode_number=2,
+            title="Cat's in the Bag",
+        ),
     ]
     history = [
         SonarrHistoryRecord(
@@ -1173,7 +1207,9 @@ def test_filter_by_audio_language(sample_items: list[MediaInventoryItem]):
 def test_filter_by_min_size(sample_items: list[MediaInventoryItem]):
     """Verify filtering by minimum size in bytes."""
     engine = InventoryEngine()
-    filtered = engine.filter_inventory(sample_items, InventoryFilter(min_size_bytes=2 * 1000 * 1000 * 1000))
+    filtered = engine.filter_inventory(
+        sample_items, InventoryFilter(min_size_bytes=2 * 1000 * 1000 * 1000)
+    )
     assert len(filtered) == 2
     assert {i.title for i in filtered} == {"New Show", "Legacy Movie"}
 
@@ -1181,7 +1217,9 @@ def test_filter_by_min_size(sample_items: list[MediaInventoryItem]):
 def test_sort_inventory_oldest_first(sample_items: list[MediaInventoryItem]):
     """Verify sorting by oldest import date (default)."""
     engine = InventoryEngine()
-    sorted_items = engine.sort_inventory(sample_items, sort_key=SortKey.IMPORT_DATE, direction=SortDirection.ASC)
+    sorted_items = engine.sort_inventory(
+        sample_items, sort_key=SortKey.IMPORT_DATE, direction=SortDirection.ASC
+    )
     assert [i.title for i in sorted_items] == ["Legacy Movie", "Old Movie", "New Show"]
 
 
@@ -1207,8 +1245,10 @@ def test_generate_summary(sample_items: list[MediaInventoryItem]):
 ```python
 from pydantic import BaseModel, ConfigDict, Field
 
+
 class ApiBaseModel(BaseModel):
     """Base model configured to ignore extra fields for forward compatibility."""
+
     model_config = ConfigDict(extra="ignore", populate_by_name=True)
 ```
 
@@ -1234,8 +1274,10 @@ else:
 ```python
 from arr_oldies.exceptions import ArrOldiesError
 
+
 class InventoryError(ArrOldiesError):
     """Base exception for inventory correlation and processing errors."""
+
 
 class ParseError(ArrOldiesError):
     """Raised when parsing human size, age, or date filter strings fails."""

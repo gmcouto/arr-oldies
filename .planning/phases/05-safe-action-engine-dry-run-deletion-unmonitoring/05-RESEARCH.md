@@ -230,20 +230,26 @@ from enum import StrEnum
 from pydantic import BaseModel, Field
 from arr_oldies.inventory.models import MediaInventoryItem
 
+
 class ActionType(StrEnum):
     """Supported mutation actions."""
+
     DELETE = "delete"
     UNMONITOR = "unmonitor"
     UNMONITOR_EPISODE = "unmonitor_episode"
     REMOVE = "remove"
 
+
 class ActionItem(BaseModel):
     """An individual media item paired with requested action types."""
+
     item: MediaInventoryItem
     action_types: list[ActionType]
 
+
 class ActionPlan(BaseModel):
     """Aggregated execution plan detailing all proposed actions."""
+
     target_actions: list[ActionType]
     items: list[ActionItem] = Field(default_factory=list)
     total_items: int = 0
@@ -282,18 +288,38 @@ async def execute_item_actions(
                 await client.unmonitor_movie(item.movie_id)
             elif isinstance(client, SonarrClient) and item.series_id:
                 await client.unmonitor_series(item.series_id)
-            results.append(ActionResult(item_id=item.id, action_type=ActionType.UNMONITOR, success=True))
+            results.append(
+                ActionResult(item_id=item.id, action_type=ActionType.UNMONITOR, success=True)
+            )
         except Exception as exc:
-            results.append(ActionResult(item_id=item.id, action_type=ActionType.UNMONITOR, success=False, error_message=str(exc)))
+            results.append(
+                ActionResult(
+                    item_id=item.id,
+                    action_type=ActionType.UNMONITOR,
+                    success=False,
+                    error_message=str(exc),
+                )
+            )
 
     # Step 2: Unmonitor Episode(s)
     if ActionType.UNMONITOR_EPISODE in actions:
         try:
             if isinstance(client, SonarrClient) and item.episode_ids:
                 await client.unmonitor_episodes(item.episode_ids)
-                results.append(ActionResult(item_id=item.id, action_type=ActionType.UNMONITOR_EPISODE, success=True))
+                results.append(
+                    ActionResult(
+                        item_id=item.id, action_type=ActionType.UNMONITOR_EPISODE, success=True
+                    )
+                )
         except Exception as exc:
-            results.append(ActionResult(item_id=item.id, action_type=ActionType.UNMONITOR_EPISODE, success=False, error_message=str(exc)))
+            results.append(
+                ActionResult(
+                    item_id=item.id,
+                    action_type=ActionType.UNMONITOR_EPISODE,
+                    success=False,
+                    error_message=str(exc),
+                )
+            )
 
     # Step 3: Delete Media File
     if ActionType.DELETE in actions and ActionType.REMOVE not in actions:
@@ -302,9 +328,23 @@ async def execute_item_actions(
                 await client.delete_movie_file(item.movie_file_id)
             elif isinstance(client, SonarrClient) and item.episode_file_id:
                 await client.delete_episode_file(item.episode_file_id)
-            results.append(ActionResult(item_id=item.id, action_type=ActionType.DELETE, success=True, freed_bytes=item.size_bytes))
+            results.append(
+                ActionResult(
+                    item_id=item.id,
+                    action_type=ActionType.DELETE,
+                    success=True,
+                    freed_bytes=item.size_bytes,
+                )
+            )
         except Exception as exc:
-            results.append(ActionResult(item_id=item.id, action_type=ActionType.DELETE, success=False, error_message=str(exc)))
+            results.append(
+                ActionResult(
+                    item_id=item.id,
+                    action_type=ActionType.DELETE,
+                    success=False,
+                    error_message=str(exc),
+                )
+            )
 
     # Step 4: Remove Library Entry
     if ActionType.REMOVE in actions:
@@ -314,9 +354,23 @@ async def execute_item_actions(
                 await client.delete_movie(item.movie_id, delete_files=delete_files)
             elif isinstance(client, SonarrClient) and item.series_id:
                 await client.delete_series(item.series_id, delete_files=delete_files)
-            results.append(ActionResult(item_id=item.id, action_type=ActionType.REMOVE, success=True, freed_bytes=item.size_bytes if delete_files else 0))
+            results.append(
+                ActionResult(
+                    item_id=item.id,
+                    action_type=ActionType.REMOVE,
+                    success=True,
+                    freed_bytes=item.size_bytes if delete_files else 0,
+                )
+            )
         except Exception as exc:
-            results.append(ActionResult(item_id=item.id, action_type=ActionType.REMOVE, success=False, error_message=str(exc)))
+            results.append(
+                ActionResult(
+                    item_id=item.id,
+                    action_type=ActionType.REMOVE,
+                    success=False,
+                    error_message=str(exc),
+                )
+            )
 
     return results
 ```
@@ -336,6 +390,7 @@ import typer
 from arr_oldies.actions.models import ActionPlan
 from arr_oldies.reporting.formatters import format_size
 
+
 def render_confirmation_panel(plan: ActionPlan) -> Panel:
     """Construct a high-contrast confirmation warning panel."""
     grid = Table.grid(expand=True, padding=(0, 2))
@@ -345,8 +400,11 @@ def render_confirmation_panel(plan: ActionPlan) -> Panel:
     actions_str = ", ".join(a.value.upper() for a in plan.target_actions)
     grid.add_row("Actions to Perform:", f"[bold red]{actions_str}[/bold red]")
     grid.add_row("Total Items Affected:", f"{plan.total_items:,} items")
-    grid.add_row("Potential Space to be Freed:", f"[bold green]{format_size(plan.total_size_bytes)}[/bold green]")
-    
+    grid.add_row(
+        "Potential Space to be Freed:",
+        f"[bold green]{format_size(plan.total_size_bytes)}[/bold green]",
+    )
+
     inst_str = ", ".join(f"{k}: {v:,}" for k, v in plan.instances_breakdown.items())
     grid.add_row("Instances Breakdown:", inst_str or "None")
 
@@ -356,6 +414,7 @@ def render_confirmation_panel(plan: ActionPlan) -> Panel:
         border_style="red",
         box=box.ROUNDED,
     )
+
 
 def prompt_confirmation(plan: ActionPlan, console) -> bool:
     """Display confirmation panel and prompt for user verification."""
@@ -433,6 +492,7 @@ def prompt_confirmation(plan: ActionPlan, console) -> bool:
 from arr_oldies.api.base import BaseArrClient
 from arr_oldies.constants import RADARR_MOVIE_ENDPOINT, RADARR_MOVIEFILE_ENDPOINT
 
+
 class RadarrClient(BaseArrClient):
     # (Existing query methods: get_movies, get_movie_files, get_history, etc.)
 
@@ -477,6 +537,7 @@ from arr_oldies.constants import (
     SONARR_EPISODEFILE_ENDPOINT,
     SONARR_SERIES_ENDPOINT,
 )
+
 
 class SonarrClient(BaseArrClient):
     # (Existing query methods: get_series, get_episode_files, get_episodes, get_history, etc.)
@@ -529,21 +590,27 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict, Field
 from arr_oldies.inventory.models import MediaInventoryItem
 
+
 class ActionType(StrEnum):
     """Supported mutation actions."""
+
     DELETE = "delete"
     UNMONITOR = "unmonitor"
     UNMONITOR_EPISODE = "unmonitor_episode"
     REMOVE = "remove"
 
+
 class ActionItem(BaseModel):
     """An individual media item paired with requested action types."""
+
     model_config = ConfigDict(extra="ignore")
     item: MediaInventoryItem
     action_types: list[ActionType]
 
+
 class ActionPlan(BaseModel):
     """Aggregated execution plan detailing all proposed actions."""
+
     model_config = ConfigDict(extra="ignore")
     target_actions: list[ActionType]
     items: list[ActionItem] = Field(default_factory=list)
@@ -552,8 +619,10 @@ class ActionPlan(BaseModel):
     instances_breakdown: dict[str, int] = Field(default_factory=dict)
     dry_run: bool = True
 
+
 class ActionResult(BaseModel):
     """Result of an action performed on a media item."""
+
     model_config = ConfigDict(extra="ignore")
     item_id: str
     instance_name: str
@@ -562,8 +631,10 @@ class ActionResult(BaseModel):
     freed_bytes: int = 0
     error_message: str | None = None
 
+
 class ExecutionReport(BaseModel):
     """Summary of executed action mutations."""
+
     model_config = ConfigDict(extra="ignore")
     mode: str = "execute"
     executed_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
@@ -586,20 +657,38 @@ class ExecutionReport(BaseModel):
 def clean_command(
     ctx: typer.Context,
     # Actions (at least one required)
-    delete: Annotated[bool, typer.Option("--delete", help="Delete media file(s) via *arr API.")] = False,
-    unmonitor: Annotated[bool, typer.Option("--unmonitor", help="Unmonitor movie or entire TV show.")] = False,
-    unmonitor_episode: Annotated[bool, typer.Option("--unmonitor-episode", help="Unmonitor specific episode(s).")] = False,
-    remove: Annotated[bool, typer.Option("--remove", help="Remove complete movie/series entry from library.")] = False,
+    delete: Annotated[
+        bool, typer.Option("--delete", help="Delete media file(s) via *arr API.")
+    ] = False,
+    unmonitor: Annotated[
+        bool, typer.Option("--unmonitor", help="Unmonitor movie or entire TV show.")
+    ] = False,
+    unmonitor_episode: Annotated[
+        bool, typer.Option("--unmonitor-episode", help="Unmonitor specific episode(s).")
+    ] = False,
+    remove: Annotated[
+        bool, typer.Option("--remove", help="Remove complete movie/series entry from library.")
+    ] = False,
     # Safety Guards
-    execute: Annotated[bool, typer.Option("--execute", help="Execute write operations (default is dry-run).")] = False,
-    yes: Annotated[bool, typer.Option("-y", "--yes", help="Bypass interactive confirmation prompt.")] = False,
+    execute: Annotated[
+        bool, typer.Option("--execute", help="Execute write operations (default is dry-run).")
+    ] = False,
+    yes: Annotated[
+        bool, typer.Option("-y", "--yes", help="Bypass interactive confirmation prompt.")
+    ] = False,
     # Targeting & Filtering (shared with scan)
     radarr: Annotated[bool, typer.Option("--radarr", help="Target only Radarr instances.")] = False,
     sonarr: Annotated[bool, typer.Option("--sonarr", help="Target only Sonarr instances.")] = False,
-    instance: Annotated[list[str] | None, typer.Option("-i", "--instance", help="Specific instance(s).")] = None,
+    instance: Annotated[
+        list[str] | None, typer.Option("-i", "--instance", help="Specific instance(s).")
+    ] = None,
     # ... filters (media_type, audio_lang, min_size, older_than, etc.)
-    limit: Annotated[int | None, typer.Option("-n", "--limit", help="Limit target items to top N.")] = None,
-    format: Annotated[OutputFormat, typer.Option("-f", "--format", help="Output format ('table' or 'json').")] = OutputFormat.TABLE,
+    limit: Annotated[
+        int | None, typer.Option("-n", "--limit", help="Limit target items to top N.")
+    ] = None,
+    format: Annotated[
+        OutputFormat, typer.Option("-f", "--format", help="Output format ('table' or 'json').")
+    ] = OutputFormat.TABLE,
 ) -> None:
     """Safely delete files, unmonitor media, or remove library entries across *arr instances."""
     # 1. Validate at least one action flag is passed
@@ -614,7 +703,9 @@ def clean_command(
         actions.append(ActionType.REMOVE)
 
     if not actions:
-        print_error("No action specified. Please provide at least one action flag: --delete, --unmonitor, --unmonitor-episode, --remove")
+        print_error(
+            "No action specified. Please provide at least one action flag: --delete, --unmonitor, --unmonitor-episode, --remove"
+        )
         raise typer.Exit(code=EXIT_CONFIG_ERROR)
 
     # 2. Ingest, correlate, filter, and sort items (same as scan)
@@ -637,12 +728,16 @@ def clean_command(
     # 5. Handle Interactive Confirmation Guard
     if not yes:
         if not sys.stdin.isatty():
-            print_error("Interactive confirmation required in execute mode. Use --yes for automated / non-interactive execution.")
+            print_error(
+                "Interactive confirmation required in execute mode. Use --yes for automated / non-interactive execution."
+            )
             raise typer.Exit(code=EXIT_PROBE_ERROR)
 
         confirmed = prompt_confirmation(plan, stdout_console)
         if not confirmed:
-            stdout_console.print("[yellow]Operation aborted by user. No changes were made.[/yellow]")
+            stdout_console.print(
+                "[yellow]Operation aborted by user. No changes were made.[/yellow]"
+            )
             raise typer.Exit(code=EXIT_SUCCESS)
 
     # 6. Execute Mutations
@@ -653,7 +748,7 @@ def clean_command(
         typer.echo(executor.export_report_json(report))
     else:
         render_execution_report_table(report)
-        
+
     raise typer.Exit(code=EXIT_SUCCESS)
 ```
 

@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Async *arr API Clients & Batch History Fetcher** - Build HTTPX async clients for Radarr v3/v4 and Sonarr v3/v4 with batch history pagination and instance resilience (completed 2026-08-23)
 - [x] **Phase 3: Media Inventory & History Timestamp Correlator** - Correlate media files with History API import/grab timestamps, extract audio languages, and build sortable/filterable inventory (completed 2026-08-24)
 - [x] **Phase 4: Rich CLI Visualization & Reporting** - Implement Rich terminal table formatting, storage metrics summaries, output limits, and JSON export (completed 2026-08-24)
-- [ ] **Phase 5: Safe Action Engine (Dry-Run, Deletion & Unmonitoring)** - Build safe mutation pipeline with dry-run default, `--delete`, `--unmonitor`, `--unmonitor-episode`, `--remove`, and confirmation guards
+- [x] **Phase 5: Safe Action Engine (Dry-Run, Deletion & Unmonitoring)** - Build safe mutation pipeline with dry-run default, `--delete`, `--unmonitor`, `--unmonitor-episode`, `--remove`, and confirmation guards (completed 2026-08-24)
 
 ## Phase Details
 
@@ -153,4 +153,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 2. Async *arr API Clients & Batch History Fetcher | 2/2 | Complete    | 2026-08-23 |
 | 3. Media Inventory & History Timestamp Correlator | 2/2 | Complete    | 2026-08-24 |
 | 4. Rich CLI Visualization & Reporting | 2/2 | Complete    | 2026-08-24 |
-| 5. Safe Action Engine (Dry-Run, Deletion & Unmonitoring) | 2/2 | In Progress|  |
+| 5. Safe Action Engine (Dry-Run, Deletion & Unmonitoring) | 2/2 | Complete    | 2026-08-24 |

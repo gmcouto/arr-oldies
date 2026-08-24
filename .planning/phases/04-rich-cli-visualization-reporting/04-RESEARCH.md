@@ -200,6 +200,7 @@ from arr_oldies.reporting.formatters import (
     format_size,
 )
 
+
 def render_inventory_table(
     items: list[MediaInventoryItem],
     total_count: int | None = None,
@@ -224,7 +225,11 @@ def render_inventory_table(
     table.add_column("Audio", style="white", no_wrap=True)
 
     for idx, item in enumerate(items, start=1):
-        type_str = "[blue]Movie[/blue]" if item.media_type == MediaType.MOVIE else "[purple]Episode[/purple]"
+        type_str = (
+            "[blue]Movie[/blue]"
+            if item.media_type == MediaType.MOVIE
+            else "[purple]Episode[/purple]"
+        )
         title_str = format_media_title(item)
         size_str = format_size(item.size_bytes)
         import_str = item.import_date.strftime("%Y-%m-%d")
@@ -265,6 +270,7 @@ from rich.table import Table
 from arr_oldies.inventory.models import InventorySummary
 from arr_oldies.reporting.formatters import format_size
 
+
 def render_summary_panel(
     summary: InventorySummary,
     displayed_items_count: int | None = None,
@@ -294,8 +300,12 @@ def render_summary_panel(
         date_span_str = "N/A"
 
     # Potential space freed is the volume of targeted/displayed items
-    reclaim_bytes = displayed_size_bytes if displayed_size_bytes is not None else summary.total_size_bytes
-    reclaim_count = displayed_items_count if displayed_items_count is not None else summary.total_items
+    reclaim_bytes = (
+        displayed_size_bytes if displayed_size_bytes is not None else summary.total_size_bytes
+    )
+    reclaim_count = (
+        displayed_items_count if displayed_items_count is not None else summary.total_items
+    )
     reclaim_str = f"[bold green]{format_size(reclaim_bytes)}[/bold green] ({reclaim_count:,} files)"
 
     grid.add_row(
@@ -306,7 +316,9 @@ def render_summary_panel(
     )
 
     # Row 3: Legacy Items and Instance Breakdown
-    instances_str = ", ".join(f"{name}: {cnt:,}" for name, cnt in summary.instances_breakdown.items()) or "None"
+    instances_str = (
+        ", ".join(f"{name}: {cnt:,}" for name, cnt in summary.instances_breakdown.items()) or "None"
+    )
     grid.add_row(
         "Legacy (No History):",
         f"{summary.legacy_count:,} items",
@@ -487,6 +499,7 @@ def render_summary_panel(
 from arr_oldies.inventory.models import MediaInventoryItem, MediaType
 from arr_oldies.models import InstanceType
 
+
 def format_size(bytes_val: int) -> str:
     """Format integer bytes into IEC binary human-readable string (e.g. '14.25 GiB', '850.50 MiB')."""
     if bytes_val < 0:
@@ -546,7 +559,7 @@ def format_audio_languages(languages: list[str]) -> str:
     """Render audio language tags or fallback to None."""
     if not languages:
         return "[dim]None[/dim]"
-    
+
     badges: list[str] = []
     for lang in languages:
         clean = lang.strip()
@@ -556,7 +569,7 @@ def format_audio_languages(languages: list[str]) -> str:
             badges.append(f"[blue]{clean}[/blue]")
         else:
             badges.append(f"[white]{clean}[/white]")
-    
+
     return ", ".join(badges)
 
 
@@ -567,8 +580,12 @@ def format_media_title(item: MediaInventoryItem) -> str:
         quality_str = f" [dim]· {item.resolution}[/dim]" if item.resolution else ""
         return f"[bold white]{item.title}[/bold white]{year_str}{quality_str}"
     else:
-        ep_str = f" [bold yellow]{item.formatted_episode}[/bold yellow]" if item.formatted_episode else ""
-        ep_title = f" [dim]\"{item.episode_title}\"[/dim]" if item.episode_title else ""
+        ep_str = (
+            f" [bold yellow]{item.formatted_episode}[/bold yellow]"
+            if item.formatted_episode
+            else ""
+        )
+        ep_title = f' [dim]"{item.episode_title}"[/dim]' if item.episode_title else ""
         quality_str = f" [dim]· {item.resolution}[/dim]" if item.resolution else ""
         return f"[bold white]{item.title}[/bold white]{ep_str}{ep_title}{quality_str}"
 ```
@@ -589,6 +606,7 @@ from arr_oldies.reporting.formatters import (
     format_media_title,
     format_size,
 )
+
 
 def render_inventory_table(
     items: list[MediaInventoryItem],
@@ -614,7 +632,11 @@ def render_inventory_table(
     table.add_column("Audio", style="white", no_wrap=True)
 
     for idx, item in enumerate(items, start=1):
-        type_str = "[blue]Movie[/blue]" if item.media_type == MediaType.MOVIE else "[purple]Episode[/purple]"
+        type_str = (
+            "[blue]Movie[/blue]"
+            if item.media_type == MediaType.MOVIE
+            else "[purple]Episode[/purple]"
+        )
         table.add_row(
             str(idx),
             format_instance_badge(item.instance_name, item.instance_type),
@@ -644,6 +666,7 @@ from rich.table import Table
 from arr_oldies.inventory.models import InventorySummary
 from arr_oldies.reporting.formatters import format_size
 
+
 def render_summary_panel(
     summary: InventorySummary,
     displayed_items_count: int | None = None,
@@ -672,8 +695,12 @@ def render_summary_panel(
     else:
         date_span_str = "N/A"
 
-    reclaim_bytes = displayed_size_bytes if displayed_size_bytes is not None else summary.total_size_bytes
-    reclaim_count = displayed_items_count if displayed_items_count is not None else summary.total_items
+    reclaim_bytes = (
+        displayed_size_bytes if displayed_size_bytes is not None else summary.total_size_bytes
+    )
+    reclaim_count = (
+        displayed_items_count if displayed_items_count is not None else summary.total_items
+    )
     reclaim_str = f"[bold green]{format_size(reclaim_bytes)}[/bold green] ({reclaim_count:,} files)"
 
     grid.add_row(
@@ -683,7 +710,9 @@ def render_summary_panel(
         reclaim_str,
     )
 
-    instances_str = ", ".join(f"{name}: {cnt:,}" for name, cnt in summary.instances_breakdown.items()) or "None"
+    instances_str = (
+        ", ".join(f"{name}: {cnt:,}" for name, cnt in summary.instances_breakdown.items()) or "None"
+    )
     grid.add_row(
         "Legacy (No History):",
         f"{summary.legacy_count:,} items",
@@ -711,6 +740,7 @@ from typing import Any
 from arr_oldies import __version__
 from arr_oldies.inventory.models import InventorySummary, MediaInventoryItem, SortDirection, SortKey
 from arr_oldies.reporting.formatters import format_size
+
 
 def build_json_payload(
     items: list[MediaInventoryItem],
@@ -748,8 +778,12 @@ def build_json_payload(
         "movie_count": summary.movie_count,
         "episode_count": summary.episode_count,
         "legacy_count": summary.legacy_count,
-        "oldest_import_date": summary.oldest_import_date.isoformat() if summary.oldest_import_date else None,
-        "newest_import_date": summary.newest_import_date.isoformat() if summary.newest_import_date else None,
+        "oldest_import_date": summary.oldest_import_date.isoformat()
+        if summary.oldest_import_date
+        else None,
+        "newest_import_date": summary.newest_import_date.isoformat()
+        if summary.newest_import_date
+        else None,
         "date_range_spanned_days": span_days,
         "potential_space_freed_bytes": displayed_size,
         "potential_space_freed_human": format_size(displayed_size),
@@ -824,28 +858,74 @@ from arr_oldies.reporting.summary import render_summary_panel
 from arr_oldies.reporting.table import render_inventory_table
 from arr_oldies.targeting import resolve_target_instances
 
+
 @app.command("scan")
 def scan_command(
     ctx: typer.Context,
     radarr: Annotated[bool, typer.Option("--radarr", help="Target only Radarr instances.")] = False,
     sonarr: Annotated[bool, typer.Option("--sonarr", help="Target only Sonarr instances.")] = False,
-    instance: Annotated[list[str] | None, typer.Option("-i", "--instance", help="Specific instance name(s) to target.")] = None,
-    config: Annotated[Path | None, typer.Option("--config", "-c", help="Path to config file.")] = None,
-    media_type: Annotated[MediaType | None, typer.Option("--type", "-t", help="Filter by media type ('movie' or 'episode').")] = None,
-    audio_lang: Annotated[list[str] | None, typer.Option("--audio-lang", "-l", help="Filter by audio language (repeatable).")] = None,
-    min_size: Annotated[str | None, typer.Option("--min-size", help="Minimum file size (e.g. '500MB', '2GB').")] = None,
-    max_size: Annotated[str | None, typer.Option("--max-size", help="Maximum file size (e.g. '10GB').")] = None,
-    older_than: Annotated[str | None, typer.Option("--older-than", "--age", help="Minimum age cutoff (e.g. '30d', '6m', '1y').")] = None,
-    newer_than: Annotated[str | None, typer.Option("--newer-than", help="Maximum age cutoff (e.g. '1y', '90d').")] = None,
-    before: Annotated[str | None, typer.Option("--before", help="Imported before date (e.g. '2023-01-01').")] = None,
-    after: Annotated[str | None, typer.Option("--after", help="Imported after date (e.g. '2024-01-01').")] = None,
-    legacy: Annotated[bool, typer.Option("--legacy", "--legacy-only", help="Filter only legacy unindexed items.")] = False,
-    history: Annotated[bool, typer.Option("--history", "--history-only", help="Filter only items with history records.")] = False,
-    sort: Annotated[SortKey, typer.Option("--sort", "-s", help="Sort field ('import_date', 'grab_date', 'size', 'title', 'age').")] = SortKey.IMPORT_DATE,
-    sort_dir: Annotated[SortDirection, typer.Option("--sort-dir", "--order", help="Sort direction ('asc', 'desc').")] = SortDirection.ASC,
-    limit: Annotated[int | None, typer.Option("--limit", "-n", min=1, help="Limit output to top N items.")] = None,
-    format: Annotated[OutputFormat, typer.Option("--format", "-f", help="Output format ('table' or 'json').")] = OutputFormat.TABLE,
-    summary: Annotated[bool, typer.Option("--summary/--no-summary", help="Display summary metrics panel (table mode only).")] = True,
+    instance: Annotated[
+        list[str] | None,
+        typer.Option("-i", "--instance", help="Specific instance name(s) to target."),
+    ] = None,
+    config: Annotated[
+        Path | None, typer.Option("--config", "-c", help="Path to config file.")
+    ] = None,
+    media_type: Annotated[
+        MediaType | None,
+        typer.Option("--type", "-t", help="Filter by media type ('movie' or 'episode')."),
+    ] = None,
+    audio_lang: Annotated[
+        list[str] | None,
+        typer.Option("--audio-lang", "-l", help="Filter by audio language (repeatable)."),
+    ] = None,
+    min_size: Annotated[
+        str | None, typer.Option("--min-size", help="Minimum file size (e.g. '500MB', '2GB').")
+    ] = None,
+    max_size: Annotated[
+        str | None, typer.Option("--max-size", help="Maximum file size (e.g. '10GB').")
+    ] = None,
+    older_than: Annotated[
+        str | None,
+        typer.Option("--older-than", "--age", help="Minimum age cutoff (e.g. '30d', '6m', '1y')."),
+    ] = None,
+    newer_than: Annotated[
+        str | None, typer.Option("--newer-than", help="Maximum age cutoff (e.g. '1y', '90d').")
+    ] = None,
+    before: Annotated[
+        str | None, typer.Option("--before", help="Imported before date (e.g. '2023-01-01').")
+    ] = None,
+    after: Annotated[
+        str | None, typer.Option("--after", help="Imported after date (e.g. '2024-01-01').")
+    ] = None,
+    legacy: Annotated[
+        bool, typer.Option("--legacy", "--legacy-only", help="Filter only legacy unindexed items.")
+    ] = False,
+    history: Annotated[
+        bool,
+        typer.Option("--history", "--history-only", help="Filter only items with history records."),
+    ] = False,
+    sort: Annotated[
+        SortKey,
+        typer.Option(
+            "--sort", "-s", help="Sort field ('import_date', 'grab_date', 'size', 'title', 'age')."
+        ),
+    ] = SortKey.IMPORT_DATE,
+    sort_dir: Annotated[
+        SortDirection, typer.Option("--sort-dir", "--order", help="Sort direction ('asc', 'desc').")
+    ] = SortDirection.ASC,
+    limit: Annotated[
+        int | None, typer.Option("--limit", "-n", min=1, help="Limit output to top N items.")
+    ] = None,
+    format: Annotated[
+        OutputFormat, typer.Option("--format", "-f", help="Output format ('table' or 'json').")
+    ] = OutputFormat.TABLE,
+    summary: Annotated[
+        bool,
+        typer.Option(
+            "--summary/--no-summary", help="Display summary metrics panel (table mode only)."
+        ),
+    ] = True,
 ) -> None:
     """Audit and scan media files across Radarr/Sonarr instances, sorted by age with storage metrics."""
     global_config: Path | None = ctx.obj.get("config") if ctx.obj else None
@@ -899,7 +979,9 @@ def scan_command(
     # 4. Concurrently fetch data across instances
     fetcher = MultiInstanceFetcher()
     if format == OutputFormat.TABLE:
-        with stderr_console.status("[bold cyan]Scanning instances and fetching history records...[/bold cyan]"):
+        with stderr_console.status(
+            "[bold cyan]Scanning instances and fetching history records...[/bold cyan]"
+        ):
             fetch_results = asyncio.run(fetcher.fetch_all_instances_data(target_instances))
     else:
         fetch_results = asyncio.run(fetcher.fetch_all_instances_data(target_instances))
@@ -908,7 +990,9 @@ def scan_command(
     failed_instances = [res for res in fetch_results if not res.success]
     if failed_instances:
         for fail in failed_instances:
-            stderr_console.print(f"[bold yellow]Warning:[/bold yellow] Instance '{fail.instance_name}' failed: {fail.error_message}")
+            stderr_console.print(
+                f"[bold yellow]Warning:[/bold yellow] Instance '{fail.instance_name}' failed: {fail.error_message}"
+            )
         if len(failed_instances) == len(fetch_results):
             print_error("All target instances failed to fetch data.")
             raise typer.Exit(code=EXIT_PROBE_ERROR)
