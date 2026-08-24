@@ -73,13 +73,15 @@ def render_banner() -> None:
         "[white]Audit and clean stale media across Radarr and Sonarr instances.[/white]\n\n"
         "[bold yellow]Commands:[/bold yellow]\n"
         "  [bold green]validate-config[/bold green]  Verify configuration syntax, connectivity, and authentication\n"
-        "  [bold green]scan[/bold green]             Audit media library and sort downloads by age [dim](Phase 4)[/dim]\n\n"
+        "  [bold green]scan[/bold green]             Audit media library and sort downloads by age\n"
+        "  [bold green]clean[/bold green]            Safely delete, unmonitor, or remove stale media with dry-run protection\n\n"
         "[bold yellow]Usage Examples:[/bold yellow]\n"
         "  [dim]$[/dim] arr-oldies validate-config\n"
-        "  [dim]$[/dim] arr-oldies validate-config --radarr\n"
-        "  [dim]$[/dim] arr-oldies validate-config -i radarr-hd -i sonarr-tv\n"
-        "  [dim]$[/dim] arr-oldies --config /path/to/config.yaml validate-config\n\n"
+        "  [dim]$[/dim] arr-oldies scan --older-than 1y --sort age\n"
+        "  [dim]$[/dim] arr-oldies clean --delete --older-than 2y\n"
+        "  [dim]$[/dim] arr-oldies clean --delete --execute --yes\n\n"
         "Run [bold cyan]arr-oldies --help[/bold cyan] or [bold cyan]arr-oldies <command> --help[/bold cyan] for full options."
+
     )
     panel = Panel(
         banner_text,

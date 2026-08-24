@@ -294,6 +294,9 @@ class HistoryCorrelator:
                 source_title = import_event.source_title
                 has_history = True
                 is_legacy = False
+                if not ep_ids and import_event.episode_id:
+                    ep_ids = [import_event.episode_id]
+
 
                 # Correlate grab event
                 grab_event: SonarrHistoryRecord | None = None
