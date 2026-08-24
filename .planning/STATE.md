@@ -113,6 +113,7 @@ None.
 | 260824-utd | include -t flag in README docker examples for colored Rich output | 2026-08-24 | e483602 | [260824-utd-include-t-flag-in-readme-docker-examples](./quick/260824-utd-include-t-flag-in-readme-docker-examples/) |
 | 260824-ucl | add interactive CLI mode and shell aliases to README | 2026-08-24 | a344633 | [260824-ucl-add-docker-cli-interactive-modes-to-readme](./quick/260824-ucl-add-docker-cli-interactive-modes-to-readme/) |
 | 260824-uaf | use fixed config path for Docker alias and function in README | 2026-08-24 | 6352208 | [260824-uaf-use-fixed-path-for-docker-alias-in-readme](./quick/260824-uaf-use-fixed-path-for-docker-alias-in-readme/) |
+| 260824-utt | add pt-br and Portuguese tests to language normalizer | 2026-08-24 | f089e03 | [260824-utt-add-pt-br-tests-to-language-normalizer](./quick/260824-utt-add-pt-br-tests-to-language-normalizer/) |
 
 ## Deferred Items
 
