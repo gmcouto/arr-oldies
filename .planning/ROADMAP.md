@@ -156,7 +156,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 6. Support Composite Time Formats for Age Filters | 1/1 | Complete   | 2026-08-24 |
 | 7. Scope unmonitor to episodes and add unmonitor-series option | 1/1 | Complete   | 2026-08-24 |
 | 8. Support --monitored and --unmonitored filter for scan and clean | 1/1 | Complete    | 2026-08-24 |
-| 9. Docker Packaging and GitHub Actions Release Workflow | 1/1 | Complete | 2026-08-24 |
+| 9. Docker Packaging and GitHub Actions Release Workflow | 1/1 | Complete   | 2026-08-24 |
 
 ### Phase 6: Support Composite Time Formats for Age Filters
 

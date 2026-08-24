@@ -50,8 +50,6 @@ COPY --from=builder /opt/venv /opt/venv
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-COPY README.md ./
-
 # Run as unprivileged user
 USER arruser
 WORKDIR /app
