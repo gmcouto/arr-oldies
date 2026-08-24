@@ -252,14 +252,14 @@ def test_cli_clean_execute_yes_bypass(config_file_path: Path) -> None:
 
 @respx.mock
 def test_cli_clean_unmonitor_actions(config_file_path: Path) -> None:
-    """Verify --unmonitor triggers movie and series unmonitoring."""
+    """Verify --unmonitor triggers movie unmonitoring for Radarr and episode unmonitoring for Sonarr."""
     mock_radarr_sonarr_instances()
     route_radarr_unmonitor = respx.put("http://localhost:7878/api/v3/movie/editor").respond(
         status_code=202
     )
-    route_sonarr_unmonitor = respx.put("https://sonarr.local:8989/api/v3/series/editor").respond(
-        status_code=202
-    )
+    route_sonarr_unmonitor_episodes = respx.put(
+        "https://sonarr.local:8989/api/v3/episode/monitor"
+    ).respond(status_code=200)
 
     result = runner.invoke(
         app,
@@ -278,22 +278,22 @@ def test_cli_clean_unmonitor_actions(config_file_path: Path) -> None:
     )
     assert result.exit_code == 0
     assert route_radarr_unmonitor.called
-    assert route_sonarr_unmonitor.called
+    assert route_sonarr_unmonitor_episodes.called
 
 
 @respx.mock
-def test_cli_clean_unmonitor_episode_action(config_file_path: Path) -> None:
-    """Verify --unmonitor-episode triggers episode unmonitoring for Sonarr."""
+def test_cli_clean_unmonitor_series_action(config_file_path: Path) -> None:
+    """Verify --unmonitor-series triggers series unmonitoring for Sonarr."""
     mock_radarr_sonarr_instances()
-    route_episodes = respx.put("https://sonarr.local:8989/api/v3/episode/monitor").respond(
-        status_code=200
+    route_series = respx.put("https://sonarr.local:8989/api/v3/series/editor").respond(
+        status_code=202
     )
 
     result = runner.invoke(
         app,
         [
             "clean",
-            "--unmonitor-episode",
+            "--unmonitor-series",
             "--execute",
             "--yes",
             "--sonarr",
@@ -302,7 +302,7 @@ def test_cli_clean_unmonitor_episode_action(config_file_path: Path) -> None:
         ],
     )
     assert result.exit_code == 0
-    assert route_episodes.called
+    assert route_series.called
 
 
 @respx.mock

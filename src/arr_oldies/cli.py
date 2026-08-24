@@ -439,11 +439,17 @@ def clean_command(
     ] = False,
     unmonitor: Annotated[
         bool,
-        typer.Option("--unmonitor", help="Unmonitor movie or entire TV show."),
+        typer.Option(
+            "--unmonitor",
+            help="Unmonitor matched media items (movies in Radarr, individual episodes in Sonarr).",
+        ),
     ] = False,
-    unmonitor_episode: Annotated[
+    unmonitor_series: Annotated[
         bool,
-        typer.Option("--unmonitor-episode", help="Unmonitor specific episode(s)."),
+        typer.Option(
+            "--unmonitor-series",
+            help="Unmonitor entire TV series in Sonarr for matched episode items.",
+        ),
     ] = False,
     remove: Annotated[
         bool,
@@ -577,15 +583,15 @@ def clean_command(
         actions.append(ActionType.DELETE)
     if unmonitor:
         actions.append(ActionType.UNMONITOR)
-    if unmonitor_episode:
-        actions.append(ActionType.UNMONITOR_EPISODE)
+    if unmonitor_series:
+        actions.append(ActionType.UNMONITOR_SERIES)
     if remove:
         actions.append(ActionType.REMOVE)
 
     if not actions:
         print_error(
             "No action specified. Please provide at least one action flag: "
-            "--delete, --unmonitor, --unmonitor-episode, --remove"
+            "--delete, --unmonitor, --unmonitor-series, --remove"
         )
         raise typer.Exit(code=EXIT_CONFIG_ERROR)
 
