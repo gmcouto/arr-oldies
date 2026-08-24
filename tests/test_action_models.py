@@ -35,7 +35,7 @@ def test_action_types_enum() -> None:
     """Verify ActionType enum values."""
     assert ActionType.DELETE == "delete"
     assert ActionType.UNMONITOR == "unmonitor"
-    assert ActionType.UNMONITOR_EPISODE == "unmonitor_episode"
+    assert ActionType.UNMONITOR_SERIES == "unmonitor_series"
     assert ActionType.REMOVE == "remove"
 
 

@@ -13,7 +13,7 @@ class ActionType(StrEnum):
 
     DELETE = "delete"
     UNMONITOR = "unmonitor"
-    UNMONITOR_EPISODE = "unmonitor_episode"
+    UNMONITOR_SERIES = "unmonitor_series"
     REMOVE = "remove"
 
 

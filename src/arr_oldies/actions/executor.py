@@ -37,7 +37,7 @@ class ActionExecutor:
             applicable_actions = [
                 act
                 for act in actions
-                if not (act == ActionType.UNMONITOR_EPISODE and item.media_type == MediaType.MOVIE)
+                if not (act == ActionType.UNMONITOR_SERIES and item.media_type == MediaType.MOVIE)
             ]
             action_items.append(ActionItem(item=item, action_types=applicable_actions))
             instances_breakdown[item.instance_name] = (
@@ -108,7 +108,7 @@ class ActionExecutor:
                         )
                     continue
 
-                # Step 1: Unmonitor Movie or entire Series (D-04, ACT-03)
+                # Step 1: Unmonitor Movie or specific Episode(s) (D-04, ACT-03, ACT-04)
                 if ActionType.UNMONITOR in action_item.action_types:
                     if isinstance(client, RadarrClient) and item.movie_id is not None:
                         try:
@@ -134,74 +134,74 @@ class ActionExecutor:
                                     error_message=str(exc),
                                 )
                             )
-                    elif isinstance(client, SonarrClient) and item.series_id is not None:
-                        series_key = (item.instance_name, item.series_id)
-                        if series_key not in unmonitored_series:
-                            try:
-                                ok = await client.unmonitor_series(item.series_id)
-                                if ok:
-                                    unmonitored_series.add(series_key)
-                                results.append(
-                                    ActionResult(
-                                        item_id=item.id,
-                                        instance_name=item.instance_name,
-                                        action_type=ActionType.UNMONITOR,
-                                        success=ok,
-                                        freed_bytes=0,
-                                        error_message=None if ok else "Unmonitor series failed",
-                                    )
-                                )
-                            except Exception as exc:  # noqa: BLE001
-                                results.append(
-                                    ActionResult(
-                                        item_id=item.id,
-                                        instance_name=item.instance_name,
-                                        action_type=ActionType.UNMONITOR,
-                                        success=False,
-                                        freed_bytes=0,
-                                        error_message=str(exc),
-                                    )
-                                )
-                        else:
-                            # Deduplicated unmonitoring
+                    elif isinstance(client, SonarrClient) and item.episode_ids:
+                        try:
+                            ok = await client.unmonitor_episodes(item.episode_ids)
                             results.append(
                                 ActionResult(
                                     item_id=item.id,
                                     instance_name=item.instance_name,
                                     action_type=ActionType.UNMONITOR,
-                                    success=True,
+                                    success=ok,
                                     freed_bytes=0,
-                                    error_message=None,
+                                    error_message=None if ok else "Unmonitor episodes failed",
+                                )
+                            )
+                        except Exception as exc:  # noqa: BLE001
+                            results.append(
+                                ActionResult(
+                                    item_id=item.id,
+                                    instance_name=item.instance_name,
+                                    action_type=ActionType.UNMONITOR,
+                                    success=False,
+                                    freed_bytes=0,
+                                    error_message=str(exc),
                                 )
                             )
 
-                # Step 2: Unmonitor specific Episode(s) (ACT-04)
+                # Step 2: Unmonitor entire parent Series (ACT-03)
                 if (
-                    ActionType.UNMONITOR_EPISODE in action_item.action_types
+                    ActionType.UNMONITOR_SERIES in action_item.action_types
                     and isinstance(client, SonarrClient)
-                    and item.episode_ids
+                    and item.series_id is not None
                 ):
-                    try:
-                        ok = await client.unmonitor_episodes(item.episode_ids)
-                        results.append(
-                            ActionResult(
-                                item_id=item.id,
-                                instance_name=item.instance_name,
-                                action_type=ActionType.UNMONITOR_EPISODE,
-                                success=ok,
-                                freed_bytes=0,
-                                error_message=None if ok else "Unmonitor episodes failed",
+                    series_key = (item.instance_name, item.series_id)
+                    if series_key not in unmonitored_series:
+                        try:
+                            ok = await client.unmonitor_series(item.series_id)
+                            if ok:
+                                unmonitored_series.add(series_key)
+                            results.append(
+                                ActionResult(
+                                    item_id=item.id,
+                                    instance_name=item.instance_name,
+                                    action_type=ActionType.UNMONITOR_SERIES,
+                                    success=ok,
+                                    freed_bytes=0,
+                                    error_message=None if ok else "Unmonitor series failed",
+                                )
                             )
-                        )
-                    except Exception as exc:  # noqa: BLE001
+                        except Exception as exc:  # noqa: BLE001
+                            results.append(
+                                ActionResult(
+                                    item_id=item.id,
+                                    instance_name=item.instance_name,
+                                    action_type=ActionType.UNMONITOR_SERIES,
+                                    success=False,
+                                    freed_bytes=0,
+                                    error_message=str(exc),
+                                )
+                            )
+                    else:
+                        # Deduplicated series unmonitoring
                         results.append(
                             ActionResult(
                                 item_id=item.id,
                                 instance_name=item.instance_name,
-                                action_type=ActionType.UNMONITOR_EPISODE,
-                                success=False,
+                                action_type=ActionType.UNMONITOR_SERIES,
+                                success=True,
                                 freed_bytes=0,
-                                error_message=str(exc),
+                                error_message=None,
                             )
                         )
 

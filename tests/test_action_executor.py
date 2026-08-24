@@ -68,21 +68,21 @@ def test_build_plan_defaults() -> None:
 
 
 def test_build_plan_prunes_inapplicable_actions() -> None:
-    """Verify unmonitor_episode is pruned on Movie items."""
+    """Verify unmonitor_series is pruned on Movie items."""
     items = create_test_items()
     executor = ActionExecutor()
     plan = executor.build_plan(
         items=items,
-        actions=[ActionType.DELETE, ActionType.UNMONITOR_EPISODE],
+        actions=[ActionType.DELETE, ActionType.UNMONITOR_SERIES],
         dry_run=False,
     )
 
     movie_action_item = next(it for it in plan.items if it.item.media_type == MediaType.MOVIE)
     episode_action_item = next(it for it in plan.items if it.item.media_type == MediaType.EPISODE)
 
-    assert ActionType.UNMONITOR_EPISODE not in movie_action_item.action_types
+    assert ActionType.UNMONITOR_SERIES not in movie_action_item.action_types
     assert ActionType.DELETE in movie_action_item.action_types
-    assert ActionType.UNMONITOR_EPISODE in episode_action_item.action_types
+    assert ActionType.UNMONITOR_SERIES in episode_action_item.action_types
     assert ActionType.DELETE in episode_action_item.action_types
 
 
@@ -110,7 +110,7 @@ def test_export_plan_json() -> None:
 @pytest.mark.asyncio
 @respx.mock
 async def test_execute_plan_deletions_and_unmonitoring() -> None:
-    """Verify execute_plan executes unmonitor before delete, deduplicates unmonitors, and calculates freed space."""
+    """Verify execute_plan executes unmonitor (movie/episodes) before delete and calculates freed space."""
     route_radarr_unmonitor = respx.put("http://radarr.local:7878/api/v3/movie/editor").respond(
         status_code=202
     )
@@ -118,15 +118,15 @@ async def test_execute_plan_deletions_and_unmonitoring() -> None:
         status_code=200
     )
 
-    route_sonarr_unmonitor = respx.put("http://sonarr.local:8989/api/v3/series/editor").respond(
-        status_code=202
-    )
+    route_sonarr_unmonitor_episodes = respx.put(
+        "http://sonarr.local:8989/api/v3/episode/monitor"
+    ).respond(status_code=200)
     route_sonarr_delete1 = respx.delete("http://sonarr.local:8989/api/v3/episodefile/200").respond(
         status_code=204
     )
 
     items = create_test_items()
-    # Add a second episode from the same series to test deduplication
+    # Add a second episode
     ep2 = MediaInventoryItem(
         id="sonarr:2",
         instance_name="sonarr-main",
@@ -174,13 +174,13 @@ async def test_execute_plan_deletions_and_unmonitoring() -> None:
     assert report.mode == "execute"
     assert (
         report.total_attempted == 6
-    )  # 3 unmonitors (1 movie, 2 eps with deduplicated series unmonitor) + 3 deletes
+    )  # 3 unmonitors (1 movie, 2 eps) + 3 deletes
     assert report.successful_count == 6
     assert report.failed_count == 0
     assert report.total_freed_bytes == 15 * 1024 * 1024 * 1024
 
-    # Verify series unmonitor was called only once for Sonarr series 20
-    assert route_sonarr_unmonitor.call_count == 1
+    # Verify episode unmonitor was called for Sonarr episodes
+    assert route_sonarr_unmonitor_episodes.call_count == 2
     assert route_radarr_unmonitor.call_count == 1
     assert route_radarr_delete.called
     assert route_sonarr_delete1.called
@@ -189,13 +189,33 @@ async def test_execute_plan_deletions_and_unmonitoring() -> None:
 
 @pytest.mark.asyncio
 @respx.mock
-async def test_execute_plan_unmonitor_episodes() -> None:
-    """Verify episode-specific unmonitoring."""
-    route_episodes = respx.put("http://sonarr.local:8989/api/v3/episode/monitor").respond(
-        status_code=200
-    )
+async def test_execute_plan_unmonitor_series() -> None:
+    """Verify series-level unmonitoring with deduplication."""
+    route_sonarr_unmonitor_series = respx.put(
+        "http://sonarr.local:8989/api/v3/series/editor"
+    ).respond(status_code=202)
 
-    items = [create_test_items()[1]]  # episode item
+    items = create_test_items()
+    # Add second episode in same series
+    ep2 = MediaInventoryItem(
+        id="sonarr:2",
+        instance_name="sonarr-main",
+        instance_type=InstanceType.SONARR,
+        media_type=MediaType.EPISODE,
+        title="Breaking Bad",
+        season_number=1,
+        episode_numbers=[2],
+        formatted_episode="S01E02",
+        series_id=20,
+        episode_file_id=201,
+        episode_ids=[1002],
+        file_path="/tv/Breaking Bad/Season 01/S01E02.mkv",
+        size_bytes=3 * 1024 * 1024 * 1024,
+        import_date=datetime(2023, 1, 2, tzinfo=UTC),
+        history_status=HistoryStatus.IMPORTED,
+    )
+    items.append(ep2)
+
     instances = [
         InstanceConfig(
             name="sonarr-main",
@@ -205,11 +225,13 @@ async def test_execute_plan_unmonitor_episodes() -> None:
         ),
     ]
     executor = ActionExecutor()
-    plan = executor.build_plan(items=items, actions=[ActionType.UNMONITOR_EPISODE], dry_run=False)
+    # Movie item is pruned, 2 episode items in series 20
+    plan = executor.build_plan(items=items, actions=[ActionType.UNMONITOR_SERIES], dry_run=False)
 
     report = await executor.execute_plan(plan, instances)
-    assert report.successful_count == 1
-    assert route_episodes.called
+    assert report.successful_count == 2
+    # Series 20 unmonitor should only be sent once due to deduplication
+    assert route_sonarr_unmonitor_series.call_count == 1
 
 
 @pytest.mark.asyncio
