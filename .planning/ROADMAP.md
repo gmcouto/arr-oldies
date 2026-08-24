@@ -106,8 +106,12 @@ Plans:
 **Plans**: TBD
 
 Plans:
+**Wave 1**
 
 - [ ] 04-01: Rich table visualizer with color-coded age tiers, units formatting, and summary cards
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 04-02: CLI scan command integration with sorting/filtering flags and JSON serialization
 
 ### Phase 5: Safe Action Engine (Dry-Run, Deletion & Unmonitoring)
