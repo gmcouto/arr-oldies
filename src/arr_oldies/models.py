@@ -1,6 +1,7 @@
 """Pydantic v2 data models for configuration, instances, and probing results."""
 
 from enum import StrEnum
+
 from pydantic import BaseModel, Field, SecretStr, field_validator, model_validator
 
 
@@ -33,7 +34,7 @@ class InstanceConfig(BaseModel):
     def sanitize_url(cls, v: str) -> str:
         """Strip trailing slashes and ensure valid HTTP/HTTPS protocol."""
         url_clean = str(v).strip().rstrip("/")
-        if not (url_clean.startswith("http://") or url_clean.startswith("https://")):
+        if not url_clean.startswith(("http://", "https://")):
             raise ValueError("URL must start with http:// or https://")
         return url_clean
 

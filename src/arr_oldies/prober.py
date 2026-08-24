@@ -3,6 +3,7 @@
 import asyncio
 import time
 from typing import Any
+
 import httpx
 
 from arr_oldies.constants import (
@@ -107,7 +108,7 @@ async def probe_single_instance(
             latency_ms=latency_ms,
             error_message=f"Connection timed out (> {timeout_val}s)",
         )
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001
         latency_ms = (time.perf_counter() - start_time) * 1000.0
         return ProbeResult(
             instance_name=instance.name,

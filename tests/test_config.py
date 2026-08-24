@@ -1,7 +1,7 @@
 """Unit tests for configuration file discovery, YAML parsing, and schema validation diagnostics."""
 
-import os
 from pathlib import Path
+
 import pytest
 
 from arr_oldies.config import find_config_file, load_config
