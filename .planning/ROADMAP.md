@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation, Multi-Instance Configuration & CLI Scaffolding** - Establish project foundation, Pydantic schemas, YAML config loading, validation command, and base CLI (completed 2026-08-23)
 - [x] **Phase 2: Async *arr API Clients & Batch History Fetcher** - Build HTTPX async clients for Radarr v3/v4 and Sonarr v3/v4 with batch history pagination and instance resilience (completed 2026-08-23)
-- [ ] **Phase 3: Media Inventory & History Timestamp Correlator** - Correlate media files with History API import/grab timestamps, extract audio languages, and build sortable/filterable inventory
+- [x] **Phase 3: Media Inventory & History Timestamp Correlator** - Correlate media files with History API import/grab timestamps, extract audio languages, and build sortable/filterable inventory (completed 2026-08-24)
 - [ ] **Phase 4: Rich CLI Visualization & Reporting** - Implement Rich terminal table formatting, storage metrics summaries, output limits, and JSON export
 - [ ] **Phase 5: Safe Action Engine (Dry-Run, Deletion & Unmonitoring)** - Build safe mutation pipeline with dry-run default, `--delete`, `--unmonitor`, `--unmonitor-episode`, `--remove`, and confirmation guards
 
@@ -80,16 +80,16 @@ Plans:
   3. Inventory items are sorted oldest-first with multi-dimensional filtering (date cutoff, size, instance, media type).
   4. Media files without history events are cleanly flagged as unindexed without failing the scan.
 
-**Plans**: 2 plans planned
+**Plans**: 2/2 plans executed planned
 
 Plans:
 **Wave 1**
 
-- [ ] 03-01-PLAN.md: Core Inventory Models, ISO-639 Language Normalization & Human Unit Parsers
+- [x] 03-01-PLAN.md: Core Inventory Models, ISO-639 Language Normalization & Human Unit Parsers
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 03-02-PLAN.md: Hash-Indexed History Correlator, Legacy Fallback & Inventory Processing Engine
+- [x] 03-02-PLAN.md: Hash-Indexed History Correlator, Legacy Fallback & Inventory Processing Engine
 
 ### Phase 4: Rich CLI Visualization & Reporting
 
@@ -139,6 +139,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Foundation, Multi-Instance Configuration & CLI Scaffolding | 2/2 | Complete    | 2026-08-23 |
 | 2. Async *arr API Clients & Batch History Fetcher | 2/2 | Complete    | 2026-08-23 |
-| 3. Media Inventory & History Timestamp Correlator | 0/2 | Not started | - |
+| 3. Media Inventory & History Timestamp Correlator | 2/2 | Complete    | 2026-08-24 |
 | 4. Rich CLI Visualization & Reporting | 0/2 | Not started | - |
 | 5. Safe Action Engine (Dry-Run, Deletion & Unmonitoring) | 0/2 | Not started | - |

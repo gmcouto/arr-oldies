@@ -22,12 +22,12 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Inventory & History Engine (INVT)
 
-- [ ] **INVT-01**: Correlate media files (`movieFileId`, `episodeFileId`) with exact `downloadFolderImported` and `grabbed` timestamps from History API
-- [ ] **INVT-02**: Extract and index `mediaInfo` audio languages for each media file
-- [ ] **INVT-03**: Build unified media item inventory records (title, year/season/episode, file path, size, audio languages, instance, import date, grab date, age in days)
-- [ ] **INVT-04**: Sort inventory items by oldest import date or oldest grab date
-- [ ] **INVT-05**: Filter inventory items by audio language (`--audio-lang <lang>`), media type (movie vs episode), minimum size, and date/age cutoff
-- [ ] **INVT-06**: Cleanly flag legacy media items that have no History API records without failing the scan
+- [x] **INVT-01**: Correlate media files (`movieFileId`, `episodeFileId`) with exact `downloadFolderImported` and `grabbed` timestamps from History API
+- [x] **INVT-02**: Extract and index `mediaInfo` audio languages for each media file
+- [x] **INVT-03**: Build unified media item inventory records (title, year/season/episode, file path, size, audio languages, instance, import date, grab date, age in days)
+- [x] **INVT-04**: Sort inventory items by oldest import date or oldest grab date
+- [x] **INVT-05**: Filter inventory items by audio language (`--audio-lang <lang>`), media type (movie vs episode), minimum size, and date/age cutoff
+- [x] **INVT-06**: Cleanly flag legacy media items that have no History API records without failing the scan
 
 ### CLI Reporting & Visualization (CLI)
 
@@ -75,12 +75,12 @@ Deferred to future release. Tracked but not in current roadmap.
 | API-02 | Phase 2 | Complete |
 | API-03 | Phase 2 | Complete |
 | API-04 | Phase 2 | Complete |
-| INVT-01 | Phase 3 | Pending |
-| INVT-02 | Phase 3 | Pending |
-| INVT-03 | Phase 3 | Pending |
-| INVT-04 | Phase 3 | Pending |
-| INVT-05 | Phase 3 | Pending |
-| INVT-06 | Phase 3 | Pending |
+| INVT-01 | Phase 3 | Complete |
+| INVT-02 | Phase 3 | Complete |
+| INVT-03 | Phase 3 | Complete |
+| INVT-04 | Phase 3 | Complete |
+| INVT-05 | Phase 3 | Complete |
+| INVT-06 | Phase 3 | Complete |
 | CLI-01 | Phase 4 | Pending |
 | CLI-02 | Phase 4 | Pending |
 | CLI-03 | Phase 4 | Pending |
