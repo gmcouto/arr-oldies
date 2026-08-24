@@ -19,9 +19,9 @@ RUN python3 -c "import tomllib; data=tomllib.load(open('pyproject.toml','rb')); 
     rm /tmp/requirements.txt
 
 # Copy README and application source code, then install arr-oldies package
+COPY README.md ./
 COPY src/ ./src/
 RUN pip install --no-cache-dir --no-deps .
-COPY README.md ./
 
 # Stage 2: Runner stage
 FROM python:3.11-slim AS runner
