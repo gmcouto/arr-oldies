@@ -14,7 +14,7 @@ Arr-Oldies delivers a high-performance CLI tool to audit and clean stale media f
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation, Multi-Instance Configuration & CLI Scaffolding** - Establish project foundation, Pydantic schemas, YAML config loading, validation command, and base CLI (completed 2026-08-23)
-- [ ] **Phase 2: Async *arr API Clients & Batch History Fetcher** - Build HTTPX async clients for Radarr v3/v4 and Sonarr v3/v4 with batch history pagination and instance resilience
+- [x] **Phase 2: Async *arr API Clients & Batch History Fetcher** - Build HTTPX async clients for Radarr v3/v4 and Sonarr v3/v4 with batch history pagination and instance resilience (completed 2026-08-23)
 - [ ] **Phase 3: Media Inventory & History Timestamp Correlator** - Correlate media files with History API import/grab timestamps, extract audio languages, and build sortable/filterable inventory
 - [ ] **Phase 4: Rich CLI Visualization & Reporting** - Implement Rich terminal table formatting, storage metrics summaries, output limits, and JSON export
 - [ ] **Phase 5: Safe Action Engine (Dry-Run, Deletion & Unmonitoring)** - Build safe mutation pipeline with dry-run default, `--delete`, `--unmonitor`, `--unmonitor-episode`, `--remove`, and confirmation guards
@@ -134,7 +134,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation, Multi-Instance Configuration & CLI Scaffolding | 2/2 | Complete    | 2026-08-23 |
-| 2. Async *arr API Clients & Batch History Fetcher | 2/2 | In Progress|  |
+| 2. Async *arr API Clients & Batch History Fetcher | 2/2 | Complete    | 2026-08-23 |
 | 3. Media Inventory & History Timestamp Correlator | 0/2 | Not started | - |
 | 4. Rich CLI Visualization & Reporting | 0/2 | Not started | - |
 | 5. Safe Action Engine (Dry-Run, Deletion & Unmonitoring) | 0/2 | Not started | - |
