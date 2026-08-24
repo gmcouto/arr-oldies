@@ -194,6 +194,47 @@ def test_filter_by_legacy_and_history_flags(sample_items: list[MediaInventoryIte
     assert {i.title for i in filtered_history} == {"Old Anime Movie", "New Drama Show"}
 
 
+def test_filter_by_monitored_flags():
+    """Verify filtering by monitored_only and unmonitored_only flags."""
+    engine = InventoryEngine()
+    items = [
+        MediaInventoryItem(
+            id="radarr:1",
+            instance_name="radarr",
+            instance_type=InstanceType.RADARR,
+            media_type=MediaType.MOVIE,
+            title="Monitored Movie",
+            file_path="/movies/1.mkv",
+            import_date=datetime(2024, 1, 1, tzinfo=UTC),
+            monitored=True,
+        ),
+        MediaInventoryItem(
+            id="radarr:2",
+            instance_name="radarr",
+            instance_type=InstanceType.RADARR,
+            media_type=MediaType.MOVIE,
+            title="Unmonitored Movie",
+            file_path="/movies/2.mkv",
+            import_date=datetime(2024, 1, 1, tzinfo=UTC),
+            monitored=False,
+        ),
+    ]
+
+    # Monitored only
+    filtered_monitored = engine.filter_inventory(items, InventoryFilter(monitored_only=True))
+    assert len(filtered_monitored) == 1
+    assert filtered_monitored[0].title == "Monitored Movie"
+
+    # Unmonitored only
+    filtered_unmonitored = engine.filter_inventory(items, InventoryFilter(unmonitored_only=True))
+    assert len(filtered_unmonitored) == 1
+    assert filtered_unmonitored[0].title == "Unmonitored Movie"
+
+    # Default (no filter)
+    filtered_default = engine.filter_inventory(items, InventoryFilter())
+    assert len(filtered_default) == 2
+
+
 def test_sort_inventory_keys_and_directions(sample_items: list[MediaInventoryItem]):
     """Verify deterministic sorting by import_date, grab_date, size, title, and age."""
     engine = InventoryEngine()

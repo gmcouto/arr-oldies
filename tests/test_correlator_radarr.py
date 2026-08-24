@@ -195,3 +195,69 @@ def test_correlate_radarr_unsupported_instance_type():
     correlator = HistoryCorrelator()
     with pytest.raises(ValueError, match="Unsupported instance type"):
         correlator.correlate_instance(data)
+
+
+def test_correlate_radarr_monitored_status():
+    """Verify Radarr movie monitored status is propagated to MediaInventoryItem."""
+    movie_monitored = RadarrMovie(
+        id=1, title="Monitored Movie", year=2020, path="/movies/M1", monitored=True
+    )
+    file_monitored = RadarrMovieFile(
+        id=101,
+        movie_id=1,
+        relative_path="M1.mkv",
+        path="/movies/M1/M1.mkv",
+        size=1000000,
+        date_added=datetime(2024, 1, 1, 0, 0, 0, tzinfo=UTC),
+    )
+    movie_unmonitored = RadarrMovie(
+        id=2, title="Unmonitored Movie", year=2021, path="/movies/M2", monitored=False
+    )
+    file_unmonitored = RadarrMovieFile(
+        id=102,
+        movie_id=2,
+        relative_path="M2.mkv",
+        path="/movies/M2/M2.mkv",
+        size=1000000,
+        date_added=datetime(2024, 1, 1, 0, 0, 0, tzinfo=UTC),
+    )
+    data = InstanceMediaData(
+        instance_name="radarr-main",
+        instance_type=InstanceType.RADARR,
+        movies=[movie_monitored, movie_unmonitored],
+        movie_files=[file_monitored, file_unmonitored],
+        history_records=[],
+    )
+
+    correlator = HistoryCorrelator()
+    items = correlator.correlate_instance(data)
+
+    assert len(items) == 2
+    items_by_id = {item.movie_file_id: item for item in items}
+    assert items_by_id[101].monitored is True
+    assert items_by_id[102].monitored is False
+
+
+def test_correlate_radarr_missing_movie_monitored_fallback():
+    """Verify Radarr fallback to monitored=True when movie object is missing."""
+    file_orphan = RadarrMovieFile(
+        id=103,
+        movie_id=999,
+        relative_path="Orphan.mkv",
+        path="/movies/Orphan/Orphan.mkv",
+        size=1000000,
+        date_added=datetime(2024, 1, 1, 0, 0, 0, tzinfo=UTC),
+    )
+    data = InstanceMediaData(
+        instance_name="radarr-main",
+        instance_type=InstanceType.RADARR,
+        movies=[],
+        movie_files=[file_orphan],
+        history_records=[],
+    )
+
+    correlator = HistoryCorrelator()
+    items = correlator.correlate_instance(data)
+
+    assert len(items) == 1
+    assert items[0].monitored is True

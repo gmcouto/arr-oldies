@@ -213,3 +213,58 @@ def test_correlate_sonarr_filename_fallback():
 
     assert len(items) == 1
     assert items[0].formatted_episode == "S03E04"
+
+
+def test_correlate_sonarr_monitored_status_single_and_multi_episode():
+    """Verify Sonarr monitored resolution across single, multi-episode, and empty episodes."""
+    series = SonarrSeries(id=10, title="Show", year=2020, path="/tv/Show", monitored=False)
+
+    # 1. Single monitored episode
+    file1 = SonarrEpisodeFile(
+        id=1, series_id=10, season_number=1, path="/tv/Show/S01E01.mkv", date_added=datetime(2024, 1, 1, tzinfo=UTC)
+    )
+    ep1 = SonarrEpisode(id=101, series_id=10, episode_file_id=1, season_number=1, episode_number=1, monitored=True)
+
+    # 2. Single unmonitored episode
+    file2 = SonarrEpisodeFile(
+        id=2, series_id=10, season_number=1, path="/tv/Show/S01E02.mkv", date_added=datetime(2024, 1, 1, tzinfo=UTC)
+    )
+    ep2 = SonarrEpisode(id=102, series_id=10, episode_file_id=2, season_number=1, episode_number=2, monitored=False)
+
+    # 3. Multi-episode mixed (one monitored, one unmonitored -> True)
+    file3 = SonarrEpisodeFile(
+        id=3, series_id=10, season_number=1, path="/tv/Show/S01E03-E04.mkv", date_added=datetime(2024, 1, 1, tzinfo=UTC)
+    )
+    ep3 = SonarrEpisode(id=103, series_id=10, episode_file_id=3, season_number=1, episode_number=3, monitored=True)
+    ep4 = SonarrEpisode(id=104, series_id=10, episode_file_id=3, season_number=1, episode_number=4, monitored=False)
+
+    # 4. Multi-episode all unmonitored -> False
+    file4 = SonarrEpisodeFile(
+        id=4, series_id=10, season_number=1, path="/tv/Show/S01E05-E06.mkv", date_added=datetime(2024, 1, 1, tzinfo=UTC)
+    )
+    ep5 = SonarrEpisode(id=105, series_id=10, episode_file_id=4, season_number=1, episode_number=5, monitored=False)
+    ep6 = SonarrEpisode(id=106, series_id=10, episode_file_id=4, season_number=1, episode_number=6, monitored=False)
+
+    # 5. Empty episodes list fallback to series.monitored (which is False)
+    file5 = SonarrEpisodeFile(
+        id=5, series_id=10, season_number=2, path="/tv/Show/S02E01.mkv", date_added=datetime(2024, 1, 1, tzinfo=UTC)
+    )
+
+    data = InstanceMediaData(
+        instance_name="sonarr-tv",
+        instance_type=InstanceType.SONARR,
+        series=[series],
+        episode_files=[file1, file2, file3, file4, file5],
+        episodes=[ep1, ep2, ep3, ep4, ep5, ep6],
+        history_records=[],
+    )
+
+    correlator = HistoryCorrelator()
+    items = correlator.correlate_instance(data)
+
+    items_by_file_id = {i.episode_file_id: i for i in items}
+    assert items_by_file_id[1].monitored is True
+    assert items_by_file_id[2].monitored is False
+    assert items_by_file_id[3].monitored is True  # Mixed -> True
+    assert items_by_file_id[4].monitored is False  # All False -> False
+    assert items_by_file_id[5].monitored is False  # series.monitored fallback -> False

@@ -71,6 +71,7 @@ class MediaInventoryItem(BaseModel):
     import_date: datetime
     grab_date: datetime | None = None
     age_days: int = 0
+    monitored: bool = True
     has_history: bool = True
     is_legacy: bool = False
     history_status: HistoryStatus = HistoryStatus.IMPORTED
@@ -104,6 +105,8 @@ class InventoryFilter(BaseModel):
     after_date: datetime | None = None
     legacy_only: bool = False
     history_only: bool = False
+    monitored_only: bool = False
+    unmonitored_only: bool = False
 
 
 class InventorySummary(BaseModel):

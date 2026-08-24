@@ -151,6 +151,36 @@ def test_media_inventory_item_serialization():
     assert parsed["title"] == "Interstellar"
     assert parsed["instance_type"] == "radarr"
     assert parsed["media_type"] == "movie"
+    assert parsed["monitored"] is True
+
+
+def test_media_inventory_item_monitored_field():
+    """Verify MediaInventoryItem default monitored=True and explicit False/True handling."""
+    dt = datetime(2024, 1, 1, 12, 0, 0, tzinfo=UTC)
+    item_default = MediaInventoryItem(
+        id="radarr:101",
+        instance_name="radarr-main",
+        instance_type=InstanceType.RADARR,
+        media_type=MediaType.MOVIE,
+        title="Interstellar",
+        file_path="/movies/Interstellar/Interstellar.mkv",
+        import_date=dt,
+    )
+    assert item_default.monitored is True
+
+    item_unmonitored = MediaInventoryItem(
+        id="radarr:102",
+        instance_name="radarr-main",
+        instance_type=InstanceType.RADARR,
+        media_type=MediaType.MOVIE,
+        title="Dune",
+        file_path="/movies/Dune/Dune.mkv",
+        import_date=dt,
+        monitored=False,
+    )
+    assert item_unmonitored.monitored is False
+    parsed_unmonitored = json.loads(item_unmonitored.model_dump_json())
+    assert parsed_unmonitored["monitored"] is False
 
 
 def test_inventory_filter_defaults():
@@ -167,6 +197,8 @@ def test_inventory_filter_defaults():
     assert f.after_date is None
     assert f.legacy_only is False
     assert f.history_only is False
+    assert f.monitored_only is False
+    assert f.unmonitored_only is False
 
 
 def test_inventory_summary_defaults():

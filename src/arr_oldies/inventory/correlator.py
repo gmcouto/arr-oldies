@@ -151,6 +151,7 @@ class HistoryCorrelator:
                 else (movie_file.relative_path or f"Movie {movie_file.movie_id}")
             )
             year = movie.year if movie else None
+            monitored = movie.monitored if movie is not None else True
 
             # Audio languages extraction
             raw_audio = movie_file.media_info.audio_languages if movie_file.media_info else None
@@ -235,6 +236,7 @@ class HistoryCorrelator:
                 import_date=import_date,
                 grab_date=grab_date,
                 age_days=age_days,
+                monitored=monitored,
                 has_history=has_history,
                 is_legacy=is_legacy,
                 history_status=history_status,
@@ -270,6 +272,11 @@ class HistoryCorrelator:
             episodes = episodes_by_file_id.get(ep_file.id, [])
             ep_numbers = sorted(e.episode_number for e in episodes)
             ep_ids = [e.id for e in episodes]
+            monitored = (
+                any(ep.monitored for ep in episodes)
+                if episodes
+                else (series.monitored if series is not None else True)
+            )
 
             if len(ep_numbers) > 1:
                 formatted_episode = (
@@ -404,6 +411,7 @@ class HistoryCorrelator:
                 import_date=import_date,
                 grab_date=grab_date,
                 age_days=age_days,
+                monitored=monitored,
                 has_history=has_history,
                 is_legacy=is_legacy,
                 history_status=history_status,

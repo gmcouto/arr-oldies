@@ -84,7 +84,13 @@ class InventoryEngine:
             if criteria.history_only and not item.has_history:
                 continue
 
-            # 7. Audio Language Filter
+            # 7. Monitored / Unmonitored Filter
+            if criteria.monitored_only and not item.monitored:
+                continue
+            if criteria.unmonitored_only and item.monitored:
+                continue
+
+            # 8. Audio Language Filter
             if criteria.audio_langs and not any(
                 self.normalizer.matches(item.audio_languages, q) for q in criteria.audio_langs
             ):
