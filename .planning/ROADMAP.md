@@ -170,8 +170,9 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
   3. CLI filters `--older-than` and `--newer-than` in both `scan` and `clean` commands evaluate compound formats accurately.
   4. Invalid combinations or syntaxes produce clear, user-friendly error messages.
 
-**Plans**: 0 plans
+**Plans**: 1 plan
 
 Plans:
+**Wave 1**
 
-- [ ] TBD (run /gsd-plan-phase 6 to break down)
+- [ ] 06-01-PLAN.md: Composite Time Format Parser, Test Suite & CLI Filter Integration
