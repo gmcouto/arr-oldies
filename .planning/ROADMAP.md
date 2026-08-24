@@ -33,7 +33,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. User can execute `arr-oldies validate-config` to verify connection and auth against each configured instance.
   3. User can target explicit instances or service types using `--radarr`, `--sonarr`, and `--instance <name>` flags.
 
-**Plans**: 1/2 plans executed
+**Plans**: 2/2 plans executed
 
 Plans:
 **Wave 1**
@@ -42,7 +42,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 01-02-PLAN.md: Instance Targeting, Health Prober & CLI Validation Command
+- [x] 01-02-PLAN.md: Instance Targeting, Health Prober & CLI Validation Command
 
 ### Phase 2: Async *arr API Clients & Batch History Fetcher
 
@@ -129,7 +129,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation, Multi-Instance Configuration & CLI Scaffolding | 1/2 | In Progress|  |
+| 1. Foundation, Multi-Instance Configuration & CLI Scaffolding | 2/2 | In Progress|  |
 | 2. Async *arr API Clients & Batch History Fetcher | 0/2 | Not started | - |
 | 3. Media Inventory & History Timestamp Correlator | 0/2 | Not started | - |
 | 4. Rich CLI Visualization & Reporting | 0/2 | Not started | - |

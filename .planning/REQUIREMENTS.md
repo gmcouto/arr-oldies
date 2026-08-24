@@ -10,8 +10,8 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Configuration & Instances (CONF)
 
 - [x] **CONF-01**: Parse YAML/JSON configuration defining multiple named Radarr and Sonarr instances (name, base URL, API key, service type)
-- [ ] **CONF-02**: Provide `validate-config` CLI command to verify config syntax, connectivity, and authentication to all defined instances
-- [ ] **CONF-03**: Support explicit instance filtering flags (`--radarr` to target all Radarr instances, `--sonarr` to target all Sonarr instances, `--instance <name>` to target a single specific instance)
+- [x] **CONF-02**: Provide `validate-config` CLI command to verify config syntax, connectivity, and authentication to all defined instances
+- [x] **CONF-03**: Support explicit instance filtering flags (`--radarr` to target all Radarr instances, `--sonarr` to target all Sonarr instances, `--instance <name>` to target a single specific instance)
 
 ### API Client & History Fetching (API)
 
@@ -69,8 +69,8 @@ Deferred to future release. Tracked but not in current roadmap.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | CONF-01 | Phase 1 | Complete |
-| CONF-02 | Phase 1 | Pending |
-| CONF-03 | Phase 1 | Pending |
+| CONF-02 | Phase 1 | Complete |
+| CONF-03 | Phase 1 | Complete |
 | API-01 | Phase 2 | Pending |
 | API-02 | Phase 2 | Pending |
 | API-03 | Phase 2 | Pending |
