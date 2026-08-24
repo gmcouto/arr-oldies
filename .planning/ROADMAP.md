@@ -131,12 +131,16 @@ Plans:
   3. Interactive execution (`--execute`) presents a Rich confirmation dialog before applying mutations.
   4. Headless scripts can execute non-interactively using `--execute --yes`.
 
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
+**Wave 1**
 
-- [ ] 05-01: Action executor core with dry-run simulations, batch deletion, show unmonitoring, episode unmonitoring, and entry removal
-- [ ] 05-02: CLI action commands, Rich confirmation modal, and `--yes` automation bypass
+- [ ] 05-01-PLAN.md: Action Models, API Client Mutation Endpoints & Ordered Executor Core
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 05-02-PLAN.md: Confirmation Modal, Interactive Prompt Guards & CLI Clean Command
 
 ## Progress
 
