@@ -3,16 +3,16 @@ gsd_state_version: 1.0
 current_phase: 06
 status: completed
 stopped_at: Completed 06-01-PLAN.md
-last_updated: "2026-08-24T13:04:43.546Z"
+last_updated: "2026-08-24T13:08:00.866Z"
 last_activity: 2026-08-24
 last_activity_desc: Phase 06 marked complete
-state_head: fdc622d9854bc67e349916d2fa214c0ffbb6888e
+state_head: 06e49c79cbbba8078bcc4856572484d063260b95
 progress:
-  total_phases: 6
+  total_phases: 7
   completed_phases: 6
   total_plans: 11
   completed_plans: 11
-  percent: 100
+  percent: 86
 ---
 
 # Project State
@@ -31,7 +31,7 @@ Plan: 1 of 1
 Status: Phase 06 complete
 Last activity: 2026-08-24 — Phase 06 marked complete
 
-Progress: [████████░░] 83%
+Progress: [█████████░] 86%
 
 ## Performance Metrics
 
@@ -90,6 +90,7 @@ Recent decisions affecting current work:
 ### Roadmap Evolution
 
 - Phase 6 added: Support compound relative time duration strings (e.g. `1y1m1d`) for `--older-than` and `--newer-than` filters
+- Phase 7 added: Scope unmonitor to episodes and add unmonitor-series option (remove --unmonitor-episode)
 
 ### Pending Todos
 

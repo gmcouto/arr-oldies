@@ -156,6 +156,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 4. Rich CLI Visualization & Reporting | 2/2 | Complete    | 2026-08-24 |
 | 5. Safe Action Engine (Dry-Run, Deletion & Unmonitoring) | 2/2 | Complete    | 2026-08-24 |
 | 6. Support Composite Time Formats for Age Filters | 1/1 | Complete   | 2026-08-24 |
+| 7. Scope unmonitor to episodes and add unmonitor-series option | 0/1 | Not Started | - |
 
 ### Phase 6: Support Composite Time Formats for Age Filters
 
@@ -176,3 +177,23 @@ Plans:
 **Wave 1**
 
 - [x] 06-01-PLAN.md: Composite Time Format Parser, Test Suite & CLI Filter Integration
+
+### Phase 7: Scope unmonitor to episodes and add unmonitor-series option
+
+**Goal:** Ensure `--unmonitor` operates on individual media items (episodes for TV files, movies for movie files), remove `--unmonitor-episode`, and add `--unmonitor-series` for full series unmonitoring.
+**Mode:** mvp
+**Depends on:** Phase 5, Phase 6
+**Requirements:** ACT-03, ACT-04
+**Success Criteria** (what must be TRUE):
+
+  1. `--unmonitor` flag unmonitors movies in Radarr and specific episodes in Sonarr for matched media files.
+  2. `--unmonitor-episode` CLI option is completely removed.
+  3. `--unmonitor-series` CLI option is added to allow unmonitoring the entire parent series in Sonarr.
+  4. Action executor, confirmation panels, dry-run simulation, and execution reports reflect the new unmonitor semantics.
+  5. All unit and integration test suites are updated and passing.
+
+**Plans:** 0 plans
+
+Plans:
+
+- [ ] TBD (run /gsd-plan-phase 7 to break down)
