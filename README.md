@@ -1,6 +1,8 @@
 # Arr-Oldies
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![Docker Image](https://img.shields.io/badge/docker-ghcr.io%2Fgmcouto%2Farr--oldies-blue.svg?logo=docker)](https://github.com/gmcouto/arr-oldies/pkgs/container/arr-oldies)
+[![Platforms](https://img.shields.io/badge/platforms-linux%2Famd64%20%7C%20linux%2Farm64-lightgrey.svg)](https://github.com/gmcouto/arr-oldies/pkgs/container/arr-oldies)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 [![Type checked: mypy](https://img.shields.io/badge/type_checked-mypy-blue.svg)](https://mypy-lang.org/)
 
@@ -32,14 +34,76 @@ It enables self-hosters and media server administrators to inspect media age dis
 
 ## Installation
 
-### Prerequisites
-- Python 3.11+
-- Access to one or more Radarr (v3/v4) and/or Sonarr (v3/v4) instances with API keys.
+### Docker Quickstart (Recommended)
+
+Arr-Oldies is published as a multi-architecture container image (`linux/amd64`, `linux/arm64`) to GitHub Container Registry (GHCR). You can run it directly without installing a local Python environment.
+
+#### Image Repository
+```bash
+ghcr.io/gmcouto/arr-oldies:latest
+```
+
+#### Volume Mounting & Configuration Discovery
+Arr-Oldies automatically searches `/app/config.yaml` inside the container. Mounting your host configuration to `/app/config.yaml:ro` allows zero-flag execution.
+
+1. **Validate Config**:
+   ```bash
+   docker run --rm \
+     -v $(pwd)/config.yaml:/app/config.yaml:ro \
+     ghcr.io/gmcouto/arr-oldies validate-config
+   ```
+
+2. **Scan Media**:
+   ```bash
+   docker run --rm \
+     -v $(pwd)/config.yaml:/app/config.yaml:ro \
+     ghcr.io/gmcouto/arr-oldies scan --older-than 90d --format table
+   ```
+
+3. **Interactive Clean (Requires `-it`)**:
+   When running interactive deletions/unmonitoring with confirmation prompts, pass `-it` to allocate a pseudo-TTY:
+   ```bash
+   docker run -it --rm \
+     -v $(pwd)/config.yaml:/app/config.yaml:ro \
+     ghcr.io/gmcouto/arr-oldies clean --delete --older-than 1y --execute
+   ```
+
+4. **Automated / Headless Clean (Cron & Scripts)**:
+   For automated scripts or cron jobs, supply `-y`/`--yes` alongside `--execute`:
+   ```bash
+   docker run --rm \
+     -v $(pwd)/config.yaml:/app/config.yaml:ro \
+     ghcr.io/gmcouto/arr-oldies clean --unmonitor --only-monitored --older-than 6m --execute --yes
+   ```
+
+5. **Custom Config Path / Volume**:
+   ```bash
+   docker run --rm \
+     -v /path/to/custom-config.yaml:/config/config.yaml:ro \
+     ghcr.io/gmcouto/arr-oldies --config /config/config.yaml scan
+   ```
+
+6. **Docker Compose**:
+   ```yaml
+   services:
+     arr-oldies:
+       image: ghcr.io/gmcouto/arr-oldies:latest
+       container_name: arr-oldies
+       volumes:
+         - ./config.yaml:/app/config.yaml:ro
+       command: scan --older-than 90d
+   ```
+
+---
 
 ### Install from Source
 
+#### Prerequisites
+- Python 3.11+
+- Access to one or more Radarr (v3/v4) and/or Sonarr (v3/v4) instances with API keys.
+
 ```bash
-git clone https://github.com/your-username/arr-oldies.git
+git clone https://github.com/gmcouto/arr-oldies.git
 cd arr-oldies
 
 # Create and activate a virtual environment
