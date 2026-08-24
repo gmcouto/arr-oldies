@@ -15,6 +15,7 @@ from arr_oldies.api.models import (
     SonarrEpisodeFile,
     SonarrHistoryRecord,
     SonarrSeries,
+    Tag,
 )
 from arr_oldies.api.radarr import RadarrClient
 from arr_oldies.api.sonarr import SonarrClient
@@ -33,6 +34,7 @@ class InstanceMediaData(BaseModel):
     series: list[SonarrSeries] = Field(default_factory=list)
     episode_files: list[SonarrEpisodeFile] = Field(default_factory=list)
     episodes: list[SonarrEpisode] = Field(default_factory=list)
+    tags: list[Tag] = Field(default_factory=list)
     history_records: list[RadarrHistoryRecord] | list[SonarrHistoryRecord] = Field(
         default_factory=list
     )
@@ -81,6 +83,10 @@ class MultiInstanceFetcher:
                             movie_files = await client.get_movie_files()
                         except Exception:  # noqa: BLE001
                             movie_files = []
+                    try:
+                        tags = await client.get_tags()
+                    except Exception:  # noqa: BLE001
+                        tags = []
                     radarr_history = await client.fetch_all_history(
                         page_size=history_page_size,
                         progress_callback=_history_progress,
@@ -91,6 +97,7 @@ class MultiInstanceFetcher:
                         instance_type=instance.type,
                         movies=movies,
                         movie_files=movie_files,
+                        tags=tags,
                         history_records=radarr_history,
                     )
                     item_count = len(movie_files) or len(movies)
@@ -98,13 +105,21 @@ class MultiInstanceFetcher:
                 elif isinstance(client, SonarrClient):
                     series = await client.get_series()
                     series_ids = [s.id for s in series]
-                    episode_files, episodes, sonarr_history = await asyncio.gather(
+
+                    async def _safe_get_tags() -> list[Tag]:
+                        try:
+                            return await client.get_tags()
+                        except Exception:  # noqa: BLE001
+                            return []
+
+                    episode_files, episodes, sonarr_history, tags = await asyncio.gather(
                         client.get_all_episode_files(series_ids=series_ids),
                         client.get_all_episodes(series_ids=series_ids),
                         client.fetch_all_history(
                             page_size=history_page_size,
                             progress_callback=_history_progress,
                         ),
+                        _safe_get_tags(),
                     )
                     data = InstanceMediaData(
                         instance_name=instance.name,
@@ -112,6 +127,7 @@ class MultiInstanceFetcher:
                         series=series,
                         episodes=episodes,
                         episode_files=episode_files,
+                        tags=tags,
                         history_records=sonarr_history,
                     )
                     item_count = len(episode_files) or len(series)

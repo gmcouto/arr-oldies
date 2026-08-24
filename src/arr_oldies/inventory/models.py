@@ -75,6 +75,9 @@ class MediaInventoryItem(BaseModel):
     has_history: bool = True
     is_legacy: bool = False
     history_status: HistoryStatus = HistoryStatus.IMPORTED
+    tags: list[str] = Field(
+        default_factory=list, description="Resolved tag labels assigned to media item"
+    )
     source_title: str | None = None
     download_id: str | None = None
 

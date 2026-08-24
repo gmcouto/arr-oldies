@@ -12,6 +12,7 @@ from arr_oldies.api.models import (
     SonarrHistoryPage,
     SonarrHistoryRecord,
     SonarrSeries,
+    Tag,
 )
 from arr_oldies.constants import (
     DEFAULT_HISTORY_PAGE_SIZE,
@@ -21,11 +22,18 @@ from arr_oldies.constants import (
     SONARR_HISTORY_ENDPOINT,
     SONARR_HISTORY_SERIES_ENDPOINT,
     SONARR_SERIES_ENDPOINT,
+    SONARR_TAG_ENDPOINT,
 )
 
 
 class SonarrClient(BaseArrClient):
     """Async API client for Sonarr v3/v4 instances."""
+
+    async def get_tags(self) -> list[Tag]:
+        """Retrieve all tags configured in Sonarr."""
+        response = await self.get(SONARR_TAG_ENDPOINT)
+        data = response.json()
+        return [Tag.model_validate(item) for item in data]
 
     async def get_series(self) -> list[SonarrSeries]:
         """Retrieve all TV series in the Sonarr library."""

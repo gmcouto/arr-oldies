@@ -21,6 +21,26 @@ def sonarr_instance() -> InstanceConfig:
 
 @pytest.mark.asyncio
 @respx.mock
+async def test_sonarr_get_tags(sonarr_instance: InstanceConfig):
+    """Verify get_tags parses tags list from /api/v3/tag."""
+    respx.get("http://sonarr.local:8989/api/v3/tag").respond(
+        json=[
+            {"id": 5, "label": "anime"},
+            {"id": 6, "label": "favorite"},
+        ]
+    )
+
+    async with SonarrClient(sonarr_instance) as client:
+        tags = await client.get_tags()
+        assert len(tags) == 2
+        assert tags[0].id == 5
+        assert tags[0].label == "anime"
+        assert tags[1].id == 6
+        assert tags[1].label == "favorite"
+
+
+@pytest.mark.asyncio
+@respx.mock
 async def test_sonarr_get_series(sonarr_instance: InstanceConfig):
     """Verify get_series and get_series_by_id parsing."""
     respx.get("http://sonarr.local:8989/api/v3/series").respond(

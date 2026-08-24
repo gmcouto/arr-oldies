@@ -21,6 +21,26 @@ def radarr_instance() -> InstanceConfig:
 
 @pytest.mark.asyncio
 @respx.mock
+async def test_radarr_get_tags(radarr_instance: InstanceConfig):
+    """Verify get_tags parses tags list from /api/v3/tag."""
+    respx.get("http://radarr.local:7878/api/v3/tag").respond(
+        json=[
+            {"id": 1, "label": "4k"},
+            {"id": 2, "label": "archive"},
+        ]
+    )
+
+    async with RadarrClient(radarr_instance) as client:
+        tags = await client.get_tags()
+        assert len(tags) == 2
+        assert tags[0].id == 1
+        assert tags[0].label == "4k"
+        assert tags[1].id == 2
+        assert tags[1].label == "archive"
+
+
+@pytest.mark.asyncio
+@respx.mock
 async def test_radarr_get_movies(radarr_instance: InstanceConfig):
     """Verify get_movies parses movie library entries."""
     respx.get("http://radarr.local:7878/api/v3/movie").respond(

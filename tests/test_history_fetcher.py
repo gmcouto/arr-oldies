@@ -222,3 +222,42 @@ async def test_fetch_all_instances_data_empty():
     fetcher = MultiInstanceFetcher()
     results = await fetcher.fetch_all_instances_data([])
     assert results == []
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_fetch_instance_data_with_tags_and_fallback(
+    radarr_inst: InstanceConfig, sonarr_inst: InstanceConfig
+):
+    """Verify fetch_instance_data retrieves tags and gracefully falls back to empty list on error."""
+    # Radarr with tags succeeding
+    respx.get("http://radarr-hd.local:7878/api/v3/movie").respond(json=[])
+    respx.get("http://radarr-hd.local:7878/api/v3/moviefile").respond(json=[])
+    respx.get("http://radarr-hd.local:7878/api/v3/history").respond(
+        json={"page": 1, "pageSize": 1000, "totalRecords": 0, "records": []}
+    )
+    respx.get("http://radarr-hd.local:7878/api/v3/tag").respond(
+        json=[{"id": 1, "label": "4k"}, {"id": 2, "label": "hdr"}]
+    )
+
+    fetcher = MultiInstanceFetcher()
+    radarr_res = await fetcher.fetch_instance_data(radarr_inst)
+    assert radarr_res.success is True
+    assert radarr_res.data is not None
+    assert len(radarr_res.data.tags) == 2
+    assert radarr_res.data.tags[0].label == "4k"
+    assert radarr_res.data.tags[1].label == "hdr"
+
+    # Sonarr where /api/v3/tag returns 500 Server Error -> fallback to tags=[]
+    respx.get("http://sonarr-anime.local:8989/api/v3/series").respond(json=[])
+    respx.get("http://sonarr-anime.local:8989/api/v3/history").respond(
+        json={"page": 1, "pageSize": 1000, "totalRecords": 0, "records": []}
+    )
+    respx.get("http://sonarr-anime.local:8989/api/v3/tag").respond(
+        status_code=500, text="Internal Server Error"
+    )
+
+    sonarr_res = await fetcher.fetch_instance_data(sonarr_inst)
+    assert sonarr_res.success is True
+    assert sonarr_res.data is not None
+    assert sonarr_res.data.tags == []

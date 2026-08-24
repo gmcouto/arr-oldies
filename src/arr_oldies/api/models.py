@@ -12,6 +12,13 @@ class ApiBaseModel(BaseModel):
     model_config = ConfigDict(extra="ignore", populate_by_name=True)
 
 
+class Tag(ApiBaseModel):
+    """Tag descriptor mapping tag ID to human-readable label."""
+
+    id: int
+    label: str
+
+
 class MediaInfo(ApiBaseModel):
     """Media technical stream metadata extracted from media file."""
 
@@ -60,6 +67,7 @@ class RadarrMovie(ApiBaseModel):
     movie_file: RadarrMovieFile | None = Field(default=None, alias="movieFile")
     size_on_disk: int | None = Field(default=None, alias="sizeOnDisk")
     genres: list[str] = Field(default_factory=list)
+    tags: list[int] = Field(default_factory=list)
 
 
 class RadarrHistoryRecord(ApiBaseModel):
@@ -104,6 +112,7 @@ class SonarrSeries(ApiBaseModel):
     monitored: bool = Field(default=True)
     seasons: list[SonarrSeason] = Field(default_factory=list)
     statistics: dict[str, Any] | None = Field(default=None)
+    tags: list[int] = Field(default_factory=list)
 
 
 class SonarrEpisodeFile(ApiBaseModel):

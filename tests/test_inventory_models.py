@@ -50,6 +50,34 @@ def test_media_inventory_item_instantiation_and_utc_normalization():
     assert item.relative_path == ""
 
 
+def test_media_inventory_item_tags_field():
+    """Verify MediaInventoryItem default tags=[] and custom tags list handling."""
+    item_default = MediaInventoryItem(
+        id="radarr:101",
+        instance_name="radarr-main",
+        instance_type=InstanceType.RADARR,
+        media_type=MediaType.MOVIE,
+        title="Interstellar",
+        file_path="/movies/Interstellar/Interstellar.mkv",
+        import_date=datetime(2024, 1, 1, 12, 0, 0, tzinfo=UTC),
+    )
+    assert item_default.tags == []
+
+    item_tagged = MediaInventoryItem(
+        id="radarr:102",
+        instance_name="radarr-main",
+        instance_type=InstanceType.RADARR,
+        media_type=MediaType.MOVIE,
+        title="Dune",
+        file_path="/movies/Dune/Dune.mkv",
+        import_date=datetime(2024, 1, 1, 12, 0, 0, tzinfo=UTC),
+        tags=["4k", "favorite"],
+    )
+    assert item_tagged.tags == ["4k", "favorite"]
+    parsed = json.loads(item_tagged.model_dump_json())
+    assert parsed["tags"] == ["4k", "favorite"]
+
+
 def test_media_inventory_item_optional_grab_date_none():
     """Verify grab_date=None validator does not fail."""
     item = MediaInventoryItem(

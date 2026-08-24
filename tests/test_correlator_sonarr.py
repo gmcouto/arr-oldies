@@ -9,10 +9,63 @@ from arr_oldies.api.models import (
     SonarrEpisodeFile,
     SonarrHistoryRecord,
     SonarrSeries,
+    Tag,
 )
 from arr_oldies.inventory.correlator import HistoryCorrelator
 from arr_oldies.inventory.models import HistoryStatus, MediaType
 from arr_oldies.models import InstanceType
+
+
+def test_correlate_sonarr_series_tag_label_mapping():
+    """Verify series numeric tag IDs resolve to human-readable tag labels on episodes."""
+    series_tagged = SonarrSeries(
+        id=10,
+        title="Breaking Bad",
+        year=2008,
+        path="/tv/Breaking Bad",
+        tags=[1, 2],
+    )
+    series_untagged = SonarrSeries(
+        id=20,
+        title="Better Call Saul",
+        year=2015,
+        path="/tv/Better Call Saul",
+        tags=[],
+    )
+    ep_file1 = SonarrEpisodeFile(
+        id=201,
+        series_id=10,
+        season_number=1,
+        path="/tv/Breaking Bad/S01E01.mkv",
+        date_added=datetime(2024, 1, 1, tzinfo=UTC),
+    )
+    ep_file2 = SonarrEpisodeFile(
+        id=202,
+        series_id=20,
+        season_number=1,
+        path="/tv/Better Call Saul/S01E01.mkv",
+        date_added=datetime(2024, 1, 1, tzinfo=UTC),
+    )
+    data = InstanceMediaData(
+        instance_name="sonarr-tv",
+        instance_type=InstanceType.SONARR,
+        series=[series_tagged, series_untagged],
+        episode_files=[ep_file1, ep_file2],
+        episodes=[],
+        tags=[
+            Tag(id=1, label="crime"),
+            Tag(id=2, label="drama"),
+        ],
+        history_records=[],
+    )
+
+    correlator = HistoryCorrelator()
+    items = correlator.correlate_instance(data)
+
+    assert len(items) == 2
+    items_by_id = {item.episode_file_id: item for item in items}
+    assert items_by_id[201].tags == ["crime", "drama"]
+    assert items_by_id[202].tags == []
 
 
 def test_correlate_sonarr_single_episode():

@@ -10,6 +10,7 @@ from arr_oldies.api.models import (
     RadarrHistoryRecord,
     RadarrMovie,
     RadarrMovieFile,
+    Tag,
 )
 from arr_oldies.constants import (
     DEFAULT_HISTORY_PAGE_SIZE,
@@ -17,11 +18,18 @@ from arr_oldies.constants import (
     RADARR_HISTORY_MOVIE_ENDPOINT,
     RADARR_MOVIE_ENDPOINT,
     RADARR_MOVIEFILE_ENDPOINT,
+    RADARR_TAG_ENDPOINT,
 )
 
 
 class RadarrClient(BaseArrClient):
     """Async API client for Radarr v3/v4 instances."""
+
+    async def get_tags(self) -> list[Tag]:
+        """Retrieve all tags configured in Radarr."""
+        response = await self.get(RADARR_TAG_ENDPOINT)
+        data = response.json()
+        return [Tag.model_validate(item) for item in data]
 
     async def get_movies(self) -> list[RadarrMovie]:
         """Retrieve all movies in the Radarr library."""

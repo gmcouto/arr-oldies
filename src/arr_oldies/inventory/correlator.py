@@ -140,6 +140,7 @@ class HistoryCorrelator:
     ) -> list[MediaInventoryItem]:
         """Correlate Radarr movie files with history events or fallback to date_added."""
         movies_by_id: dict[int, RadarrMovie] = {m.id: m for m in instance_data.movies}
+        tags_by_id: dict[int, str] = {t.id: t.label for t in instance_data.tags}
         index = RadarrHistoryIndex(instance_data.history_records)
         items: list[MediaInventoryItem] = []
 
@@ -152,6 +153,11 @@ class HistoryCorrelator:
             )
             year = movie.year if movie else None
             monitored = movie.monitored if movie is not None else True
+            movie_tags = (
+                [tags_by_id[tid] for tid in movie.tags if tid in tags_by_id]
+                if movie and movie.tags
+                else []
+            )
 
             # Audio languages extraction
             raw_audio = movie_file.media_info.audio_languages if movie_file.media_info else None
@@ -240,6 +246,7 @@ class HistoryCorrelator:
                 has_history=has_history,
                 is_legacy=is_legacy,
                 history_status=history_status,
+                tags=movie_tags,
                 source_title=source_title,
                 download_id=download_id,
             )
@@ -254,6 +261,7 @@ class HistoryCorrelator:
     ) -> list[MediaInventoryItem]:
         """Correlate Sonarr episode files with history events or fallback to date_added."""
         series_by_id: dict[int, SonarrSeries] = {s.id: s for s in instance_data.series}
+        tags_by_id: dict[int, str] = {t.id: t.label for t in instance_data.tags}
         episodes_by_file_id: dict[int, list[SonarrEpisode]] = defaultdict(list)
         for ep in instance_data.episodes:
             if ep.episode_file_id is not None:
@@ -268,6 +276,11 @@ class HistoryCorrelator:
                 series.title if series else (ep_file.relative_path or f"Series {ep_file.series_id}")
             )
             year = series.year if series else None
+            series_tags = (
+                [tags_by_id[tid] for tid in series.tags if tid in tags_by_id]
+                if series and series.tags
+                else []
+            )
 
             episodes = episodes_by_file_id.get(ep_file.id, [])
             ep_numbers = sorted(e.episode_number for e in episodes)
@@ -415,6 +428,7 @@ class HistoryCorrelator:
                 has_history=has_history,
                 is_legacy=is_legacy,
                 history_status=history_status,
+                tags=series_tags,
                 source_title=source_title,
                 download_id=download_id,
             )

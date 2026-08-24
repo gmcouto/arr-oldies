@@ -10,7 +10,31 @@ from arr_oldies.api.models import (
     SonarrEpisodeFile,
     SonarrHistoryPage,
     SonarrSeries,
+    Tag,
 )
+
+
+def test_tag_model_parsing():
+    """Verify Tag model parses id and label."""
+    payload = {"id": 1, "label": "4k"}
+    tag = Tag.model_validate(payload)
+    assert tag.id == 1
+    assert tag.label == "4k"
+
+
+def test_radarr_movie_and_sonarr_series_tags_parsing():
+    """Verify RadarrMovie and SonarrSeries parse integer tag IDs."""
+    movie = RadarrMovie.model_validate({"id": 1, "title": "Test", "tags": [1, 2, 5]})
+    assert movie.tags == [1, 2, 5]
+
+    movie_default = RadarrMovie.model_validate({"id": 2, "title": "Default"})
+    assert movie_default.tags == []
+
+    series = SonarrSeries.model_validate({"id": 10, "title": "Test Show", "tags": [3, 4]})
+    assert series.tags == [3, 4]
+
+    series_default = SonarrSeries.model_validate({"id": 20, "title": "Default Show"})
+    assert series_default.tags == []
 
 
 def test_media_info_parsing():

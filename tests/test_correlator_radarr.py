@@ -10,10 +10,65 @@ from arr_oldies.api.models import (
     RadarrHistoryRecord,
     RadarrMovie,
     RadarrMovieFile,
+    Tag,
 )
 from arr_oldies.inventory.correlator import HistoryCorrelator
 from arr_oldies.inventory.models import HistoryStatus, MediaType
 from arr_oldies.models import InstanceType
+
+
+def test_correlate_radarr_movie_tag_label_mapping():
+    """Verify movie numeric tag IDs resolve to human-readable tag labels."""
+    movie_tagged = RadarrMovie(
+        id=1,
+        title="Inception",
+        year=2010,
+        path="/movies/Inception (2010)",
+        tags=[10, 20, 99],  # 99 is unmapped/missing
+    )
+    movie_untagged = RadarrMovie(
+        id=2,
+        title="Dune",
+        year=2021,
+        path="/movies/Dune (2021)",
+        tags=[],
+    )
+    file1 = RadarrMovieFile(
+        id=101,
+        movie_id=1,
+        relative_path="Inception.mkv",
+        path="/movies/Inception (2010)/Inception.mkv",
+        size=1000000000,
+        date_added=datetime(2024, 1, 1, 0, 0, 0, tzinfo=UTC),
+    )
+    file2 = RadarrMovieFile(
+        id=102,
+        movie_id=2,
+        relative_path="Dune.mkv",
+        path="/movies/Dune (2021)/Dune.mkv",
+        size=2000000000,
+        date_added=datetime(2024, 1, 2, 0, 0, 0, tzinfo=UTC),
+    )
+    data = InstanceMediaData(
+        instance_name="radarr-main",
+        instance_type=InstanceType.RADARR,
+        movies=[movie_tagged, movie_untagged],
+        movie_files=[file1, file2],
+        tags=[
+            Tag(id=10, label="4k"),
+            Tag(id=20, label="favorite"),
+            Tag(id=30, label="archive"),
+        ],
+        history_records=[],
+    )
+
+    correlator = HistoryCorrelator()
+    items = correlator.correlate_instance(data)
+
+    assert len(items) == 2
+    items_by_id = {item.movie_file_id: item for item in items}
+    assert items_by_id[101].tags == ["4k", "favorite"]
+    assert items_by_id[102].tags == []
 
 
 def test_correlate_radarr_movie_exact_file_id_and_download_id_match():
