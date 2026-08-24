@@ -517,3 +517,176 @@ def test_cli_clean_composite_age_filters(config_file_path: Path) -> None:
     parsed_empty = json.loads(res_empty.stdout)
     assert parsed_empty["summary"]["total_items"] == 0
     assert parsed_empty["items"] == []
+
+
+@respx.mock
+def test_cli_clean_monitored_and_unmonitored_filters(config_file_path: Path) -> None:
+    """Verify clean --monitored (and aliases) and --unmonitored filters and mutual exclusion."""
+    respx.get("http://localhost:7878/api/v3/movie").respond(
+        json=[
+            {
+                "id": 1,
+                "title": "Monitored Film",
+                "year": 2020,
+                "path": "/m/1",
+                "monitored": True,
+                "hasFile": True,
+            },
+            {
+                "id": 2,
+                "title": "Unmonitored Film",
+                "year": 2021,
+                "path": "/m/2",
+                "monitored": False,
+                "hasFile": True,
+            },
+        ]
+    )
+    respx.get("http://localhost:7878/api/v3/moviefile").respond(
+        json=[
+            {
+                "id": 101,
+                "movieId": 1,
+                "relativePath": "1.mkv",
+                "path": "/m/1/1.mkv",
+                "size": 1_000_000_000,
+                "dateAdded": "2020-01-01T00:00:00Z",
+            },
+            {
+                "id": 102,
+                "movieId": 2,
+                "relativePath": "2.mkv",
+                "path": "/m/2/2.mkv",
+                "size": 2_000_000_000,
+                "dateAdded": "2021-01-01T00:00:00Z",
+            },
+        ]
+    )
+    respx.get("http://localhost:7878/api/v3/history").respond(
+        json={"page": 1, "pageSize": 1000, "totalRecords": 0, "records": []}
+    )
+
+    route_unmonitor = respx.put("http://localhost:7878/api/v3/movie/editor").respond(
+        status_code=202
+    )
+    route_delete_101 = respx.delete("http://localhost:7878/api/v3/moviefile/101").respond(
+        status_code=200
+    )
+    route_delete_102 = respx.delete("http://localhost:7878/api/v3/moviefile/102").respond(
+        status_code=200
+    )
+
+    # 1. Test clean --unmonitor --only-monitored dry-run
+    res_unmon_dry = runner.invoke(
+        app,
+        [
+            "clean",
+            "--unmonitor",
+            "--only-monitored",
+            "-i",
+            "radarr-main",
+            "--config",
+            str(config_file_path),
+        ],
+    )
+    assert res_unmon_dry.exit_code == 0
+    assert "Monitored Film" in res_unmon_dry.output
+    assert "Unmonitored Film" not in res_unmon_dry.output
+    assert not route_unmonitor.called
+
+    # 1b. Test clean --unmonitor --only-monitored execution
+    res_unmon_exec = runner.invoke(
+        app,
+        [
+            "clean",
+            "--unmonitor",
+            "--only-monitored",
+            "--execute",
+            "--yes",
+            "-i",
+            "radarr-main",
+            "--config",
+            str(config_file_path),
+        ],
+    )
+    assert res_unmon_exec.exit_code == 0
+    assert "radarr-main:101" in res_unmon_exec.output
+    assert "radarr-main:102" not in res_unmon_exec.output
+    assert route_unmonitor.called
+    assert not route_delete_101.called
+    assert not route_delete_102.called
+
+    # 2. Test clean --delete --unmonitored dry-run
+    res_del_dry = runner.invoke(
+        app,
+        [
+            "clean",
+            "--delete",
+            "--unmonitored",
+            "-i",
+            "radarr-main",
+            "--config",
+            str(config_file_path),
+        ],
+    )
+    assert res_del_dry.exit_code == 0
+    assert "Unmonitored Film" in res_del_dry.output
+    assert "Monitored Film" not in res_del_dry.output
+
+    # 2b. Test clean --delete --only-unmonitored in JSON mode
+    res_del_json = runner.invoke(
+        app,
+        [
+            "clean",
+            "--delete",
+            "--only-unmonitored",
+            "-i",
+            "radarr-main",
+            "--format",
+            "json",
+            "--config",
+            str(config_file_path),
+        ],
+    )
+    assert res_del_json.exit_code == 0
+    parsed_json = json.loads(res_del_json.stdout)
+    assert len(parsed_json["items"]) == 1
+    assert parsed_json["items"][0]["item"]["title"] == "Unmonitored Film"
+
+    # 2c. Test clean --delete --unmonitored execution
+    res_del_exec = runner.invoke(
+        app,
+        [
+            "clean",
+            "--delete",
+            "--unmonitored",
+            "--execute",
+            "--yes",
+            "-i",
+            "radarr-main",
+            "--config",
+            str(config_file_path),
+        ],
+    )
+    assert res_del_exec.exit_code == 0
+    assert "radarr-main:102" in res_del_exec.output
+    assert "radarr-main:101" not in res_del_exec.output
+    assert route_delete_102.called
+    assert not route_delete_101.called
+
+    # 3. Test mutual exclusion check
+    res_mutex = runner.invoke(
+        app,
+        [
+            "clean",
+            "--delete",
+            "--monitored",
+            "--unmonitored",
+            "-i",
+            "radarr-main",
+            "--config",
+            str(config_file_path),
+        ],
+    )
+    assert res_mutex.exit_code == 2
+    assert "Cannot specify both --monitored and --unmonitored filter flags." in res_mutex.output

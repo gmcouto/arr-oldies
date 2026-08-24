@@ -259,6 +259,24 @@ def scan_command(
             help="Filter only items with verified history records.",
         ),
     ] = False,
+    monitored: Annotated[
+        bool,
+        typer.Option(
+            "--monitored",
+            "--monitored-only",
+            "--only-monitored",
+            help="Filter only monitored media items.",
+        ),
+    ] = False,
+    unmonitored: Annotated[
+        bool,
+        typer.Option(
+            "--unmonitored",
+            "--unmonitored-only",
+            "--only-unmonitored",
+            help="Filter only unmonitored media items.",
+        ),
+    ] = False,
     sort: Annotated[
         SortKey,
         typer.Option(
@@ -301,6 +319,10 @@ def scan_command(
     ] = True,
 ) -> None:
     """Audit and visualize downloaded media files sorted by age across Radarr and Sonarr instances."""
+    if monitored and unmonitored:
+        print_error("Cannot specify both --monitored and --unmonitored filter flags.")
+        raise typer.Exit(code=EXIT_CONFIG_ERROR)
+
     global_config: Path | None = ctx.obj.get("config") if ctx.obj else None
     effective_config = config or global_config
     verbose: bool = ctx.obj.get("verbose", False) if ctx.obj else False
@@ -349,6 +371,8 @@ def scan_command(
         after_date=after_date,
         legacy_only=legacy,
         history_only=history,
+        monitored_only=monitored,
+        unmonitored_only=unmonitored,
     )
 
     # 4. Fetch library and history data concurrently
@@ -543,6 +567,24 @@ def clean_command(
             help="Filter only items with verified history records.",
         ),
     ] = False,
+    monitored: Annotated[
+        bool,
+        typer.Option(
+            "--monitored",
+            "--monitored-only",
+            "--only-monitored",
+            help="Filter only monitored media items.",
+        ),
+    ] = False,
+    unmonitored: Annotated[
+        bool,
+        typer.Option(
+            "--unmonitored",
+            "--unmonitored-only",
+            "--only-unmonitored",
+            help="Filter only unmonitored media items.",
+        ),
+    ] = False,
     sort: Annotated[
         SortKey,
         typer.Option(
@@ -578,6 +620,10 @@ def clean_command(
     ] = OutputFormat.TABLE,
 ) -> None:
     """Safely execute targeted actions (delete, unmonitor, remove) on media items with dry-run protection."""
+    if monitored and unmonitored:
+        print_error("Cannot specify both --monitored and --unmonitored filter flags.")
+        raise typer.Exit(code=EXIT_CONFIG_ERROR)
+
     actions: list[ActionType] = []
     if delete:
         actions.append(ActionType.DELETE)
@@ -643,6 +689,8 @@ def clean_command(
         after_date=after_date,
         legacy_only=legacy,
         history_only=history,
+        monitored_only=monitored,
+        unmonitored_only=unmonitored,
     )
 
     # 4. Fetch library and history data

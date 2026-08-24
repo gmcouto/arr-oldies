@@ -1071,3 +1071,116 @@ def test_cli_scan_composite_age_filters(tmp_path: Path, sample_valid_yaml: str) 
     parsed_newer = json.loads(res_newer.stdout)
     assert parsed_newer["metadata"]["total_matched_items"] == 1
     assert parsed_newer["items"][0]["title"] == "Recent Film"
+
+
+@respx.mock
+def test_cli_scan_monitored_filters(tmp_path: Path, sample_valid_yaml: str) -> None:
+    """Verify --monitored and --unmonitored CLI flags and aliases."""
+    cfg = tmp_path / "config.yaml"
+    cfg.write_text(sample_valid_yaml, encoding="utf-8")
+
+    respx.get("http://localhost:7878/api/v3/movie").respond(
+        json=[
+            {
+                "id": 1,
+                "title": "Monitored Movie",
+                "year": 2020,
+                "path": "/m/1",
+                "monitored": True,
+                "hasFile": True,
+            },
+            {
+                "id": 2,
+                "title": "Unmonitored Movie",
+                "year": 2021,
+                "path": "/m/2",
+                "monitored": False,
+                "hasFile": True,
+            },
+        ]
+    )
+    respx.get("http://localhost:7878/api/v3/moviefile").respond(
+        json=[
+            {
+                "id": 10,
+                "movieId": 1,
+                "relativePath": "1.mkv",
+                "path": "/m/1/1.mkv",
+                "size": 1_000_000_000,
+                "dateAdded": "2020-01-01T00:00:00Z",
+            },
+            {
+                "id": 20,
+                "movieId": 2,
+                "relativePath": "2.mkv",
+                "path": "/m/2/2.mkv",
+                "size": 2_000_000_000,
+                "dateAdded": "2021-01-01T00:00:00Z",
+            },
+        ]
+    )
+    respx.get("http://localhost:7878/api/v3/history").respond(
+        json={"page": 1, "pageSize": 1000, "totalRecords": 0, "records": []}
+    )
+
+    # 1. Test --monitored
+    res_m = runner.invoke(
+        app,
+        ["--config", str(cfg), "scan", "-i", "radarr-main", "--monitored", "--format", "json"],
+    )
+    assert res_m.exit_code == 0
+    parsed_m = json.loads(res_m.stdout)
+    assert len(parsed_m["items"]) == 1
+    assert parsed_m["items"][0]["title"] == "Monitored Movie"
+    assert parsed_m["items"][0]["monitored"] is True
+
+    # 2. Test alias --only-monitored
+    res_om = runner.invoke(
+        app,
+        ["--config", str(cfg), "scan", "-i", "radarr-main", "--only-monitored", "--format", "json"],
+    )
+    assert res_om.exit_code == 0
+    assert len(json.loads(res_om.stdout)["items"]) == 1
+
+    # 3. Test alias --monitored-only
+    res_mo = runner.invoke(
+        app,
+        ["--config", str(cfg), "scan", "-i", "radarr-main", "--monitored-only", "--format", "json"],
+    )
+    assert res_mo.exit_code == 0
+    assert len(json.loads(res_mo.stdout)["items"]) == 1
+
+    # 4. Test --unmonitored
+    res_u = runner.invoke(
+        app,
+        ["--config", str(cfg), "scan", "-i", "radarr-main", "--unmonitored", "--format", "json"],
+    )
+    assert res_u.exit_code == 0
+    parsed_u = json.loads(res_u.stdout)
+    assert len(parsed_u["items"]) == 1
+    assert parsed_u["items"][0]["title"] == "Unmonitored Movie"
+    assert parsed_u["items"][0]["monitored"] is False
+
+    # 5. Test alias --only-unmonitored
+    res_ou = runner.invoke(
+        app,
+        ["--config", str(cfg), "scan", "-i", "radarr-main", "--only-unmonitored", "--format", "json"],
+    )
+    assert res_ou.exit_code == 0
+    assert len(json.loads(res_ou.stdout)["items"]) == 1
+
+    # 6. Test alias --unmonitored-only
+    res_uo = runner.invoke(
+        app,
+        ["--config", str(cfg), "scan", "-i", "radarr-main", "--unmonitored-only", "--format", "json"],
+    )
+    assert res_uo.exit_code == 0
+    assert len(json.loads(res_uo.stdout)["items"]) == 1
+
+    # 7. Mutual exclusion error
+    res_mutex = runner.invoke(
+        app,
+        ["--config", str(cfg), "scan", "-i", "radarr-main", "--monitored", "--unmonitored"],
+    )
+    assert res_mutex.exit_code == 2
+    assert "Cannot specify both --monitored and --unmonitored filter flags." in res_mutex.output
