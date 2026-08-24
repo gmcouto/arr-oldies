@@ -1,7 +1,7 @@
 """Human-friendly string parsing for file sizes, age intervals, and date cutoffs."""
 
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from arr_oldies.exceptions import ParseError
 
@@ -73,11 +73,12 @@ def parse_date_cutoff(date_str: str) -> datetime:
     clean = date_str.strip()
     try:
         if "T" in clean:
-            dt = datetime.fromisoformat(clean.replace("Z", "+00:00"))
+            dt = datetime.fromisoformat(clean)
         else:
-            dt = datetime.strptime(clean, "%Y-%m-%d")
+            dt = datetime.strptime(clean, "%Y-%m-%d").replace(tzinfo=UTC)
         if dt.tzinfo is None:
-            dt = dt.replace(tzinfo=timezone.utc)
-        return dt.astimezone(timezone.utc)
+            dt = dt.replace(tzinfo=UTC)
+        return dt.astimezone(UTC)
     except (ValueError, TypeError) as exc:
         raise ParseError(f"Invalid date format: '{date_str}'. Expected 'YYYY-MM-DD' or ISO-8601 format.") from exc
+

@@ -95,13 +95,13 @@ class LanguageNormalizer:
             if clean_lang in target_identifiers:
                 return True
             entry = self._lookup.get(clean_lang)
-            if entry:
-                if (
-                    entry.name.lower() in target_identifiers
-                    or entry.code_3.lower() in target_identifiers
-                    or (entry.code_2 and entry.code_2.lower() in target_identifiers)
-                    or any(s.lower() in target_identifiers for s in entry.synonyms)
-                ):
-                    return True
+            if entry and (
+                entry.name.lower() in target_identifiers
+                or entry.code_3.lower() in target_identifiers
+                or (entry.code_2 and entry.code_2.lower() in target_identifiers)
+                or any(s.lower() in target_identifiers for s in entry.synonyms)
+            ):
+                return True
 
         return False
+

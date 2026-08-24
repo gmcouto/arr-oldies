@@ -1,6 +1,6 @@
 """Unit tests for human size, age interval, and date cutoff parsing utilities."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 
@@ -79,13 +79,13 @@ def test_parse_age_cutoff_invalid():
 def test_parse_date_cutoff_valid():
     """Verify ISO and YYYY-MM-DD date strings parse to UTC timezone-aware datetimes."""
     dt = parse_date_cutoff("2024-01-15")
-    assert dt == datetime(2024, 1, 15, 0, 0, 0, tzinfo=timezone.utc)
+    assert dt == datetime(2024, 1, 15, 0, 0, 0, tzinfo=UTC)
 
     dt_iso = parse_date_cutoff("2024-01-15T14:30:00Z")
-    assert dt_iso == datetime(2024, 1, 15, 14, 30, 0, tzinfo=timezone.utc)
+    assert dt_iso == datetime(2024, 1, 15, 14, 30, 0, tzinfo=UTC)
 
     dt_offset = parse_date_cutoff("2024-01-15T16:30:00+02:00")
-    assert dt_offset == datetime(2024, 1, 15, 14, 30, 0, tzinfo=timezone.utc)
+    assert dt_offset == datetime(2024, 1, 15, 14, 30, 0, tzinfo=UTC)
 
 
 def test_parse_date_cutoff_invalid():

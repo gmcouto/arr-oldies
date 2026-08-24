@@ -1,7 +1,7 @@
 """Unit tests for MediaInventoryItem, InventoryFilter, and InventorySummary models."""
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from arr_oldies.inventory import (
     HistoryStatus,
@@ -22,8 +22,9 @@ from arr_oldies.models import InstanceType
 
 def test_media_inventory_item_instantiation_and_utc_normalization():
     """Verify MediaInventoryItem creation, UTC normalization for naive/aware datetimes, and field defaults."""
-    naive_dt = datetime(2024, 1, 1, 12, 0, 0)
+    naive_dt = datetime(2024, 1, 1, 12, 0, 0)  # noqa: DTZ001 - testing naive conversion
     item = MediaInventoryItem(
+
         id="radarr:101",
         instance_name="radarr-main",
         instance_type=InstanceType.RADARR,
@@ -34,14 +35,14 @@ def test_media_inventory_item_instantiation_and_utc_normalization():
         size_bytes=15000000000,
         audio_languages=["English"],
         import_date=naive_dt,  # Naive should become UTC
-        grab_date=datetime(2024, 1, 1, 10, 0, 0, tzinfo=timezone.utc),
+        grab_date=datetime(2024, 1, 1, 10, 0, 0, tzinfo=UTC),
         age_days=100,
     )
     assert item.id == "radarr:101"
     assert item.instance_name == "radarr-main"
-    assert item.import_date.tzinfo == timezone.utc
-    assert item.import_date == datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
-    assert item.grab_date == datetime(2024, 1, 1, 10, 0, 0, tzinfo=timezone.utc)
+    assert item.import_date.tzinfo == UTC
+    assert item.import_date == datetime(2024, 1, 1, 12, 0, 0, tzinfo=UTC)
+    assert item.grab_date == datetime(2024, 1, 1, 10, 0, 0, tzinfo=UTC)
     assert item.has_history is True
     assert item.is_legacy is False
     assert item.history_status == HistoryStatus.IMPORTED
@@ -59,7 +60,7 @@ def test_media_inventory_item_optional_grab_date_none():
         media_type=MediaType.MOVIE,
         title="Dune",
         file_path="/movies/Dune/Dune.mkv",
-        import_date=datetime(2024, 2, 1, 0, 0, 0, tzinfo=timezone.utc),
+        import_date=datetime(2024, 2, 1, 0, 0, 0, tzinfo=UTC),
         grab_date=None,
     )
     assert item.grab_date is None
@@ -85,8 +86,8 @@ def test_media_inventory_item_multi_episode():
         relative_path="Breaking Bad - S01E01-E02.mkv",
         size_bytes=3000000000,
         audio_languages=["English"],
-        import_date=datetime(2024, 2, 1, 12, 0, 0, tzinfo=timezone.utc),
-        grab_date=datetime(2024, 2, 1, 10, 0, 0, tzinfo=timezone.utc),
+        import_date=datetime(2024, 2, 1, 12, 0, 0, tzinfo=UTC),
+        grab_date=datetime(2024, 2, 1, 10, 0, 0, tzinfo=UTC),
         age_days=50,
         history_status=HistoryStatus.GRABBED_AND_IMPORTED,
     )
@@ -111,7 +112,7 @@ def test_media_inventory_item_legacy_representation():
         movie_file_id=505,
         file_path="/movies/Classic Film (1980)/Classic Film (1980).mkv",
         size_bytes=4000000000,
-        import_date=datetime(2020, 5, 10, 15, 0, 0, tzinfo=timezone.utc),
+        import_date=datetime(2020, 5, 10, 15, 0, 0, tzinfo=UTC),
         grab_date=None,
         age_days=1500,
         has_history=False,
@@ -126,7 +127,7 @@ def test_media_inventory_item_legacy_representation():
 
 def test_media_inventory_item_serialization():
     """Verify serialization to dict and JSON roundtrip."""
-    dt = datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
+    dt = datetime(2024, 1, 1, 12, 0, 0, tzinfo=UTC)
     item = MediaInventoryItem(
         id="radarr:101",
         instance_name="radarr-main",

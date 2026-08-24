@@ -1,6 +1,6 @@
 """Pydantic v2 data models for unified media inventory, filter options, and summaries."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import StrEnum
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -84,8 +84,8 @@ class MediaInventoryItem(BaseModel):
         if v is None:
             return None
         if v.tzinfo is None:
-            return v.replace(tzinfo=timezone.utc)
-        return v.astimezone(timezone.utc)
+            return v.replace(tzinfo=UTC)
+        return v.astimezone(UTC)
 
 
 class InventoryFilter(BaseModel):
