@@ -39,6 +39,7 @@ testpaths = ["tests"]
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+extend-exclude = [".planning", ".agents"]
 
 [tool.mypy]
 python_version = "3.11"

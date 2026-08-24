@@ -1205,7 +1205,9 @@ def test_cli_scan_monitored_filters(tmp_path: Path, sample_valid_yaml: str) -> N
 
 
 @respx.mock
-def test_cli_scan_negative_language_and_title_filter(tmp_path: Path, sample_valid_yaml: str) -> None:
+def test_cli_scan_negative_language_and_title_filter(
+    tmp_path: Path, sample_valid_yaml: str
+) -> None:
     """Verify scan with --!l and --title filtering flags in table and JSON modes."""
     cfg = tmp_path / "config.yaml"
     cfg.write_text(sample_valid_yaml, encoding="utf-8")
@@ -1380,9 +1382,7 @@ def test_cli_scan_tag_and_not_tag_filters(tmp_path: Path, sample_valid_yaml: str
     )
 
     # 1. Include tag "4k" -> matches Movie 4K and Movie 4K Archive
-    res_tag = runner.invoke(
-        app, ["--config", str(cfg), "scan", "-i", "radarr-main", "--tag", "4k"]
-    )
+    res_tag = runner.invoke(app, ["--config", str(cfg), "scan", "-i", "radarr-main", "--tag", "4k"])
     assert res_tag.exit_code == 0
     assert "Movie 4K" in res_tag.output
     assert "Movie 4K Archive" in res_tag.output

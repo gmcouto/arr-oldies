@@ -70,6 +70,7 @@ Enable negative audio language exclusion (`--!l` / `--not-audio-lang`), case-ins
     ```python
     class Tag(ApiBaseModel):
         """Tag definition in Radarr or Sonarr."""
+
         id: int
         label: str
     ```
@@ -185,21 +186,21 @@ not_audio_lang: Annotated[
         "--not-lang",
         help="Exclude media items containing specified audio language (repeatable, e.g. --!l pt-br).",
     ),
-] = None,
+] = (None,)
 title: Annotated[
     list[str] | None,
     typer.Option(
         "--title",
         help="Filter by case-insensitive title substring matching across movie, series, and episode titles (repeatable).",
     ),
-] = None,
+] = (None,)
 tag: Annotated[
     list[str] | None,
     typer.Option(
         "--tag",
         help="Filter media items having the specified tag label (repeatable, e.g. --tag 4k).",
     ),
-] = None,
+] = (None,)
 not_tag: Annotated[
     list[str] | None,
     typer.Option(
@@ -208,7 +209,7 @@ not_tag: Annotated[
         "--not-tag",
         help="Exclude media items having the specified tag label (repeatable, e.g. --!tag archive).",
     ),
-] = None,
+] = (None,)
 ```
 CLI parses and binds these options into `InventoryFilter`:
 ```python

@@ -107,9 +107,7 @@ class InventoryEngine:
                 title_queries = [t.strip().lower() for t in criteria.titles if t.strip()]
                 if title_queries:
                     item_title_lower = item.title.lower()
-                    item_ep_title_lower = (
-                        item.episode_title.lower() if item.episode_title else ""
-                    )
+                    item_ep_title_lower = item.episode_title.lower() if item.episode_title else ""
                     matched_title = any(
                         q in item_title_lower or (item_ep_title_lower and q in item_ep_title_lower)
                         for q in title_queries

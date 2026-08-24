@@ -908,4 +908,3 @@ def test_cli_clean_execution_with_tag_filter(config_file_path: Path) -> None:
     assert "Arr-Oldies Execution Report" in res.output
     assert route_delete_101.called
     assert not route_delete_102.called
-

@@ -726,11 +726,19 @@ class InventoryEngine:
 
         before_date = criteria.before_date
         if before_date is not None:
-            before_date = before_date.replace(tzinfo=UTC) if before_date.tzinfo is None else before_date.astimezone(UTC)
+            before_date = (
+                before_date.replace(tzinfo=UTC)
+                if before_date.tzinfo is None
+                else before_date.astimezone(UTC)
+            )
 
         after_date = criteria.after_date
         if after_date is not None:
-            after_date = after_date.replace(tzinfo=UTC) if after_date.tzinfo is None else after_date.astimezone(UTC)
+            after_date = (
+                after_date.replace(tzinfo=UTC)
+                if after_date.tzinfo is None
+                else after_date.astimezone(UTC)
+            )
 
         for item in items:
             # 1. Media Type Filter
@@ -738,7 +746,10 @@ class InventoryEngine:
                 continue
 
             # 2. Instance Filter
-            if norm_instances is not None and item.instance_name.strip().lower() not in norm_instances:
+            if (
+                norm_instances is not None
+                and item.instance_name.strip().lower() not in norm_instances
+            ):
                 continue
 
             # 3. Size Bounds Filter (bytes)
@@ -833,21 +844,21 @@ not_audio_lang: Annotated[
         "--not-lang",
         help="Exclude media items containing specified audio language (repeatable, e.g. --!l pt-br).",
     ),
-] = None,
+] = (None,)
 title: Annotated[
     list[str] | None,
     typer.Option(
         "--title",
         help="Filter by case-insensitive title substring matching across movie, series, and episode titles (repeatable).",
     ),
-] = None,
+] = (None,)
 tag: Annotated[
     list[str] | None,
     typer.Option(
         "--tag",
         help="Filter media items having the specified tag label (repeatable, e.g. --tag 4k).",
     ),
-] = None,
+] = (None,)
 not_tag: Annotated[
     list[str] | None,
     typer.Option(
@@ -856,7 +867,7 @@ not_tag: Annotated[
         "--not-tag",
         help="Exclude media items having the specified tag label (repeatable, e.g. --!tag archive).",
     ),
-] = None,
+] = (None,)
 
 # Bound to InventoryFilter in both commands:
 criteria = InventoryFilter(
@@ -1083,7 +1094,14 @@ def test_correlate_sonarr_series_tag_label_mapping():
         date_added=datetime(2024, 2, 1, 0, 0, 0, tzinfo=UTC),
     )
     episodes = [
-        SonarrEpisode(id=301, series_id=10, episode_file_id=201, season_number=1, episode_number=1, title="Pilot"),
+        SonarrEpisode(
+            id=301,
+            series_id=10,
+            episode_file_id=201,
+            season_number=1,
+            episode_number=1,
+            title="Pilot",
+        ),
     ]
     tags = [Tag(id=5, label="drama")]
     data = InstanceMediaData(
@@ -1149,9 +1167,7 @@ def test_filter_negative_audio_language(sample_items: list[MediaInventoryItem]):
     engine = InventoryEngine()
 
     # Exclude Japanese
-    filtered = engine.filter_inventory(
-        sample_items, InventoryFilter(not_audio_langs=["ja"])
-    )
+    filtered = engine.filter_inventory(sample_items, InventoryFilter(not_audio_langs=["ja"]))
     assert not any("Japanese" in item.audio_languages for item in filtered)
 
 
@@ -1159,9 +1175,7 @@ def test_filter_title_substring_matching(sample_items: list[MediaInventoryItem])
     """Verify case-insensitive substring title matching across title and episode_title."""
     engine = InventoryEngine()
 
-    filtered = engine.filter_inventory(
-        sample_items, InventoryFilter(titles=["anime"])
-    )
+    filtered = engine.filter_inventory(sample_items, InventoryFilter(titles=["anime"]))
     assert len(filtered) == 1
     assert "Anime" in filtered[0].title
 
@@ -1243,9 +1257,7 @@ def test_cli_scan_negative_language_and_title_filter(tmp_path: Path, sample_vali
             }
         ]
     )
-    respx.get("http://localhost:7878/api/v3/tag").respond(
-        json=[{"id": 1, "label": "4k"}]
-    )
+    respx.get("http://localhost:7878/api/v3/tag").respond(json=[{"id": 1, "label": "4k"}])
     respx.get("http://localhost:7878/api/v3/history").respond(
         json={"page": 1, "pageSize": 1000, "totalRecords": 0, "records": []}
     )
@@ -1306,9 +1318,7 @@ def test_cli_clean_with_negative_language_and_tag_flags(tmp_path: Path, sample_v
             }
         ]
     )
-    respx.get("http://localhost:7878/api/v3/tag").respond(
-        json=[{"id": 1, "label": "4k"}]
-    )
+    respx.get("http://localhost:7878/api/v3/tag").respond(json=[{"id": 1, "label": "4k"}])
     respx.get("http://localhost:7878/api/v3/history").respond(
         json={"page": 1, "pageSize": 1000, "totalRecords": 0, "records": []}
     )
