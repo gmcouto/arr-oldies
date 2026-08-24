@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: Rich CLI Visualization & Reporting** - Implement Rich terminal table formatting, storage metrics summaries, output limits, and JSON export (completed 2026-08-24)
 - [x] **Phase 6: Support Composite Time Formats for Age Filters** - Support compound relative time duration strings (e.g., `1y1m1d` for 1 year, 1 month, and 1 day) in `--older-than` and `--newer-than` filters (completed 2026-08-24)
 - [x] **Phase 7: Scope unmonitor to episodes and add unmonitor-series option** - Scope unmonitor to individual media items and add full series unmonitoring option (completed 2026-08-24)
-- [ ] **Phase 8: Support --monitored and --unmonitored filter for scan and clean** - Filter inventory by monitored status to inspect or unmonitor only monitored items
+- [x] **Phase 8: Support --monitored and --unmonitored filter for scan and clean** - Filter inventory by monitored status to inspect or unmonitor only monitored items (completed 2026-08-24)
 
 ## Phase Details
 
@@ -158,7 +158,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 5. Safe Action Engine (Dry-Run, Deletion & Unmonitoring) | 2/2 | Complete    | 2026-08-24 |
 | 6. Support Composite Time Formats for Age Filters | 1/1 | Complete   | 2026-08-24 |
 | 7. Scope unmonitor to episodes and add unmonitor-series option | 1/1 | Complete   | 2026-08-24 |
-| 8. Support --monitored and --unmonitored filter for scan and clean | 0/1 | Not started | - |
+| 8. Support --monitored and --unmonitored filter for scan and clean | 1/1 | Complete    | 2026-08-24 |
 
 ### Phase 6: Support Composite Time Formats for Age Filters
 
@@ -214,10 +214,10 @@ Plans:
   4. Running clean with `--unmonitor --only-monitored` isolates and unmonitors currently monitored files without redundant operations.
   5. JSON reporting and table formatting reflect monitored metadata accurately.
 
-**Plans:** 1/1 plans planned
+**Plans:** 1/1 plans complete
 
 Plans:
 **Wave 1**
 
-- [ ] 08-01-PLAN.md: Monitored Status Correlation, Inventory Engine Filtering & CLI Integration
+- [x] 08-01-PLAN.md: Monitored Status Correlation, Inventory Engine Filtering & CLI Integration
 
