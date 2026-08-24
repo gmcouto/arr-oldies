@@ -75,11 +75,17 @@ class MultiInstanceFetcher:
             async with client:
                 if isinstance(client, RadarrClient):
                     movies = await client.get_movies()
-                    movie_files = await client.get_movie_files()
+                    movie_files = [m.movie_file for m in movies if m.movie_file is not None]
+                    if not movie_files:
+                        try:
+                            movie_files = await client.get_movie_files()
+                        except Exception:  # noqa: BLE001
+                            movie_files = []
                     radarr_history = await client.fetch_all_history(
                         page_size=history_page_size,
                         progress_callback=_history_progress,
                     )
+
                     data = InstanceMediaData(
                         instance_name=instance.name,
                         instance_type=instance.type,
