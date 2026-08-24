@@ -93,6 +93,7 @@ Recent decisions affecting current work:
 - Phase 6 added: Support compound relative time duration strings (e.g. `1y1m1d`) for `--older-than` and `--newer-than` filters
 - Phase 7 added: Scope unmonitor to episodes and add unmonitor-series option (remove --unmonitor-episode)
 - Phase 8 added: Support --monitored and --unmonitored filter for scan and clean
+- Phase 9 added: Docker Packaging and GitHub Actions Release Workflow
 
 ### Pending Todos
 

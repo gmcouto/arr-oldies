@@ -20,6 +20,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 6: Support Composite Time Formats for Age Filters** - Support compound relative time duration strings (e.g., `1y1m1d` for 1 year, 1 month, and 1 day) in `--older-than` and `--newer-than` filters (completed 2026-08-24)
 - [x] **Phase 7: Scope unmonitor to episodes and add unmonitor-series option** - Scope unmonitor to individual media items and add full series unmonitoring option (completed 2026-08-24)
 - [x] **Phase 8: Support --monitored and --unmonitored filter for scan and clean** - Filter inventory by monitored status to inspect or unmonitor only monitored items (completed 2026-08-24)
+- [ ] **Phase 9: Docker Packaging and GitHub Actions Release Workflow** - Containerize arr-oldies and automate multi-platform Docker image build/publish to GHCR upon version release tags
 
 ## Phase Details
 
@@ -147,7 +148,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -159,6 +160,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 6. Support Composite Time Formats for Age Filters | 1/1 | Complete   | 2026-08-24 |
 | 7. Scope unmonitor to episodes and add unmonitor-series option | 1/1 | Complete   | 2026-08-24 |
 | 8. Support --monitored and --unmonitored filter for scan and clean | 1/1 | Complete    | 2026-08-24 |
+| 9. Docker Packaging and GitHub Actions Release Workflow | 0/1 | Not started | - |
 
 ### Phase 6: Support Composite Time Formats for Age Filters
 
@@ -221,3 +223,21 @@ Plans:
 
 - [x] 08-01-PLAN.md: Monitored Status Correlation, Inventory Engine Filtering & CLI Integration
 
+### Phase 9: Docker Packaging and GitHub Actions Release Workflow
+
+**Goal:** Package arr-oldies into a lightweight Docker image (runnable anywhere, e.g. `docker run ghcr.io/gmcouto/arr-oldies arr-oldies --help`) and configure a GitHub Actions workflow to build and deploy the image to GHCR upon version release tags.
+**Mode:** mvp
+**Depends on:** Phase 8
+**Requirements:** DIST-01, DIST-02
+**Success Criteria** (what must be TRUE):
+
+  1. Dockerfile builds a lightweight container with `arr-oldies` as the entrypoint supporting CLI arguments, volume mounting (e.g. `config.yaml`), and environment configuration.
+  2. Users can run commands via Docker (e.g., `docker run --rm -v $(pwd)/config.yaml:/app/config.yaml ghcr.io/gmcouto/arr-oldies arr-oldies --help`).
+  3. GitHub Actions workflow automates building and pushing multi-platform images (linux/amd64, linux/arm64) to `ghcr.io/gmcouto/arr-oldies` upon publishing version release tags (e.g., `v*`).
+  4. README.md and documentation are updated with Docker run instructions, mounting guidelines, and CI/CD release details.
+
+**Plans:** 0 plans
+
+Plans:
+
+- [ ] TBD (run /gsd-plan-phase 9 to break down)
