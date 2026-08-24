@@ -37,7 +37,10 @@ class ActionExecutor:
             applicable_actions = [
                 act
                 for act in actions
-                if not (act == ActionType.UNMONITOR_SERIES and item.media_type == MediaType.MOVIE)
+                if not (
+                    act in (ActionType.UNMONITOR_SERIES, ActionType.UNMONITOR_SEASON)
+                    and item.media_type == MediaType.MOVIE
+                )
             ]
             action_items.append(ActionItem(item=item, action_types=applicable_actions))
             instances_breakdown[item.instance_name] = (
@@ -88,6 +91,7 @@ class ActionExecutor:
         start_time = time.perf_counter()
         results: list[ActionResult] = []
         unmonitored_series: set[tuple[str, int]] = set()
+        unmonitored_seasons: set[tuple[str, int, int]] = set()
 
         try:
             for action_item in plan.items:
@@ -159,7 +163,65 @@ class ActionExecutor:
                                 )
                             )
 
-                # Step 2: Unmonitor entire parent Series (ACT-03)
+                # Step 2: Unmonitor Season in Sonarr
+                if ActionType.UNMONITOR_SEASON in action_item.action_types and isinstance(
+                    client, SonarrClient
+                ):
+                    if item.series_id is not None and item.season_number is not None:
+                        season_key = (item.instance_name, item.series_id, item.season_number)
+                        if season_key not in unmonitored_seasons:
+                            try:
+                                ok = await client.unmonitor_season(
+                                    item.series_id, item.season_number
+                                )
+                                if ok:
+                                    unmonitored_seasons.add(season_key)
+                                results.append(
+                                    ActionResult(
+                                        item_id=item.id,
+                                        instance_name=item.instance_name,
+                                        action_type=ActionType.UNMONITOR_SEASON,
+                                        success=ok,
+                                        freed_bytes=0,
+                                        error_message=None if ok else "Unmonitor season failed",
+                                    )
+                                )
+                            except Exception as exc:  # noqa: BLE001
+                                results.append(
+                                    ActionResult(
+                                        item_id=item.id,
+                                        instance_name=item.instance_name,
+                                        action_type=ActionType.UNMONITOR_SEASON,
+                                        success=False,
+                                        freed_bytes=0,
+                                        error_message=str(exc),
+                                    )
+                                )
+                        else:
+                            # Deduplicated season unmonitoring
+                            results.append(
+                                ActionResult(
+                                    item_id=item.id,
+                                    instance_name=item.instance_name,
+                                    action_type=ActionType.UNMONITOR_SEASON,
+                                    success=True,
+                                    freed_bytes=0,
+                                    error_message=None,
+                                )
+                            )
+                    else:
+                        results.append(
+                            ActionResult(
+                                item_id=item.id,
+                                instance_name=item.instance_name,
+                                action_type=ActionType.UNMONITOR_SEASON,
+                                success=False,
+                                freed_bytes=0,
+                                error_message="Missing series ID or season number",
+                            )
+                        )
+
+                # Step 3: Unmonitor entire parent Series (ACT-03)
                 if (
                     ActionType.UNMONITOR_SERIES in action_item.action_types
                     and isinstance(client, SonarrClient)

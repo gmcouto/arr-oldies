@@ -255,6 +255,22 @@ class SonarrClient(BaseArrClient):
         response = await self.put(endpoint, json=payload)
         return response.status_code in (200, 202)
 
+    async def unmonitor_season(self, series_id: int, season_number: int) -> bool:
+        """Unmonitor a specific season within a series to prevent automatic redownloads."""
+        response = await self.get(f"{SONARR_SERIES_ENDPOINT}/{series_id}")
+        series_data = response.json()
+        seasons = series_data.get("seasons", [])
+        found = False
+        for season in seasons:
+            if season.get("seasonNumber") == season_number:
+                season["monitored"] = False
+                found = True
+                break
+        if not found:
+            return False
+        put_response = await self.put(f"{SONARR_SERIES_ENDPOINT}/{series_id}", json=series_data)
+        return put_response.status_code in (200, 202)
+
     async def unmonitor_episodes(self, episode_ids: list[int]) -> bool:
         """Unmonitor specific episodes by their episode IDs."""
         endpoint = f"{SONARR_EPISODE_ENDPOINT}/monitor"

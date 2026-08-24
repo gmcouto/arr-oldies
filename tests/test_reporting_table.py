@@ -161,4 +161,3 @@ def test_table_rendering_narrow_terminal_and_multiple_languages() -> None:
         assert "Oppenheimer" in output, f"Oppenheimer missing at width {width}"
         assert "Demon Slayer" in output, f"Demon Slayer missing at width {width}"
         assert "S05E01" in output, f"S05E01 missing at width {width}"
-

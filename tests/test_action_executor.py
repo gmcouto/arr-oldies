@@ -68,12 +68,12 @@ def test_build_plan_defaults() -> None:
 
 
 def test_build_plan_prunes_inapplicable_actions() -> None:
-    """Verify unmonitor_series is pruned on Movie items."""
+    """Verify unmonitor_series and unmonitor_season are pruned on Movie items."""
     items = create_test_items()
     executor = ActionExecutor()
     plan = executor.build_plan(
         items=items,
-        actions=[ActionType.DELETE, ActionType.UNMONITOR_SERIES],
+        actions=[ActionType.DELETE, ActionType.UNMONITOR_SERIES, ActionType.UNMONITOR_SEASON],
         dry_run=False,
     )
 
@@ -81,8 +81,10 @@ def test_build_plan_prunes_inapplicable_actions() -> None:
     episode_action_item = next(it for it in plan.items if it.item.media_type == MediaType.EPISODE)
 
     assert ActionType.UNMONITOR_SERIES not in movie_action_item.action_types
+    assert ActionType.UNMONITOR_SEASON not in movie_action_item.action_types
     assert ActionType.DELETE in movie_action_item.action_types
     assert ActionType.UNMONITOR_SERIES in episode_action_item.action_types
+    assert ActionType.UNMONITOR_SEASON in episode_action_item.action_types
     assert ActionType.DELETE in episode_action_item.action_types
 
 
@@ -172,9 +174,7 @@ async def test_execute_plan_deletions_and_unmonitoring() -> None:
     report = await executor.execute_plan(plan, instances)
 
     assert report.mode == "execute"
-    assert (
-        report.total_attempted == 6
-    )  # 3 unmonitors (1 movie, 2 eps) + 3 deletes
+    assert report.total_attempted == 6  # 3 unmonitors (1 movie, 2 eps) + 3 deletes
     assert report.successful_count == 6
     assert report.failed_count == 0
     assert report.total_freed_bytes == 15 * 1024 * 1024 * 1024
@@ -232,6 +232,80 @@ async def test_execute_plan_unmonitor_series() -> None:
     assert report.successful_count == 2
     # Series 20 unmonitor should only be sent once due to deduplication
     assert route_sonarr_unmonitor_series.call_count == 1
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_execute_plan_unmonitor_season() -> None:
+    """Verify season-level unmonitoring with deduplication across episodes in the same season."""
+    series_data = {
+        "id": 20,
+        "title": "Breaking Bad",
+        "monitored": True,
+        "seasons": [
+            {"seasonNumber": 1, "monitored": True},
+            {"seasonNumber": 2, "monitored": True},
+        ],
+    }
+    route_get = respx.get("http://sonarr.local:8989/api/v3/series/20").respond(json=series_data)
+    route_put = respx.put("http://sonarr.local:8989/api/v3/series/20").respond(status_code=200)
+
+    items = create_test_items()
+    # Add second episode in same season (S1)
+    ep2 = MediaInventoryItem(
+        id="sonarr:2",
+        instance_name="sonarr-main",
+        instance_type=InstanceType.SONARR,
+        media_type=MediaType.EPISODE,
+        title="Breaking Bad",
+        season_number=1,
+        episode_numbers=[2],
+        formatted_episode="S01E02",
+        series_id=20,
+        episode_file_id=201,
+        episode_ids=[1002],
+        file_path="/tv/Breaking Bad/Season 01/S01E02.mkv",
+        size_bytes=3 * 1024 * 1024 * 1024,
+        import_date=datetime(2023, 1, 2, tzinfo=UTC),
+        history_status=HistoryStatus.IMPORTED,
+    )
+    # Add third episode in a different season (S2)
+    ep3 = MediaInventoryItem(
+        id="sonarr:3",
+        instance_name="sonarr-main",
+        instance_type=InstanceType.SONARR,
+        media_type=MediaType.EPISODE,
+        title="Breaking Bad",
+        season_number=2,
+        episode_numbers=[1],
+        formatted_episode="S02E01",
+        series_id=20,
+        episode_file_id=202,
+        episode_ids=[1003],
+        file_path="/tv/Breaking Bad/Season 02/S02E01.mkv",
+        size_bytes=3 * 1024 * 1024 * 1024,
+        import_date=datetime(2023, 1, 3, tzinfo=UTC),
+        history_status=HistoryStatus.IMPORTED,
+    )
+    items.extend([ep2, ep3])
+
+    instances = [
+        InstanceConfig(
+            name="sonarr-main",
+            type=InstanceType.SONARR,
+            url="http://sonarr.local:8989",
+            api_key=SecretStr("key2"),
+        ),
+    ]
+    executor = ActionExecutor()
+    # Movie item is pruned, 3 episode items (2 for S1, 1 for S2)
+    plan = executor.build_plan(items=items, actions=[ActionType.UNMONITOR_SEASON], dry_run=False)
+
+    report = await executor.execute_plan(plan, instances)
+    assert report.successful_count == 3
+    # S1 should be unmonitored once (deduplicated), S2 once -> total 2 GETs and 2 PUTs
+    assert route_get.call_count == 2
+    assert route_put.call_count == 2
 
 
 @pytest.mark.asyncio

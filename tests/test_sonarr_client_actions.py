@@ -48,6 +48,51 @@ async def test_sonarr_unmonitor_series(sonarr_instance: InstanceConfig) -> None:
 
 @pytest.mark.asyncio
 @respx.mock
+async def test_sonarr_unmonitor_season(sonarr_instance: InstanceConfig) -> None:
+    """Verify unmonitor_season gets series, sets season monitored=False, and PUTs updated series."""
+    series_data = {
+        "id": 20,
+        "title": "Breaking Bad",
+        "monitored": True,
+        "seasons": [
+            {"seasonNumber": 1, "monitored": True},
+            {"seasonNumber": 2, "monitored": True},
+        ],
+    }
+    get_route = respx.get("http://sonarr.local:8989/api/v3/series/20").respond(json=series_data)
+    put_route = respx.put("http://sonarr.local:8989/api/v3/series/20").respond(status_code=200)
+
+    async with SonarrClient(sonarr_instance) as client:
+        success = await client.unmonitor_season(20, season_number=1)
+        assert success is True
+        assert get_route.called
+        assert put_route.called
+        updated_payload = json.loads(put_route.calls.last.request.content)
+        assert updated_payload["seasons"][0] == {"seasonNumber": 1, "monitored": False}
+        assert updated_payload["seasons"][1] == {"seasonNumber": 2, "monitored": True}
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_sonarr_unmonitor_season_not_found(sonarr_instance: InstanceConfig) -> None:
+    """Verify unmonitor_season returns False when season number is not found."""
+    series_data = {
+        "id": 20,
+        "title": "Breaking Bad",
+        "monitored": True,
+        "seasons": [
+            {"seasonNumber": 1, "monitored": True},
+        ],
+    }
+    respx.get("http://sonarr.local:8989/api/v3/series/20").respond(json=series_data)
+
+    async with SonarrClient(sonarr_instance) as client:
+        success = await client.unmonitor_season(20, season_number=99)
+        assert success is False
+
+
+@pytest.mark.asyncio
+@respx.mock
 async def test_sonarr_unmonitor_episodes(sonarr_instance: InstanceConfig) -> None:
     """Verify unmonitor_episodes sends PUT request to /api/v3/episode/monitor with correct payload."""
     route = respx.put("http://sonarr.local:8989/api/v3/episode/monitor").respond(status_code=200)

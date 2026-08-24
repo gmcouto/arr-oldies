@@ -22,7 +22,7 @@ It enables self-hosters and media server administrators to inspect media age dis
   - Sort by `import_date`, `grab_date`, `size`, `title`, or `age` in ascending or descending order.
 - **Safe Action Engine (`clean`)**:
   - **Dry-Run by Default**: Simulates proposed deletions and unmonitoring without mutating any data unless explicit `--execute` is supplied.
-  - **Granular Unmonitoring**: Unmonitor specific matched files (individual episodes in Sonarr, movies in Radarr) with `--unmonitor`, or unmonitor entire parent shows with `--unmonitor-series`.
+  - **Granular Unmonitoring**: Unmonitor specific matched files (individual episodes in Sonarr, movies in Radarr) with `--unmonitor`, unmonitor whole seasons with `--unmonitor-season`, or unmonitor entire parent shows with `--unmonitor-series`.
   - **Safety Ordering**: Automatically unmonitors media in *arr before deleting files to prevent automatic re-download snatch loops.
   - **Interactive Safeguards**: High-contrast warning confirmation prompt (`[y/N]`) before applying mutations.
   - **Automated / Headless Mode**: Fast-fails if `--execute` is run in non-interactive stdin without `-y`/`--yes` to prevent hung cron jobs or subprocess deadlocks.
@@ -150,7 +150,7 @@ arr-oldies scan --format json > audit.json
 ---
 
 ### 3. `clean`
-Safely execute targeted write actions (`--delete`, `--unmonitor`, `--unmonitor-series`, `--remove`) on media matching filter criteria.
+Safely execute targeted write actions (`--delete`, `--unmonitor`, `--unmonitor-season`, `--unmonitor-series`, `--remove`) on media matching filter criteria.
 
 > [!IMPORTANT]
 > **Safety Guard**: `arr-oldies clean` runs in **dry-run simulation mode by default**. No files are deleted and no *arr settings are modified unless you explicitly pass the `--execute` flag.
@@ -164,15 +164,19 @@ arr-oldies clean --delete --radarr --older-than 2y -l ja
 # Identifies and unmonitors only monitored episodes older than 180 days (skipping already unmonitored)
 arr-oldies clean --unmonitor --only-monitored --sonarr --older-than 180d --execute
 
-# 3. UNMONITOR ENTIRE SERIES IN SONARR
+# 3. UNMONITOR WHOLE SEASON IN SONARR
+# Unmonitors the entire season for matched old episode items
+arr-oldies clean --unmonitor-season --sonarr --older-than 1y --execute
+
+# 4. UNMONITOR ENTIRE SERIES IN SONARR
 # Unmonitors full parent series for matched old episode items
 arr-oldies clean --unmonitor-series --sonarr --older-than 2y --execute
 
-# 4. INTERACTIVE DELETION
+# 5. INTERACTIVE DELETION
 # Prompts with a confirmation warning modal [y/N] before making changes
 arr-oldies clean --delete --unmonitor --older-than 3y --execute
 
-# 5. HEADLESS AUTOMATION / CRON EXECUTION
+# 6. HEADLESS AUTOMATION / CRON EXECUTION
 # Bypasses interactive confirmation with --yes
 arr-oldies clean --delete --unmonitor --older-than 2y --limit 50 --execute --yes
 ```
@@ -180,6 +184,7 @@ arr-oldies clean --delete --unmonitor --older-than 2y --limit 50 --execute --yes
 #### Action Flags (at least one required):
 - `--delete`: Delete the media file(s) via the *arr REST API.
 - `--unmonitor`: Unmonitor matched media items (movies in Radarr, specific episodes in Sonarr).
+- `--unmonitor-season`: Unmonitor entire season in Sonarr for matched episode items.
 - `--unmonitor-series`: Unmonitor entire parent TV series in Sonarr for matched episode items.
 - `--remove`: Remove complete movie or series library entry from the *arr database.
 

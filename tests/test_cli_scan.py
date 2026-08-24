@@ -1164,7 +1164,16 @@ def test_cli_scan_monitored_filters(tmp_path: Path, sample_valid_yaml: str) -> N
     # 5. Test alias --only-unmonitored
     res_ou = runner.invoke(
         app,
-        ["--config", str(cfg), "scan", "-i", "radarr-main", "--only-unmonitored", "--format", "json"],
+        [
+            "--config",
+            str(cfg),
+            "scan",
+            "-i",
+            "radarr-main",
+            "--only-unmonitored",
+            "--format",
+            "json",
+        ],
     )
     assert res_ou.exit_code == 0
     assert len(json.loads(res_ou.stdout)["items"]) == 1
@@ -1172,7 +1181,16 @@ def test_cli_scan_monitored_filters(tmp_path: Path, sample_valid_yaml: str) -> N
     # 6. Test alias --unmonitored-only
     res_uo = runner.invoke(
         app,
-        ["--config", str(cfg), "scan", "-i", "radarr-main", "--unmonitored-only", "--format", "json"],
+        [
+            "--config",
+            str(cfg),
+            "scan",
+            "-i",
+            "radarr-main",
+            "--unmonitored-only",
+            "--format",
+            "json",
+        ],
     )
     assert res_uo.exit_code == 0
     assert len(json.loads(res_uo.stdout)["items"]) == 1

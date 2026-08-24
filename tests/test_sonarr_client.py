@@ -154,13 +154,17 @@ async def test_sonarr_get_all_episodes(sonarr_instance: InstanceConfig):
     respx.get("http://sonarr.local:8989/api/v3/episode", params={"seriesId": 1}).mock(
         return_value=httpx.Response(
             200,
-            json=[{"id": 101, "seriesId": 1, "seasonNumber": 1, "episodeNumber": 1, "title": "Ep1"}],
+            json=[
+                {"id": 101, "seriesId": 1, "seasonNumber": 1, "episodeNumber": 1, "title": "Ep1"}
+            ],
         )
     )
     respx.get("http://sonarr.local:8989/api/v3/episode", params={"seriesId": 2}).mock(
         return_value=httpx.Response(
             200,
-            json=[{"id": 102, "seriesId": 2, "seasonNumber": 1, "episodeNumber": 2, "title": "Ep2"}],
+            json=[
+                {"id": 102, "seriesId": 2, "seasonNumber": 1, "episodeNumber": 2, "title": "Ep2"}
+            ],
         )
     )
 

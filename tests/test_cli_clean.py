@@ -78,6 +78,7 @@ def mock_radarr_sonarr_instances() -> None:
             {
                 "id": 201,
                 "seriesId": 2,
+                "seasonNumber": 1,
                 "relativePath": "Season 01/S01E01.mkv",
                 "path": "/tv/Attack on Titan/Season 01/S01E01.mkv",
                 "size": 2_000_000_000,
@@ -138,6 +139,7 @@ def test_cli_clean_missing_action_flag(config_file_path: Path) -> None:
     result = runner.invoke(app, ["clean", "--config", str(config_file_path)])
     assert result.exit_code == 2
     assert "No action specified" in result.output
+    assert "--unmonitor-season" in result.output
 
 
 @respx.mock
@@ -303,6 +305,45 @@ def test_cli_clean_unmonitor_series_action(config_file_path: Path) -> None:
     )
     assert result.exit_code == 0
     assert route_series.called
+
+
+@respx.mock
+def test_cli_clean_unmonitor_season_action(config_file_path: Path) -> None:
+    """Verify --unmonitor-season triggers season unmonitoring for Sonarr."""
+    mock_radarr_sonarr_instances()
+    series_data = {
+        "id": 2,
+        "title": "Attack on Titan",
+        "monitored": True,
+        "seasons": [
+            {"seasonNumber": 1, "monitored": True},
+        ],
+    }
+    route_get_series = respx.get("https://sonarr.local:8989/api/v3/series/2").respond(
+        json=series_data
+    )
+    route_put_series = respx.put("https://sonarr.local:8989/api/v3/series/2").respond(
+        status_code=200
+    )
+
+    result = runner.invoke(
+        app,
+        [
+            "clean",
+            "--unmonitor-season",
+            "--execute",
+            "--yes",
+            "--sonarr",
+            "--config",
+            str(config_file_path),
+        ],
+    )
+    assert result.exit_code == 0
+    assert route_get_series.called
+    assert route_put_series.called
+    updated_payload = json.loads(route_put_series.calls.last.request.content)
+    assert updated_payload["seasons"][0]["seasonNumber"] == 1
+    assert updated_payload["seasons"][0]["monitored"] is False
 
 
 @respx.mock
