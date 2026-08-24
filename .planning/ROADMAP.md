@@ -108,7 +108,7 @@ Plans:
 Plans:
 
 - [x] 04-01-PLAN.md
-- [ ] 04-02-PLAN.md
+- [x] 04-02-PLAN.md
 
 **Wave 1**
 
@@ -148,5 +148,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 1. Foundation, Multi-Instance Configuration & CLI Scaffolding | 2/2 | Complete    | 2026-08-23 |
 | 2. Async *arr API Clients & Batch History Fetcher | 2/2 | Complete    | 2026-08-23 |
 | 3. Media Inventory & History Timestamp Correlator | 2/2 | Complete    | 2026-08-24 |
-| 4. Rich CLI Visualization & Reporting | 1/2 | In Progress|  |
+| 4. Rich CLI Visualization & Reporting | 2/2 | In Progress|  |
 | 5. Safe Action Engine (Dry-Run, Deletion & Unmonitoring) | 0/2 | Not started | - |
