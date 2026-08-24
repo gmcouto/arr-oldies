@@ -95,6 +95,36 @@ Arr-Oldies automatically searches `/app/config.yaml` inside the container. Mount
        command: scan --older-than 90d
    ```
 
+#### Interactive CLI Mode & Shell Aliases
+
+If you plan to run multiple `arr-oldies` commands without repeating the `docker run` command prefix:
+
+- **Option A: Drop into an Interactive Container Shell**
+  ```bash
+  docker run -it --rm \
+    -v $(pwd)/config.yaml:/app/config.yaml:ro \
+    ghcr.io/gmcouto/arr-oldies sh
+  ```
+  Once inside the container shell, run subcommands directly:
+  ```sh
+  /app $ arr-oldies validate-config
+  /app $ arr-oldies scan --older-than 90d
+  /app $ arr-oldies clean --delete --older-than 1y
+  /app $ exit
+  ```
+
+- **Option B: Shell Alias (Native CLI Experience)**
+  Add an alias to your shell profile (`~/.bashrc` or `~/.zshrc`):
+  ```bash
+  alias arr-oldies="docker run -it --rm -v \$(pwd)/config.yaml:/app/config.yaml:ro ghcr.io/gmcouto/arr-oldies"
+  ```
+  Then invoke `arr-oldies` directly from your host terminal:
+  ```bash
+  arr-oldies validate-config
+  arr-oldies scan --older-than 90d
+  arr-oldies clean --delete --older-than 2y --execute
+  ```
+
 ---
 
 ### Install from Source

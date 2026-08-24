@@ -111,6 +111,7 @@ None.
 |---|-------------|------|--------|-----------|
 | 260824-fwt | add option --unmonitor-season for unmonitoring the whole season | 2026-08-24 | 3f9de5e | [260824-fwt-add-option-unmonitor-season-for-unmonito](./quick/260824-fwt-add-option-unmonitor-season-for-unmonito/) |
 | 260824-utd | include -t flag in README docker examples for colored Rich output | 2026-08-24 | e483602 | [260824-utd-include-t-flag-in-readme-docker-examples](./quick/260824-utd-include-t-flag-in-readme-docker-examples/) |
+| 260824-ucl | add interactive CLI mode and shell aliases to README | 2026-08-24 | a344633 | [260824-ucl-add-docker-cli-interactive-modes-to-readme](./quick/260824-ucl-add-docker-cli-interactive-modes-to-readme/) |
 
 ## Deferred Items
 
