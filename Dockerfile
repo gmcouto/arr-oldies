@@ -7,13 +7,20 @@ WORKDIR /build
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Copy package metadata and source code
-COPY pyproject.toml README.md ./
-COPY src/ ./src/
+# Upgrade pip
+RUN pip install --no-cache-dir --upgrade pip
 
-# Install build dependencies and the package
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir .
+# Copy project manifest first to maximize layer caching of dependencies
+COPY pyproject.toml README.md ./
+
+# Install third-party dependencies using standard library tomllib before copying source code
+RUN python3 -c "import tomllib; data=tomllib.load(open('pyproject.toml','rb')); print('\n'.join(data['project']['dependencies']))" > /tmp/requirements.txt && \
+    pip install --no-cache-dir -r /tmp/requirements.txt && \
+    rm /tmp/requirements.txt
+
+# Copy application source code and install arr-oldies package
+COPY src/ ./src/
+RUN pip install --no-cache-dir --no-deps .
 
 # Stage 2: Runner stage
 FROM python:3.11-slim AS runner
