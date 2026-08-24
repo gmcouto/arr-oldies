@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Media Inventory & History Timestamp Correlator** - Correlate media files with History API import/grab timestamps, extract audio languages, and build sortable/filterable inventory (completed 2026-08-24)
 - [x] **Phase 4: Rich CLI Visualization & Reporting** - Implement Rich terminal table formatting, storage metrics summaries, output limits, and JSON export (completed 2026-08-24)
 - [x] **Phase 5: Safe Action Engine (Dry-Run, Deletion & Unmonitoring)** - Build safe mutation pipeline with dry-run default, `--delete`, `--unmonitor`, `--unmonitor-episode`, `--remove`, and confirmation guards (completed 2026-08-24)
-- [ ] **Phase 6: Support Composite Time Formats for Age Filters** - Support compound relative time duration strings (e.g., `1y1m1d` for 1 year, 1 month, and 1 day) in `--older-than` and `--newer-than` filters
+- [x] **Phase 6: Support Composite Time Formats for Age Filters** - Support compound relative time duration strings (e.g., `1y1m1d` for 1 year, 1 month, and 1 day) in `--older-than` and `--newer-than` filters (completed 2026-08-24)
 
 ## Phase Details
 
@@ -155,7 +155,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 3. Media Inventory & History Timestamp Correlator | 2/2 | Complete    | 2026-08-24 |
 | 4. Rich CLI Visualization & Reporting | 2/2 | Complete    | 2026-08-24 |
 | 5. Safe Action Engine (Dry-Run, Deletion & Unmonitoring) | 2/2 | Complete    | 2026-08-24 |
-| 6. Support Composite Time Formats for Age Filters | 1/1 | In Progress|  |
+| 6. Support Composite Time Formats for Age Filters | 1/1 | Complete   | 2026-08-24 |
 
 ### Phase 6: Support Composite Time Formats for Age Filters
 
@@ -170,7 +170,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
   3. CLI filters `--older-than` and `--newer-than` in both `scan` and `clean` commands evaluate compound formats accurately.
   4. Invalid combinations or syntaxes produce clear, user-friendly error messages.
 
-**Plans**: 1/1 plans executed
+**Plans**: 1/1 plans complete
 
 Plans:
 **Wave 1**
