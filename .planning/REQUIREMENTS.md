@@ -46,6 +46,11 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **ACT-06**: Require explicit `--execute` flag to perform write operations, prompting with an interactive Rich confirmation modal listing target files and space to be freed
 - [x] **ACT-07**: Support `--yes` flag (when combined with `--execute`) to bypass interactive confirmation for automated scripts and headless cron execution
 
+### Distribution & Packaging (DIST)
+
+- [ ] **DIST-01**: Build lightweight container image with `arr-oldies` entrypoint supporting CLI arguments, volume mounting (e.g. `config.yaml`), and environment configuration
+- [ ] **DIST-02**: GitHub Actions release workflow to automate multi-platform (`linux/amd64,linux/arm64`) image builds and publish to `ghcr.io/gmcouto/arr-oldies` on version release tags (`v*`)
+
 ## v2 Requirements
 
 Deferred to future release. Tracked but not in current roadmap.
@@ -92,13 +97,15 @@ Deferred to future release. Tracked but not in current roadmap.
 | ACT-05 | Phase 5 | Complete |
 | ACT-06 | Phase 5 | Complete |
 | ACT-07 | Phase 5 | Complete |
+| DIST-01 | Phase 9 | Pending |
+| DIST-02 | Phase 9 | Pending |
 
 **Coverage:**
 
-- v1 requirements: 24 total
-- Mapped to phases: 24
+- v1 requirements: 26 total
+- Mapped to phases: 26
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-08-23*
-*Last updated: 2026-08-23 after initial definition*
+*Last updated: 2026-08-24 after Phase 9 planning*

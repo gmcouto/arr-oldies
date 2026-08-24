@@ -236,8 +236,9 @@ Plans:
   3. GitHub Actions workflow automates building and pushing multi-platform images (linux/amd64, linux/arm64) to `ghcr.io/gmcouto/arr-oldies` upon publishing version release tags (e.g., `v*`).
   4. README.md and documentation are updated with Docker run instructions, mounting guidelines, and CI/CD release details.
 
-**Plans:** 0 plans
+**Plans:** 1 plan
 
 Plans:
+**Wave 1**
 
-- [ ] TBD (run /gsd-plan-phase 9 to break down)
+- [ ] 09-01-PLAN.md: Multi-Stage Docker Packaging, Entrypoint, GitHub Actions CI/CD Release Pipeline & User Documentation
