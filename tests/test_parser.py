@@ -58,6 +58,19 @@ def test_parse_size_invalid():
         ("1yr", 365),
         ("1year", 365),
         ("2years", 730),
+        # Composite duration test cases
+        ("1y1m1d", 365 + 30 + 1),  # 396
+        ("2y6m", 2 * 365 + 6 * 30),  # 910
+        ("3w4d", 3 * 7 + 4 * 1),  # 25
+        ("1y 2mo 3d", 365 + 2 * 30 + 3),  # 428
+        ("1 year 1 month 1 day", 396),
+        ("2 weeks, 3 days", 17),
+        ("1 year and 2 months", 365 + 60),  # 425
+        ("1y & 3w", 365 + 21),  # 386
+        ("1Y1M1D", 396),
+        ("2Years 6Months", 910),
+        ("1d 1m 1y", 396),  # Out-of-order units
+        ("1y 1y", 730),  # Repeated units
     ],
 )
 def test_parse_age_cutoff_valid(input_str: str, expected_days: int):
@@ -65,15 +78,25 @@ def test_parse_age_cutoff_valid(input_str: str, expected_days: int):
     assert parse_age_cutoff(input_str) == expected_days
 
 
-def test_parse_age_cutoff_invalid():
-    """Verify invalid age strings raise ParseError."""
+@pytest.mark.parametrize(
+    "invalid_input,expected_error",
+    [
+        ("bad_age", "Invalid age specification"),
+        ("", "Invalid age specification"),
+        ("   ", "Invalid age specification"),
+        ("30x", "Unknown age unit"),
+        ("1y2x3d", "Unknown age unit"),
+        ("1y1m1d_extra", "Invalid age specification"),
+        ("1y 1m extra", "Invalid age specification"),
+        ("-5d", "Invalid age specification"),
+        ("1y-2m", "Invalid age specification"),
+    ],
+)
+def test_parse_age_cutoff_invalid(invalid_input: str, expected_error: str):
+    """Verify invalid age strings raise ParseError with expected messages."""
     with pytest.raises(ParseError) as exc_info:
-        parse_age_cutoff("bad_age")
-    assert "Invalid age specification" in str(exc_info.value)
-
-    with pytest.raises(ParseError) as exc_info:
-        parse_age_cutoff("30x")
-    assert "Unknown age unit" in str(exc_info.value)
+        parse_age_cutoff(invalid_input)
+    assert expected_error in str(exc_info.value)
 
 
 def test_parse_date_cutoff_valid():

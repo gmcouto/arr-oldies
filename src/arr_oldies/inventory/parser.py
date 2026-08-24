@@ -6,7 +6,34 @@ from datetime import UTC, datetime
 from arr_oldies.exceptions import ParseError
 
 SIZE_REGEX = re.compile(r"^\s*([0-9]+(?:\.[0-9]+)?)\s*([a-zA-Z]*)\s*$")
-AGE_REGEX = re.compile(r"^\s*([0-9]+)\s*([a-zA-Z]*)\s*$")
+AGE_BARE_INT_REGEX = re.compile(r"^\s*([0-9]+)\s*$")
+AGE_TOKEN_REGEX = re.compile(r"([0-9]+)\s*([a-zA-Z]+)")
+AGE_DELIMITER_REGEX = re.compile(r"^(?:[\s,]|\band\b|&)*$", re.IGNORECASE)
+
+AGE_UNIT_MULTIPLIERS: dict[str, int] = {
+    # Days
+    "d": 1,
+    "day": 1,
+    "days": 1,
+    # Weeks
+    "w": 7,
+    "wk": 7,
+    "wks": 7,
+    "week": 7,
+    "weeks": 7,
+    # Months
+    "m": 30,
+    "mo": 30,
+    "mos": 30,
+    "month": 30,
+    "months": 30,
+    # Years
+    "y": 365,
+    "yr": 365,
+    "yrs": 365,
+    "year": 365,
+    "years": 365,
+}
 
 SIZE_MULTIPLIERS: dict[str, int] = {
     "": 1,
@@ -47,29 +74,54 @@ def parse_size(size_str: str) -> int:
 
 
 def parse_age_cutoff(age_str: str) -> int:
-    """Parse human age interval (e.g., '30d', '6m', '1y', '2w', '90') into integer days."""
-    match = AGE_REGEX.match(age_str)
-    if not match:
+    """Parse human age interval (e.g., '30d', '6m', '1y', '2w', '1y1m1d', '2y6m', '90') into integer days."""
+    clean = age_str.strip()
+    if not clean:
         raise ParseError(
-            f"Invalid age specification: '{age_str}'. Examples: '30d', '6m', '1y', '2w'."
+            f"Invalid age specification: '{age_str}'. Examples: '30d', '6m', '1y1m1d', '2w'."
         )
 
-    val_str, unit_raw = match.groups()
-    val = int(val_str)
-    unit = unit_raw.lower()
+    # Fast path for bare integer inputs (defaulting to days)
+    match_bare = AGE_BARE_INT_REGEX.match(clean)
+    if match_bare:
+        return int(match_bare.group(1))
 
-    if unit in ("", "d", "day", "days"):
-        return val
-    elif unit in ("w", "week", "weeks"):
-        return val * 7
-    elif unit in ("m", "month", "months", "mo"):
-        return val * 30
-    elif unit in ("y", "year", "years", "yr"):
-        return val * 365
-    else:
+    # Tokenize composite duration string
+    matches = list(AGE_TOKEN_REGEX.finditer(clean))
+    if not matches:
         raise ParseError(
-            f"Unknown age unit '{unit_raw}' in '{age_str}'. Supported units: d (days), w (weeks), m (months), y (years)."
+            f"Invalid age specification: '{age_str}'. Examples: '30d', '6m', '1y1m1d', '2w'."
         )
+
+    total_days = 0
+    current_idx = 0
+
+    for match in matches:
+        prefix = clean[current_idx : match.start()]
+        if not AGE_DELIMITER_REGEX.match(prefix):
+            raise ParseError(
+                f"Invalid age specification: '{age_str}'. Examples: '30d', '6m', '1y1m1d', '2w'."
+            )
+
+        val_str, unit_raw = match.groups()
+        unit = unit_raw.lower()
+
+        multiplier = AGE_UNIT_MULTIPLIERS.get(unit)
+        if multiplier is None:
+            raise ParseError(
+                f"Unknown age unit '{unit_raw}' in '{age_str}'. Supported units: d (days), w (weeks), m (months), y (years)."
+            )
+
+        total_days += int(val_str) * multiplier
+        current_idx = match.end()
+
+    suffix = clean[current_idx:]
+    if not AGE_DELIMITER_REGEX.match(suffix):
+        raise ParseError(
+            f"Invalid age specification: '{age_str}'. Examples: '30d', '6m', '1y1m1d', '2w'."
+        )
+
+    return total_days
 
 
 def parse_date_cutoff(date_str: str) -> datetime:
