@@ -38,13 +38,13 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Safe Action Engine (ACT)
 
-- [ ] **ACT-01**: Default to dry-run mode for all commands, printing exact simulated actions without mutating *arr databases or deleting files
-- [ ] **ACT-02**: Implement `--delete` action to remove target media file(s) via Radarr/Sonarr API
-- [ ] **ACT-03**: Implement `--unmonitor` action to unmonitor target movie or entire TV show in *arr without deleting files
-- [ ] **ACT-04**: Implement `--unmonitor-episode` action to unmonitor specific individual episode(s) in Sonarr without unmonitoring the entire series
-- [ ] **ACT-05**: Implement `--remove` action to completely remove the movie or show entry from the *arr library
-- [ ] **ACT-06**: Require explicit `--execute` flag to perform write operations, prompting with an interactive Rich confirmation modal listing target files and space to be freed
-- [ ] **ACT-07**: Support `--yes` flag (when combined with `--execute`) to bypass interactive confirmation for automated scripts and headless cron execution
+- [x] **ACT-01**: Default to dry-run mode for all commands, printing exact simulated actions without mutating *arr databases or deleting files
+- [x] **ACT-02**: Implement `--delete` action to remove target media file(s) via Radarr/Sonarr API
+- [x] **ACT-03**: Implement `--unmonitor` action to unmonitor target movie or entire TV show in *arr without deleting files
+- [x] **ACT-04**: Implement `--unmonitor-episode` action to unmonitor specific individual episode(s) in Sonarr without unmonitoring the entire series
+- [x] **ACT-05**: Implement `--remove` action to completely remove the movie or show entry from the *arr library
+- [x] **ACT-06**: Require explicit `--execute` flag to perform write operations, prompting with an interactive Rich confirmation modal listing target files and space to be freed
+- [x] **ACT-07**: Support `--yes` flag (when combined with `--execute`) to bypass interactive confirmation for automated scripts and headless cron execution
 
 ## v2 Requirements
 
@@ -85,13 +85,13 @@ Deferred to future release. Tracked but not in current roadmap.
 | CLI-02 | Phase 4 | Complete |
 | CLI-03 | Phase 4 | Complete |
 | CLI-04 | Phase 4 | Complete |
-| ACT-01 | Phase 5 | Pending |
-| ACT-02 | Phase 5 | Pending |
-| ACT-03 | Phase 5 | Pending |
-| ACT-04 | Phase 5 | Pending |
-| ACT-05 | Phase 5 | Pending |
-| ACT-06 | Phase 5 | Pending |
-| ACT-07 | Phase 5 | Pending |
+| ACT-01 | Phase 5 | Complete |
+| ACT-02 | Phase 5 | Complete |
+| ACT-03 | Phase 5 | Complete |
+| ACT-04 | Phase 5 | Complete |
+| ACT-05 | Phase 5 | Complete |
+| ACT-06 | Phase 5 | Complete |
+| ACT-07 | Phase 5 | Complete |
 
 **Coverage:**
 
