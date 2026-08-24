@@ -17,8 +17,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Async *arr API Clients & Batch History Fetcher** - Build HTTPX async clients for Radarr v3/v4 and Sonarr v3/v4 with batch history pagination and instance resilience (completed 2026-08-23)
 - [x] **Phase 3: Media Inventory & History Timestamp Correlator** - Correlate media files with History API import/grab timestamps, extract audio languages, and build sortable/filterable inventory (completed 2026-08-24)
 - [x] **Phase 4: Rich CLI Visualization & Reporting** - Implement Rich terminal table formatting, storage metrics summaries, output limits, and JSON export (completed 2026-08-24)
-- [x] **Phase 5: Safe Action Engine (Dry-Run, Deletion & Unmonitoring)** - Build safe mutation pipeline with dry-run default, `--delete`, `--unmonitor`, `--unmonitor-episode`, `--remove`, and confirmation guards (completed 2026-08-24)
 - [x] **Phase 6: Support Composite Time Formats for Age Filters** - Support compound relative time duration strings (e.g., `1y1m1d` for 1 year, 1 month, and 1 day) in `--older-than` and `--newer-than` filters (completed 2026-08-24)
+- [x] **Phase 7: Scope unmonitor to episodes and add unmonitor-series option** - Scope unmonitor to individual media items and add full series unmonitoring option (completed 2026-08-24)
+- [ ] **Phase 8: Support --monitored and --unmonitored filter for scan and clean** - Filter inventory by monitored status to inspect or unmonitor only monitored items
 
 ## Phase Details
 
@@ -157,6 +158,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 5. Safe Action Engine (Dry-Run, Deletion & Unmonitoring) | 2/2 | Complete    | 2026-08-24 |
 | 6. Support Composite Time Formats for Age Filters | 1/1 | Complete   | 2026-08-24 |
 | 7. Scope unmonitor to episodes and add unmonitor-series option | 1/1 | Complete   | 2026-08-24 |
+| 8. Support --monitored and --unmonitored filter for scan and clean | 0/1 | Not started | - |
 
 ### Phase 6: Support Composite Time Formats for Age Filters
 
@@ -198,4 +200,22 @@ Plans:
 
 - [x] 07-01-PLAN.md
 
-- [x] TBD (run /gsd-plan-phase 7 to break down) (completed 2026-08-24)
+### Phase 8: Support --monitored and --unmonitored filter for scan and clean
+
+**Goal:** Enable filtering media items by monitored status across Radarr movies and Sonarr episodes in `scan` and `clean` commands (e.g., `--only-monitored` / `--monitored-only` and `--unmonitored-only`).
+**Mode:** mvp
+**Depends on:** Phase 7
+**Requirements:** INVT-03, ACT-02
+**Success Criteria** (what must be TRUE):
+
+  1. MediaInventoryItem captures monitored status for movies in Radarr and episodes/series in Sonarr.
+  2. InventoryFilter supports filtering by monitored status (e.g. `--only-monitored` or `--monitored`, and `--unmonitored`).
+  3. CLI `scan` and `clean` commands expose `--monitored` / `--only-monitored` and `--unmonitored` options.
+  4. Running clean with `--unmonitor --only-monitored` isolates and unmonitors currently monitored files without redundant operations.
+  5. JSON reporting and table formatting reflect monitored metadata accurately.
+
+**Plans:** 0 plans
+
+Plans:
+
+- [ ] TBD (run /gsd-plan-phase 8 to break down)
