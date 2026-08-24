@@ -48,8 +48,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Distribution & Packaging (DIST)
 
-- [ ] **DIST-01**: Build lightweight container image with `arr-oldies` entrypoint supporting CLI arguments, volume mounting (e.g. `config.yaml`), and environment configuration
-- [ ] **DIST-02**: GitHub Actions release workflow to automate multi-platform (`linux/amd64,linux/arm64`) image builds and publish to `ghcr.io/gmcouto/arr-oldies` on version release tags (`v*`)
+- [x] **DIST-01**: Build lightweight container image with `arr-oldies` entrypoint supporting CLI arguments, volume mounting (e.g. `config.yaml`), and environment configuration
+- [x] **DIST-02**: GitHub Actions release workflow to automate multi-platform (`linux/amd64,linux/arm64`) image builds and publish to `ghcr.io/gmcouto/arr-oldies` on version release tags (`v*`)
 
 ## v2 Requirements
 
@@ -97,8 +97,8 @@ Deferred to future release. Tracked but not in current roadmap.
 | ACT-05 | Phase 5 | Complete |
 | ACT-06 | Phase 5 | Complete |
 | ACT-07 | Phase 5 | Complete |
-| DIST-01 | Phase 9 | Pending |
-| DIST-02 | Phase 9 | Pending |
+| DIST-01 | Phase 9 | Complete |
+| DIST-02 | Phase 9 | Complete |
 
 **Coverage:**
 
@@ -108,4 +108,4 @@ Deferred to future release. Tracked but not in current roadmap.
 
 ---
 *Requirements defined: 2026-08-23*
-*Last updated: 2026-08-24 after Phase 9 planning*
+*Last updated: 2026-08-24 after Phase 9 completion*

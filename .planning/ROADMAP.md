@@ -20,7 +20,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 6: Support Composite Time Formats for Age Filters** - Support compound relative time duration strings (e.g., `1y1m1d` for 1 year, 1 month, and 1 day) in `--older-than` and `--newer-than` filters (completed 2026-08-24)
 - [x] **Phase 7: Scope unmonitor to episodes and add unmonitor-series option** - Scope unmonitor to individual media items and add full series unmonitoring option (completed 2026-08-24)
 - [x] **Phase 8: Support --monitored and --unmonitored filter for scan and clean** - Filter inventory by monitored status to inspect or unmonitor only monitored items (completed 2026-08-24)
-- [ ] **Phase 9: Docker Packaging and GitHub Actions Release Workflow** - Containerize arr-oldies and automate multi-platform Docker image build/publish to GHCR upon version release tags
+- [x] **Phase 9: Docker Packaging and GitHub Actions Release Workflow** - Containerize arr-oldies and automate multi-platform Docker image build/publish to GHCR upon version release tags (completed 2026-08-24)
 
 ## Phase Details
 
@@ -106,20 +106,16 @@ Plans:
   2. Output includes summary cards detailing total storage inspected, oldest items date range, and potential space freed.
   3. Output can be constrained with `--limit <n>` or exported as structured JSON via `--format json`.
 
-**Plans**: TBD
+**Plans**: 2/2 plans complete
 
 Plans:
-
-- [x] 04-01-PLAN.md
-- [x] 04-02-PLAN.md
-
 **Wave 1**
 
-- [x] 04-01: Rich table visualizer with color-coded age tiers, units formatting, and summary cards
+- [x] 04-01-PLAN.md: Rich table visualizer with color-coded age tiers, units formatting, and summary cards
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [x] 04-02: CLI scan command integration with sorting/filtering flags and JSON serialization
+- [x] 04-02-PLAN.md: CLI scan command integration with sorting/filtering flags and JSON serialization
 
 ### Phase 5: Safe Action Engine (Dry-Run, Deletion & Unmonitoring)
 
@@ -160,7 +156,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 6. Support Composite Time Formats for Age Filters | 1/1 | Complete   | 2026-08-24 |
 | 7. Scope unmonitor to episodes and add unmonitor-series option | 1/1 | Complete   | 2026-08-24 |
 | 8. Support --monitored and --unmonitored filter for scan and clean | 1/1 | Complete    | 2026-08-24 |
-| 9. Docker Packaging and GitHub Actions Release Workflow | 0/1 | Not started | - |
+| 9. Docker Packaging and GitHub Actions Release Workflow | 1/1 | Complete | 2026-08-24 |
 
 ### Phase 6: Support Composite Time Formats for Age Filters
 
@@ -236,9 +232,9 @@ Plans:
   3. GitHub Actions workflow automates building and pushing multi-platform images (linux/amd64, linux/arm64) to `ghcr.io/gmcouto/arr-oldies` upon publishing version release tags (e.g., `v*`).
   4. README.md and documentation are updated with Docker run instructions, mounting guidelines, and CI/CD release details.
 
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
 **Wave 1**
 
-- [ ] 09-01-PLAN.md: Multi-Stage Docker Packaging, Entrypoint, GitHub Actions CI/CD Release Pipeline & User Documentation
+- [x] 09-01-PLAN.md: Multi-Stage Docker Packaging, Entrypoint, GitHub Actions CI/CD Release Pipeline & User Documentation

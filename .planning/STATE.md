@@ -2,18 +2,18 @@
 gsd_state_version: 1.0
 current_phase: 09
 current_phase_name: Docker Packaging and GitHub Actions Release Workflow
-status: executing
-stopped_at: Completed 08-01-PLAN.md
-last_updated: "2026-08-24T18:19:12.089Z"
+status: complete
+stopped_at: Completed 09-01-PLAN.md
+last_updated: "2026-08-24T18:29:00.000Z"
 last_activity: 2026-08-24
-last_activity_desc: Phase 08 marked complete
-state_head: 8c82fac71502798e81c572b7f01bc2883df646f8
+last_activity_desc: Phase 09 completed
+state_head: c72d17f
 progress:
   total_phases: 9
-  completed_phases: 8
+  completed_phases: 9
   total_plans: 14
-  completed_plans: 13
-  percent: 89
+  completed_plans: 14
+  percent: 100
 ---
 
 # Project State
@@ -23,14 +23,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-08-23)
 
 **Core value:** Accurately inventory and trace media files across multiple Radarr and Sonarr instances back to their exact History API download/import timestamps, presenting an actionable, sortable audit with audio language filtering and safe, granular execution controls.
-**Current focus:** Phase 08 — Support --monitored and --unmonitored filter for scan and clean
+**Current focus:** Phase 09 — Docker Packaging and GitHub Actions Release Workflow (Complete)
 
 ## Current Position
 
-Phase: 09 (Docker Packaging and GitHub Actions Release Workflow) — READY TO EXECUTE
+Phase: 09 (Docker Packaging and GitHub Actions Release Workflow) — COMPLETE
 Plan: 1 of 1
-Status: Ready to execute
-Last activity: 2026-08-24 — Phase 08 marked complete
+Status: Complete
+Last activity: 2026-08-24 — Phase 09 completed
 
 Progress: [██████████] 100%
 
@@ -38,32 +38,29 @@ Progress: [██████████] 100%
 
 **Velocity:**
 
-- Total plans completed: 10
-- Average duration: - min
-- Total execution time: 0.0 hours
+- Total plans completed: 14
+- Average duration: 4 min
+- Total execution time: ~0.9 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 1. Foundation & Config | 0/2 | - | - |
-| 2. Async API Clients | 0/2 | - | - |
-| 3. History Correlator | 0/2 | - | - |
-| 4. CLI & Visualization | 0/2 | - | - |
-| 5. Safe Action Engine | 0/2 | - | - |
-| 01 | 2 | - | - |
-| 02 | 2 | - | - |
-| 03 | 2 | - | - |
-| 04 | 2 | - | - |
-| 05 | 2 | - | - |
-| 06 | 0/1 | - | - |
+| 1. Foundation & Config | 2/2 | 8 min | 4 min |
+| 2. Async API Clients | 2/2 | 5 min | 2.5 min |
+| 3. History Correlator | 2/2 | 8 min | 4 min |
+| 4. CLI & Visualization | 2/2 | 9 min | 4.5 min |
+| 5. Safe Action Engine | 2/2 | 10 min | 5 min |
+| 6. Composite Time Formats | 1/1 | 4 min | 4 min |
+| 7. Unmonitor Scoping | 1/1 | 4 min | 4 min |
+| 8. Monitored Status Filters | 1/1 | 5 min | 5 min |
+| 9. Docker & CI/CD | 1/1 | 6 min | 6 min |
 
 **Recent Trend:**
 
-- Last 5 plans: -
-- Trend: Stable
+- Last 5 plans: 4 min, 4 min, 5 min, 6 min
+- Trend: Fast and stable
 
-*Updated after each plan completion*
 **Per-Plan Metrics:**
 
 | Plan | Duration | Tasks | Files |
@@ -73,6 +70,8 @@ Progress: [██████████] 100%
 | Phase 04 P01 | 4 min | 3 tasks | 8 files |
 | Phase 04 P02 | 5 min | 3 tasks | 5 files |
 | Phase 06 P01 | 4 min | 2 tasks | 5 files |
+| Phase 08 P01 | 5 min | 3 tasks | 7 files |
+| Phase 09 P01 | 6 min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -85,8 +84,11 @@ Recent decisions affecting current work:
 - [Init]: Multi-instance YAML config with explicit app selection (--radarr, --sonarr)
 - [Init]: Strict History API correlation for exact download/import event dates
 - [Init]: Audio language extraction from mediaInfo with --audio-lang filtering
-- [Init]: Granular action separation (--delete, --unmonitor, --unmonitor-episode, --remove)
+- [Init]: Granular action separation (--delete, --unmonitor, --unmonitor-series, --remove)
 - [Init]: Dry-run default with --execute and --yes safeguards
+- [Phase 09]: Multi-stage Docker packaging with builder dependency caching via standard library tomllib
+- [Phase 09]: Non-root unprivileged runner arruser:arrgroup (UID/GID 1000) with /app and /config folders
+- [Phase 09]: Intelligent docker-entrypoint.sh stripping redundant arr-oldies prefix while permitting direct binary passthrough
 
 ### Roadmap Evolution
 
@@ -97,11 +99,11 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-None yet.
+None - all milestone v1 requirements complete.
 
 ### Blockers/Concerns
 
-None yet.
+None.
 
 ### Quick Tasks Completed
 
@@ -119,6 +121,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-08-24T13:03:20.745Z
-Stopped at: Completed 06-01-PLAN.md
+Last session: 2026-08-24T18:29:00Z
+Stopped at: Completed 09-01-PLAN.md
 Resume file: None
