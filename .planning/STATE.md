@@ -1,18 +1,18 @@
 ---
 gsd_state_version: 1.0
-current_phase: 05
-status: completed
-stopped_at: Phase 05 complete — all phases complete
-last_updated: "2026-08-24T04:03:59.406Z"
+current_phase: 06
+status: ready_to_plan
+stopped_at: Phase 6 added to roadmap
+last_updated: "2026-08-24T09:50:00.000Z"
 last_activity: 2026-08-24
-last_activity_desc: Phase 05 complete
+last_activity_desc: Phase 06 added
 state_head: 86d6402c70009bcd7737d01fa777ff5bf50c995f
 progress:
-  total_phases: 5
+  total_phases: 6
   completed_phases: 5
   total_plans: 10
   completed_plans: 10
-  percent: 100
+  percent: 83
 ---
 
 # Project State
@@ -22,16 +22,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-08-23)
 
 **Core value:** Accurately inventory and trace media files across multiple Radarr and Sonarr instances back to their exact History API download/import timestamps, presenting an actionable, sortable audit with audio language filtering and safe, granular execution controls.
-**Current focus:** Phase 05 — Safe Action Engine (Dry-Run, Deletion & Unmonitoring)
+**Current focus:** Phase 06 — Support Composite Time Formats for Age Filters
 
 ## Current Position
 
-Phase: 05
+Phase: 06
 Plan: Not started
-Status: All phases complete
-Last activity: 2026-08-24 — Phase 05 complete
+Status: Ready to plan Phase 06
+Last activity: 2026-08-24 — Phase 06 added
 
-Progress: [████████░░] 80%
+Progress: [████████░░] 83%
 
 ## Performance Metrics
 
@@ -84,6 +84,10 @@ Recent decisions affecting current work:
 - [Init]: Audio language extraction from mediaInfo with --audio-lang filtering
 - [Init]: Granular action separation (--delete, --unmonitor, --unmonitor-episode, --remove)
 - [Init]: Dry-run default with --execute and --yes safeguards
+
+### Roadmap Evolution
+
+- Phase 6 added: Support compound relative time duration strings (e.g. `1y1m1d`) for `--older-than` and `--newer-than` filters
 
 ### Pending Todos
 
