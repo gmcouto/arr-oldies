@@ -72,3 +72,17 @@ class ArrDatabaseLockedError(ArrResponseError):
 
     def __init__(self, message: str = "Instance database is locked") -> None:
         super().__init__(status_code=500, message=message)
+
+
+# Inventory and parsing domain exceptions (per INVT-01..06)
+class InventoryError(ArrOldiesError):
+    """Base exception for inventory correlation and processing errors."""
+
+
+class ParseError(ArrOldiesError):
+    """Raised when parsing human size, age, or date filter strings fails."""
+
+
+class CorrelationError(InventoryError):
+    """Raised when critical media metadata or history correlation fails."""
+

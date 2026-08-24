@@ -1,0 +1,106 @@
+"""Unit tests for MediaInventoryItem, InventoryFilter, and InventorySummary models."""
+
+from datetime import datetime, timezone
+
+from arr_oldies.inventory.models import (
+    HistoryStatus,
+    InventoryFilter,
+    InventorySummary,
+    MediaInventoryItem,
+    MediaType,
+    SortDirection,
+    SortKey,
+)
+from arr_oldies.models import InstanceType
+
+
+def test_media_inventory_item_instantiation_and_utc_normalization():
+    """Verify MediaInventoryItem creation, UTC normalization for naive/aware datetimes, and field defaults."""
+    naive_dt = datetime(2024, 1, 1, 12, 0, 0)
+    item = MediaInventoryItem(
+        id="radarr:101",
+        instance_name="radarr-main",
+        instance_type=InstanceType.RADARR,
+        media_type=MediaType.MOVIE,
+        title="Interstellar",
+        year=2014,
+        file_path="/movies/Interstellar (2014)/Interstellar (2014).mkv",
+        size_bytes=15000000000,
+        audio_languages=["English"],
+        import_date=naive_dt,  # Naive should become UTC
+        grab_date=datetime(2024, 1, 1, 10, 0, 0, tzinfo=timezone.utc),
+        age_days=100,
+    )
+    assert item.id == "radarr:101"
+    assert item.instance_name == "radarr-main"
+    assert item.import_date.tzinfo == timezone.utc
+    assert item.import_date == datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
+    assert item.grab_date == datetime(2024, 1, 1, 10, 0, 0, tzinfo=timezone.utc)
+    assert item.has_history is True
+    assert item.is_legacy is False
+    assert item.history_status == HistoryStatus.IMPORTED
+    assert item.episode_numbers == []
+    assert item.episode_ids == []
+    assert item.relative_path == ""
+
+
+def test_media_inventory_item_optional_grab_date_none():
+    """Verify grab_date=None validator does not fail."""
+    item = MediaInventoryItem(
+        id="radarr:102",
+        instance_name="radarr-main",
+        instance_type=InstanceType.RADARR,
+        media_type=MediaType.MOVIE,
+        title="Dune",
+        file_path="/movies/Dune/Dune.mkv",
+        import_date=datetime(2024, 2, 1, 0, 0, 0, tzinfo=timezone.utc),
+        grab_date=None,
+    )
+    assert item.grab_date is None
+
+
+def test_inventory_filter_defaults():
+    """Verify InventoryFilter default field values."""
+    f = InventoryFilter()
+    assert f.media_types is None
+    assert f.instance_names is None
+    assert f.audio_langs is None
+    assert f.min_size_bytes is None
+    assert f.max_size_bytes is None
+    assert f.min_age_days is None
+    assert f.max_age_days is None
+    assert f.before_date is None
+    assert f.after_date is None
+    assert f.legacy_only is False
+    assert f.history_only is False
+
+
+def test_inventory_summary_defaults():
+    """Verify InventorySummary default field values."""
+    s = InventorySummary()
+    assert s.total_items == 0
+    assert s.total_size_bytes == 0
+    assert s.movie_count == 0
+    assert s.episode_count == 0
+    assert s.legacy_count == 0
+    assert s.oldest_import_date is None
+    assert s.newest_import_date is None
+    assert s.oldest_grab_date is None
+    assert s.instances_breakdown == {}
+
+
+def test_enums_values():
+    """Verify enum representations."""
+    assert MediaType.MOVIE == "movie"
+    assert MediaType.EPISODE == "episode"
+    assert HistoryStatus.IMPORTED == "imported"
+    assert HistoryStatus.GRABBED_AND_IMPORTED == "grabbed_and_imported"
+    assert HistoryStatus.LEGACY == "legacy"
+    assert HistoryStatus.UNINDEXED == "unindexed"
+    assert SortKey.IMPORT_DATE == "import_date"
+    assert SortKey.GRAB_DATE == "grab_date"
+    assert SortKey.SIZE == "size"
+    assert SortKey.TITLE == "title"
+    assert SortKey.AGE == "age"
+    assert SortDirection.ASC == "asc"
+    assert SortDirection.DESC == "desc"
