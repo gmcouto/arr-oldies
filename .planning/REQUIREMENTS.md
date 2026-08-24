@@ -31,10 +31,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### CLI Reporting & Visualization (CLI)
 
-- [ ] **CLI-01**: Format scan results in Rich terminal tables with color-coded age, instance badges, human-readable file sizes, and audio language tags
-- [ ] **CLI-02**: Display summary metrics (total media items scanned, total storage consumed, date range spanned, potential space freed)
-- [ ] **CLI-03**: Support `--limit <n>` to display top N oldest files
-- [ ] **CLI-04**: Support `--format json` output for machine readability and scripting
+- [x] **CLI-01**: Format scan results in Rich terminal tables with color-coded age, instance badges, human-readable file sizes, and audio language tags
+- [x] **CLI-02**: Display summary metrics (total media items scanned, total storage consumed, date range spanned, potential space freed)
+- [x] **CLI-03**: Support `--limit <n>` to display top N oldest files
+- [x] **CLI-04**: Support `--format json` output for machine readability and scripting
 
 ### Safe Action Engine (ACT)
 
@@ -81,10 +81,10 @@ Deferred to future release. Tracked but not in current roadmap.
 | INVT-04 | Phase 3 | Complete |
 | INVT-05 | Phase 3 | Complete |
 | INVT-06 | Phase 3 | Complete |
-| CLI-01 | Phase 4 | Pending |
-| CLI-02 | Phase 4 | Pending |
-| CLI-03 | Phase 4 | Pending |
-| CLI-04 | Phase 4 | Pending |
+| CLI-01 | Phase 4 | Complete |
+| CLI-02 | Phase 4 | Complete |
+| CLI-03 | Phase 4 | Complete |
+| CLI-04 | Phase 4 | Complete |
 | ACT-01 | Phase 5 | Pending |
 | ACT-02 | Phase 5 | Pending |
 | ACT-03 | Phase 5 | Pending |
