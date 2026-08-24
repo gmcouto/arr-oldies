@@ -155,7 +155,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 3. Media Inventory & History Timestamp Correlator | 2/2 | Complete    | 2026-08-24 |
 | 4. Rich CLI Visualization & Reporting | 2/2 | Complete    | 2026-08-24 |
 | 5. Safe Action Engine (Dry-Run, Deletion & Unmonitoring) | 2/2 | Complete    | 2026-08-24 |
-| 6. Support Composite Time Formats for Age Filters | 0/1 | Not started | - |
+| 6. Support Composite Time Formats for Age Filters | 1/1 | In Progress|  |
 
 ### Phase 6: Support Composite Time Formats for Age Filters
 
@@ -170,9 +170,9 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
   3. CLI filters `--older-than` and `--newer-than` in both `scan` and `clean` commands evaluate compound formats accurately.
   4. Invalid combinations or syntaxes produce clear, user-friendly error messages.
 
-**Plans**: 1 plan
+**Plans**: 1/1 plans executed
 
 Plans:
 **Wave 1**
 
-- [ ] 06-01-PLAN.md: Composite Time Format Parser, Test Suite & CLI Filter Integration
+- [x] 06-01-PLAN.md: Composite Time Format Parser, Test Suite & CLI Filter Integration
