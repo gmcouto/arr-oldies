@@ -52,3 +52,8 @@ SONARR_EPISODEFILE_ENDPOINT: str = "/api/v3/episodefile"
 SONARR_EPISODE_ENDPOINT: str = "/api/v3/episode"
 SONARR_HISTORY_ENDPOINT: str = "/api/v3/history"
 SONARR_HISTORY_SERIES_ENDPOINT: str = "/api/v3/history/series"
+
+# Inventory defaults (per INVT-04, INVT-05)
+DEFAULT_SORT_KEY: str = "import_date"
+DEFAULT_SORT_DIRECTION: str = "asc"
+
