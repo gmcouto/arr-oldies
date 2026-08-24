@@ -147,7 +147,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -214,8 +214,10 @@ Plans:
   4. Running clean with `--unmonitor --only-monitored` isolates and unmonitors currently monitored files without redundant operations.
   5. JSON reporting and table formatting reflect monitored metadata accurately.
 
-**Plans:** 0 plans
+**Plans:** 1/1 plans planned
 
 Plans:
+**Wave 1**
 
-- [ ] TBD (run /gsd-plan-phase 8 to break down)
+- [ ] 08-01-PLAN.md: Monitored Status Correlation, Inventory Engine Filtering & CLI Integration
+

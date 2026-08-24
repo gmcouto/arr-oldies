@@ -1,18 +1,18 @@
 ---
 gsd_state_version: 1.0
-current_phase: 07
-status: completed
-stopped_at: Completed 06-01-PLAN.md
-last_updated: "2026-08-24T13:13:32.282Z"
+current_phase: 08
+status: ready_to_execute
+stopped_at: Planned 08-01-PLAN.md
+last_updated: "2026-08-24T14:03:00.000Z"
 last_activity: 2026-08-24
-last_activity_desc: Phase 07 marked complete
+last_activity_desc: Phase 08 planned and validated
 state_head: f7729da9c5eea30fbfc8c34f25919a6537e81de6
 progress:
-  total_phases: 7
+  total_phases: 8
   completed_phases: 7
-  total_plans: 12
+  total_plans: 13
   completed_plans: 12
-  percent: 100
+  percent: 92
 ---
 
 # Project State
@@ -22,16 +22,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-08-23)
 
 **Core value:** Accurately inventory and trace media files across multiple Radarr and Sonarr instances back to their exact History API download/import timestamps, presenting an actionable, sortable audit with audio language filtering and safe, granular execution controls.
-**Current focus:** Phase 07 — Scope unmonitor to episodes and add unmonitor-series option
+**Current focus:** Phase 08 — Support --monitored and --unmonitored filter for scan and clean
 
 ## Current Position
 
-Phase: 07 — COMPLETE
-Plan: 1 of 1
-Status: Phase 07 complete
-Last activity: 2026-08-24 — Phase 07 marked complete
+Phase: 08 — READY TO EXECUTE
+Plan: 0 of 1
+Status: Phase 08 planned and validated
+Last activity: 2026-08-24 — Phase 08 planned and validated
 
-Progress: [██████████] 100%
+Progress: [█████████░] 92%
 
 ## Performance Metrics
 
