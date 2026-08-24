@@ -113,12 +113,20 @@ If you plan to run multiple `arr-oldies` commands without repeating the `docker 
   /app $ exit
   ```
 
-- **Option B: Shell Alias (Native CLI Experience)**
-  Add an alias to your shell profile (`~/.bashrc` or `~/.zshrc`):
+- **Option B: Shell Alias or Function (Run from Any Directory)**
+  Point the volume mount to a fixed configuration file location (such as `~/.config/arr-oldies/config.yaml` or an explicit absolute path) in your `~/.bashrc` or `~/.zshrc`:
   ```bash
-  alias arr-oldies="docker run -it --rm -v \$(pwd)/config.yaml:/app/config.yaml:ro ghcr.io/gmcouto/arr-oldies"
+  alias arr-oldies="docker run -it --rm -v \$HOME/.config/arr-oldies/config.yaml:/app/config.yaml:ro ghcr.io/gmcouto/arr-oldies"
   ```
-  Then invoke `arr-oldies` directly from your host terminal:
+  Or define a shell function for complete flexibility:
+  ```bash
+  arr-oldies() {
+    docker run -it --rm \
+      -v "${HOME}/.config/arr-oldies/config.yaml:/app/config.yaml:ro" \
+      ghcr.io/gmcouto/arr-oldies "$@"
+  }
+  ```
+  Now `arr-oldies` can be executed directly from anywhere on your system:
   ```bash
   arr-oldies validate-config
   arr-oldies scan --older-than 90d
