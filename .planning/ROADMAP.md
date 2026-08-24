@@ -80,12 +80,16 @@ Plans:
   3. Inventory items are sorted oldest-first with multi-dimensional filtering (date cutoff, size, instance, media type).
   4. Media files without history events are cleanly flagged as unindexed without failing the scan.
 
-**Plans**: TBD
+**Plans**: 2 plans planned
 
 Plans:
+**Wave 1**
 
-- [ ] 03-01: History correlation engine mapping event logs to movie and episode file records
-- [ ] 03-02: MediaInfo audio language extractor, inventory aggregator, and sorting/filtering engine
+- [ ] 03-01-PLAN.md: Core Inventory Models, ISO-639 Language Normalization & Human Unit Parsers
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 03-02-PLAN.md: Hash-Indexed History Correlator, Legacy Fallback & Inventory Processing Engine
 
 ### Phase 4: Rich CLI Visualization & Reporting
 
