@@ -1,15 +1,21 @@
 """Unit tests for MediaInventoryItem, InventoryFilter, and InventorySummary models."""
 
+import json
 from datetime import datetime, timezone
 
-from arr_oldies.inventory.models import (
+from arr_oldies.inventory import (
     HistoryStatus,
     InventoryFilter,
     InventorySummary,
+    LanguageEntry,
+    LanguageNormalizer,
     MediaInventoryItem,
     MediaType,
     SortDirection,
     SortKey,
+    parse_age_cutoff,
+    parse_date_cutoff,
+    parse_size,
 )
 from arr_oldies.models import InstanceType
 
@@ -59,6 +65,94 @@ def test_media_inventory_item_optional_grab_date_none():
     assert item.grab_date is None
 
 
+def test_media_inventory_item_multi_episode():
+    """Verify multi-episode TV item representation."""
+    item = MediaInventoryItem(
+        id="sonarr:201",
+        instance_name="sonarr-tv",
+        instance_type=InstanceType.SONARR,
+        media_type=MediaType.EPISODE,
+        title="Breaking Bad",
+        year=2008,
+        season_number=1,
+        episode_numbers=[1, 2],
+        formatted_episode="S01E01-E02",
+        episode_title="Pilot / Cat's in the Bag",
+        series_id=10,
+        episode_file_id=201,
+        episode_ids=[301, 302],
+        file_path="/tv/Breaking Bad/Breaking Bad - S01E01-E02.mkv",
+        relative_path="Breaking Bad - S01E01-E02.mkv",
+        size_bytes=3000000000,
+        audio_languages=["English"],
+        import_date=datetime(2024, 2, 1, 12, 0, 0, tzinfo=timezone.utc),
+        grab_date=datetime(2024, 2, 1, 10, 0, 0, tzinfo=timezone.utc),
+        age_days=50,
+        history_status=HistoryStatus.GRABBED_AND_IMPORTED,
+    )
+    assert item.media_type == MediaType.EPISODE
+    assert item.season_number == 1
+    assert item.episode_numbers == [1, 2]
+    assert item.formatted_episode == "S01E01-E02"
+    assert item.episode_ids == [301, 302]
+    assert item.history_status == HistoryStatus.GRABBED_AND_IMPORTED
+
+
+def test_media_inventory_item_legacy_representation():
+    """Verify legacy item representation when History API records are missing."""
+    item = MediaInventoryItem(
+        id="radarr:505",
+        instance_name="radarr-main",
+        instance_type=InstanceType.RADARR,
+        media_type=MediaType.MOVIE,
+        title="Classic Film",
+        year=1980,
+        movie_id=5,
+        movie_file_id=505,
+        file_path="/movies/Classic Film (1980)/Classic Film (1980).mkv",
+        size_bytes=4000000000,
+        import_date=datetime(2020, 5, 10, 15, 0, 0, tzinfo=timezone.utc),
+        grab_date=None,
+        age_days=1500,
+        has_history=False,
+        is_legacy=True,
+        history_status=HistoryStatus.LEGACY,
+    )
+    assert item.is_legacy is True
+    assert item.has_history is False
+    assert item.history_status == HistoryStatus.LEGACY
+    assert item.grab_date is None
+
+
+def test_media_inventory_item_serialization():
+    """Verify serialization to dict and JSON roundtrip."""
+    dt = datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
+    item = MediaInventoryItem(
+        id="radarr:101",
+        instance_name="radarr-main",
+        instance_type=InstanceType.RADARR,
+        media_type=MediaType.MOVIE,
+        title="Interstellar",
+        year=2014,
+        file_path="/movies/Interstellar (2014)/Interstellar (2014).mkv",
+        size_bytes=15000000000,
+        audio_languages=["English"],
+        import_date=dt,
+    )
+    d = item.model_dump()
+    assert d["id"] == "radarr:101"
+    assert d["instance_type"] == InstanceType.RADARR
+    assert d["media_type"] == MediaType.MOVIE
+    assert d["import_date"] == dt
+
+    json_str = item.model_dump_json()
+    parsed = json.loads(json_str)
+    assert parsed["id"] == "radarr:101"
+    assert parsed["title"] == "Interstellar"
+    assert parsed["instance_type"] == "radarr"
+    assert parsed["media_type"] == "movie"
+
+
 def test_inventory_filter_defaults():
     """Verify InventoryFilter default field values."""
     f = InventoryFilter()
@@ -104,3 +198,15 @@ def test_enums_values():
     assert SortKey.AGE == "age"
     assert SortDirection.ASC == "asc"
     assert SortDirection.DESC == "desc"
+
+
+def test_package_reexports():
+    """Verify symbols exported from package root."""
+    assert LanguageNormalizer is not None
+    assert LanguageEntry is not None
+    assert parse_size is not None
+    assert parse_age_cutoff is not None
+    assert parse_date_cutoff is not None
+    assert MediaInventoryItem is not None
+    assert InventoryFilter is not None
+    assert InventorySummary is not None
