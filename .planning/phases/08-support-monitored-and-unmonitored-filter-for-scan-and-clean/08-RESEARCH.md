@@ -77,7 +77,7 @@ Enable filtering media items by monitored status across Radarr movies and Sonarr
           "--only-monitored",
           help="Filter only monitored media items.",
       ),
-  ] = False,
+  ] = (False,)
   unmonitored: Annotated[
       bool,
       typer.Option(
@@ -86,7 +86,7 @@ Enable filtering media items by monitored status across Radarr movies and Sonarr
           "--only-unmonitored",
           help="Filter only unmonitored media items.",
       ),
-  ] = False,
+  ] = (False,)
   ```
 - **Mutual Exclusion Check**:
   ```python

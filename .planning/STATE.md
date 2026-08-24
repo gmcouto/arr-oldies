@@ -102,6 +102,12 @@ None yet.
 
 None yet.
 
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260824-fwt | add option --unmonitor-season for unmonitoring the whole season | 2026-08-24 | 3f9de5e | [260824-fwt-add-option-unmonitor-season-for-unmonito](./quick/260824-fwt-add-option-unmonitor-season-for-unmonito/) |
+
 ## Deferred Items
 
 | Category | Item | Status | Deferred At | Milestone |
