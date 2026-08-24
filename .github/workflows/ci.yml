@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+permissions:
+  contents: read
+
+jobs:
+  lint-and-test:
+    name: Lint, Type Check & Test (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.11', '3.12']
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install .[dev]
+
+      - name: Lint and Format Check (Ruff)
+        run: |
+          ruff check .
+          ruff format --check .
+
+      - name: Type Check (Mypy)
+        run: |
+          mypy src/
+
+      - name: Run Pytest
+        run: |
+          pytest
+
+  docker-build-check:
+    name: Docker Build & Verification Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build local container image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          tags: arr-oldies:test
+
+      - name: Verify container execution
+        run: |
+          docker run --rm arr-oldies:test --version
+          docker run --rm arr-oldies:test --help
+          docker run --rm arr-oldies:test arr-oldies --help
