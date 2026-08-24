@@ -1,5 +1,6 @@
 """Async API clients and models for Radarr and Sonarr instances."""
 
+from arr_oldies.api.base import BaseArrClient
 from arr_oldies.api.models import (
     ApiBaseModel,
     MediaInfo,
@@ -17,6 +18,7 @@ from arr_oldies.api.models import (
 
 __all__ = [
     "ApiBaseModel",
+    "BaseArrClient",
     "MediaInfo",
     "RadarrMovieFile",
     "RadarrMovie",
