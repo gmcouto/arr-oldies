@@ -958,3 +958,116 @@ def test_cli_scan_complex_combined_query(tmp_path: Path, sample_valid_yaml: str)
     parsed = json.loads(res.stdout)
     assert parsed["metadata"]["total_matched_items"] == 1
     assert parsed["items"][0]["title"] == "Match Film"
+
+
+@respx.mock
+def test_cli_scan_composite_age_filters(tmp_path: Path, sample_valid_yaml: str) -> None:
+    """Verify scan filters correctly using composite time duration strings (e.g. 1y1m1d, 6m2w)."""
+    cfg = tmp_path / "config.yaml"
+    cfg.write_text(sample_valid_yaml, encoding="utf-8")
+
+    respx.get("http://localhost:7878/api/v3/movie").respond(
+        json=[
+            {
+                "id": 1,
+                "title": "Very Old Film",
+                "year": 2015,
+                "path": "/m/1",
+                "monitored": True,
+                "hasFile": True,
+            },
+            {
+                "id": 2,
+                "title": "Recent Film",
+                "year": 2026,
+                "path": "/m/2",
+                "monitored": True,
+                "hasFile": True,
+            },
+        ]
+    )
+    respx.get("http://localhost:7878/api/v3/moviefile").respond(
+        json=[
+            {
+                "id": 10,
+                "movieId": 1,
+                "relativePath": "1.mkv",
+                "path": "/m/1/1.mkv",
+                "size": 10_000_000_000,
+                "dateAdded": "2018-01-01T00:00:00Z",
+            },
+            {
+                "id": 20,
+                "movieId": 2,
+                "relativePath": "2.mkv",
+                "path": "/m/2/2.mkv",
+                "size": 5_000_000_000,
+                "dateAdded": "2026-08-15T00:00:00Z",
+            },
+        ]
+    )
+    respx.get("http://localhost:7878/api/v3/history").respond(
+        json={
+            "page": 1,
+            "pageSize": 1000,
+            "totalRecords": 2,
+            "records": [
+                {
+                    "id": 1,
+                    "movieId": 1,
+                    "sourceTitle": "M1",
+                    "eventType": "downloadFolderImported",
+                    "date": "2018-01-01T00:00:00Z",
+                    "data": {"fileId": "10"},
+                },
+                {
+                    "id": 2,
+                    "movieId": 2,
+                    "sourceTitle": "M2",
+                    "eventType": "downloadFolderImported",
+                    "date": "2026-08-15T00:00:00Z",
+                    "data": {"fileId": "20"},
+                },
+            ],
+        }
+    )
+
+    # Test --older-than 1y1m1d (396 days) -> only Very Old Film matches
+    res_older = runner.invoke(
+        app,
+        [
+            "--config",
+            str(cfg),
+            "scan",
+            "-i",
+            "radarr-main",
+            "--older-than",
+            "1y1m1d",
+            "--format",
+            "json",
+        ],
+    )
+    assert res_older.exit_code == 0
+    parsed_older = json.loads(res_older.stdout)
+    assert parsed_older["metadata"]["total_matched_items"] == 1
+    assert parsed_older["items"][0]["title"] == "Very Old Film"
+
+    # Test --newer-than 6m2w (194 days) -> only Recent Film matches
+    res_newer = runner.invoke(
+        app,
+        [
+            "--config",
+            str(cfg),
+            "scan",
+            "-i",
+            "radarr-main",
+            "--newer-than",
+            "6m2w",
+            "--format",
+            "json",
+        ],
+    )
+    assert res_newer.exit_code == 0
+    parsed_newer = json.loads(res_newer.stdout)
+    assert parsed_newer["metadata"]["total_matched_items"] == 1
+    assert parsed_newer["items"][0]["title"] == "Recent Film"

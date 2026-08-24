@@ -228,12 +228,12 @@ def scan_command(
         typer.Option(
             "--older-than",
             "--age",
-            help="Minimum age cutoff (e.g. '30d', '6m', '1y').",
+            help="Minimum age cutoff (e.g. '30d', '6m', '1y1m1d').",
         ),
     ] = None,
     newer_than: Annotated[
         str | None,
-        typer.Option("--newer-than", help="Maximum age cutoff (e.g. '1y', '90d')."),
+        typer.Option("--newer-than", help="Maximum age cutoff (e.g. '1y', '90d', '6m2w')."),
     ] = None,
     before: Annotated[
         str | None,
@@ -506,12 +506,12 @@ def clean_command(
         typer.Option(
             "--older-than",
             "--age",
-            help="Minimum age cutoff (e.g. '30d', '6m', '1y').",
+            help="Minimum age cutoff (e.g. '30d', '6m', '1y1m1d').",
         ),
     ] = None,
     newer_than: Annotated[
         str | None,
-        typer.Option("--newer-than", help="Maximum age cutoff (e.g. '1y', '90d')."),
+        typer.Option("--newer-than", help="Maximum age cutoff (e.g. '1y', '90d', '6m2w')."),
     ] = None,
     before: Annotated[
         str | None,

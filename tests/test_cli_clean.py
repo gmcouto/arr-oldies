@@ -446,3 +446,74 @@ def test_cli_clean_all_instances_fetch_failure(config_file_path: Path) -> None:
     )
     assert result.exit_code == 1
     assert "All target instances failed to fetch data" in result.output
+
+
+@respx.mock
+def test_cli_clean_composite_age_filters(config_file_path: Path) -> None:
+    """Verify clean filters items correctly using composite duration strings in dry-run and execution modes."""
+    mock_radarr_sonarr_instances()
+    route_delete = respx.delete("http://localhost:7878/api/v3/moviefile/101").respond(
+        status_code=200
+    )
+
+    # Dry-run with --older-than 1y1m1d (396 days) matches The Matrix (imported in 2022)
+    res_match = runner.invoke(
+        app,
+        [
+            "clean",
+            "--delete",
+            "--radarr",
+            "--older-than",
+            "1y1m1d",
+            "--newer-than",
+            "10y",
+            "--format",
+            "json",
+            "--config",
+            str(config_file_path),
+        ],
+    )
+    assert res_match.exit_code == 0
+    parsed = json.loads(res_match.stdout)
+    assert parsed["summary"]["total_items"] == 1
+    assert parsed["items"][0]["item"]["title"] == "The Matrix"
+    assert not route_delete.called
+
+    # Execution with --older-than 1y1m1d --execute --yes
+    res_exec = runner.invoke(
+        app,
+        [
+            "clean",
+            "--delete",
+            "--radarr",
+            "--older-than",
+            "1y1m1d",
+            "--execute",
+            "--yes",
+            "--config",
+            str(config_file_path),
+        ],
+    )
+    assert res_exec.exit_code == 0
+    assert "Arr-Oldies Execution Report" in res_exec.output
+    assert route_delete.called
+
+    # Filter with older-than 50y matches nothing
+    res_empty = runner.invoke(
+        app,
+        [
+            "clean",
+            "--delete",
+            "--radarr",
+            "--older-than",
+            "50y",
+            "--format",
+            "json",
+            "--config",
+            str(config_file_path),
+        ],
+    )
+    assert res_empty.exit_code == 0
+    parsed_empty = json.loads(res_empty.stdout)
+    assert parsed_empty["summary"]["total_items"] == 0
+    assert parsed_empty["items"] == []
