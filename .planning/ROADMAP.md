@@ -56,12 +56,16 @@ Plans:
   2. History API queries use optimized batch pagination (500–1000 items/page) to prevent *arr database lock timeouts.
   3. Unreachable or failing instances log warnings gracefully without terminating scans of healthy instances.
 
-**Plans**: TBD
+**Plans**: 0/2 plans executed
 
 Plans:
+**Wave 1**
 
-- [ ] 02-01: Base async client with connection pooling, retry policies, and auth headers
-- [ ] 02-02: RadarrClient & SonarrClient endpoint implementations with batch history pagination and resilience
+- [ ] 02-01-PLAN.md: Base Async Client, API Models & Resilience Infrastructure
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 02-02-PLAN.md: Radarr & Sonarr Clients, Batch History Pagination & Resilient Multi-Instance Fetcher
 
 ### Phase 3: Media Inventory & History Timestamp Correlator
 
