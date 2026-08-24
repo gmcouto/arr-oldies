@@ -1,6 +1,5 @@
 """Unit tests for BaseArrClient HTTPX async engine, retries, and error mapping."""
 
-import asyncio
 from unittest.mock import patch
 
 import httpx
@@ -14,7 +13,6 @@ from arr_oldies.exceptions import (
     ArrConnectionError,
     ArrDatabaseLockedError,
     ArrNotFoundError,
-    ArrResponseError,
     ArrTimeoutError,
 )
 from arr_oldies.models import InstanceConfig, InstanceType
@@ -49,7 +47,9 @@ async def test_base_client_headers_and_config(mock_instance: InstanceConfig):
 async def test_base_client_crud_methods(mock_instance: InstanceConfig):
     """Verify GET, POST, PUT, DELETE convenience methods."""
     respx.get("http://radarr.local:7878/api/v3/test").respond(json={"status": "ok"})
-    respx.post("http://radarr.local:7878/api/v3/test").respond(json={"created": True}, status_code=201)
+    respx.post("http://radarr.local:7878/api/v3/test").respond(
+        json={"created": True}, status_code=201
+    )
     respx.put("http://radarr.local:7878/api/v3/test").respond(json={"updated": True})
     respx.delete("http://radarr.local:7878/api/v3/test").respond(status_code=204)
 
@@ -72,7 +72,9 @@ async def test_base_client_crud_methods(mock_instance: InstanceConfig):
 @respx.mock
 async def test_base_client_401_auth_error(mock_instance: InstanceConfig):
     """Verify HTTP 401 translates to ArrAuthenticationError without exposing the API key."""
-    respx.get("http://radarr.local:7878/api/v3/secure").respond(status_code=401, text="Unauthorized")
+    respx.get("http://radarr.local:7878/api/v3/secure").respond(
+        status_code=401, text="Unauthorized"
+    )
 
     async with BaseArrClient(mock_instance) as client:
         with pytest.raises(ArrAuthenticationError) as exc_info:

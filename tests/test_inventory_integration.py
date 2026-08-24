@@ -36,7 +36,9 @@ def test_multi_instance_inventory_pipeline_end_to_end():
         instance_type=InstanceType.RADARR,
         movies=[
             RadarrMovie(id=1, title="Oppenheimer", year=2023, path="/movies/Oppenheimer (2023)"),
-            RadarrMovie(id=2, title="Dune: Part Two", year=2024, path="/movies/Dune Part Two (2024)"),
+            RadarrMovie(
+                id=2, title="Dune: Part Two", year=2024, path="/movies/Dune Part Two (2024)"
+            ),
         ],
         movie_files=[
             RadarrMovieFile(
@@ -46,7 +48,9 @@ def test_multi_instance_inventory_pipeline_end_to_end():
                 path="/movies/Oppenheimer (2023)/Oppenheimer.mkv",
                 size=45_000_000_000,
                 date_added=datetime(2023, 11, 20, 0, 0, 0, tzinfo=UTC),
-                media_info=MediaInfo(audio_languages="eng/fre", video_codec="x265", resolution="2160p"),
+                media_info=MediaInfo(
+                    audio_languages="eng/fre", video_codec="x265", resolution="2160p"
+                ),
             ),
             RadarrMovieFile(
                 id=102,
@@ -94,7 +98,9 @@ def test_multi_instance_inventory_pipeline_end_to_end():
         instance_type=InstanceType.RADARR,
         movies=[
             RadarrMovie(id=3, title="Casablanca", year=1942, path="/movies/Casablanca (1942)"),
-            RadarrMovie(id=4, title="Seven Samurai", year=1954, path="/movies/Seven Samurai (1954)"),
+            RadarrMovie(
+                id=4, title="Seven Samurai", year=1954, path="/movies/Seven Samurai (1954)"
+            ),
         ],
         movie_files=[
             RadarrMovieFile(
@@ -135,7 +141,9 @@ def test_multi_instance_inventory_pipeline_end_to_end():
                 path="/anime/Attack on Titan/AOT.S01E01-E02.mkv",
                 size=3_000_000_000,
                 date_added=datetime(2023, 1, 10, 0, 0, 0, tzinfo=UTC),
-                media_info=MediaInfo(audio_languages="Japanese, English", video_codec="x265", resolution="1080p"),
+                media_info=MediaInfo(
+                    audio_languages="Japanese, English", video_codec="x265", resolution="1080p"
+                ),
             ),
             SonarrEpisodeFile(
                 id=302,
@@ -149,9 +157,30 @@ def test_multi_instance_inventory_pipeline_end_to_end():
             ),
         ],
         episodes=[
-            SonarrEpisode(id=1001, series_id=10, episode_file_id=301, season_number=1, episode_number=1, title="To You"),
-            SonarrEpisode(id=1002, series_id=10, episode_file_id=301, season_number=1, episode_number=2, title="That Day"),
-            SonarrEpisode(id=1003, series_id=10, episode_file_id=302, season_number=1, episode_number=3, title="A Dim Light"),
+            SonarrEpisode(
+                id=1001,
+                series_id=10,
+                episode_file_id=301,
+                season_number=1,
+                episode_number=1,
+                title="To You",
+            ),
+            SonarrEpisode(
+                id=1002,
+                series_id=10,
+                episode_file_id=301,
+                season_number=1,
+                episode_number=2,
+                title="That Day",
+            ),
+            SonarrEpisode(
+                id=1003,
+                series_id=10,
+                episode_file_id=302,
+                season_number=1,
+                episode_number=3,
+                title="A Dim Light",
+            ),
         ],
         history_records=[
             SonarrHistoryRecord(
@@ -216,8 +245,22 @@ def test_multi_instance_inventory_pipeline_end_to_end():
             ),
         ],
         episodes=[
-            SonarrEpisode(id=2001, series_id=20, episode_file_id=401, season_number=1, episode_number=1, title="Celebration"),
-            SonarrEpisode(id=2002, series_id=20, episode_file_id=402, season_number=4, episode_number=10, title="With Open Eyes"),
+            SonarrEpisode(
+                id=2001,
+                series_id=20,
+                episode_file_id=401,
+                season_number=1,
+                episode_number=1,
+                title="Celebration",
+            ),
+            SonarrEpisode(
+                id=2002,
+                series_id=20,
+                episode_file_id=402,
+                season_number=4,
+                episode_number=10,
+                title="With Open Eyes",
+            ),
         ],
         history_records=[
             SonarrHistoryRecord(

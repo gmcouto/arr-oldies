@@ -104,4 +104,3 @@ class LanguageNormalizer:
                 return True
 
         return False
-

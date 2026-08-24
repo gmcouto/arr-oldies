@@ -1,6 +1,6 @@
 """Unit tests for HistoryCorrelator with Radarr movie files and history events."""
 
-from datetime import UTC, datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 
@@ -11,7 +11,7 @@ from arr_oldies.api.models import (
     RadarrMovie,
     RadarrMovieFile,
 )
-from arr_oldies.inventory.correlator import HistoryCorrelator, RadarrHistoryIndex
+from arr_oldies.inventory.correlator import HistoryCorrelator
 from arr_oldies.inventory.models import HistoryStatus, MediaType
 from arr_oldies.models import InstanceType
 

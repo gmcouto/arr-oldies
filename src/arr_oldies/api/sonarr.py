@@ -192,7 +192,9 @@ class SonarrClient(BaseArrClient):
 
             if total_records is None:
                 total_records = history_page.total_records
-                total_pages = max(1, math.ceil(total_records / page_size)) if total_records > 0 else 1
+                total_pages = (
+                    max(1, math.ceil(total_records / page_size)) if total_records > 0 else 1
+                )
 
             if not history_page.records:
                 break
@@ -243,4 +245,3 @@ class SonarrClient(BaseArrClient):
         }
         response = await self.delete(endpoint, params=params)
         return response.status_code in (200, 204)
-

@@ -81,7 +81,6 @@ def render_banner() -> None:
         "  [dim]$[/dim] arr-oldies clean --delete --older-than 2y\n"
         "  [dim]$[/dim] arr-oldies clean --delete --execute --yes\n\n"
         "Run [bold cyan]arr-oldies --help[/bold cyan] or [bold cyan]arr-oldies <command> --help[/bold cyan] for full options."
-
     )
     panel = Panel(
         banner_text,

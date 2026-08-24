@@ -1,6 +1,10 @@
 """Media inventory indexing, History API correlation, and filtering engine."""
 
-from arr_oldies.inventory.correlator import HistoryCorrelator, RadarrHistoryIndex, SonarrHistoryIndex
+from arr_oldies.inventory.correlator import (
+    HistoryCorrelator,
+    RadarrHistoryIndex,
+    SonarrHistoryIndex,
+)
 from arr_oldies.inventory.engine import InventoryEngine
 from arr_oldies.inventory.languages import LanguageEntry, LanguageNormalizer
 from arr_oldies.inventory.models import (

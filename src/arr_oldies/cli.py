@@ -18,7 +18,6 @@ from arr_oldies.actions import (
 )
 from arr_oldies.api.fetcher import MultiInstanceFetcher
 from arr_oldies.config import load_config
-
 from arr_oldies.console import (
     print_debug,
     print_error,
@@ -411,9 +410,7 @@ def scan_command(
         typer.echo(json_output)
     else:
         if not sorted_items:
-            stdout_console.print(
-                "[yellow]No media items matched the specified criteria.[/yellow]"
-            )
+            stdout_console.print("[yellow]No media items matched the specified criteria.[/yellow]")
         else:
             table = render_inventory_table(
                 display_items,
@@ -710,9 +707,13 @@ def clean_command(
         )
         if not confirmed:
             if format == OutputFormat.JSON:
-                stderr_console.print("[yellow]Operation aborted by user. No changes were made.[/yellow]")
+                stderr_console.print(
+                    "[yellow]Operation aborted by user. No changes were made.[/yellow]"
+                )
             else:
-                stdout_console.print("[yellow]Operation aborted by user. No changes were made.[/yellow]")
+                stdout_console.print(
+                    "[yellow]Operation aborted by user. No changes were made.[/yellow]"
+                )
             raise typer.Exit(code=EXIT_SUCCESS)
 
     report = asyncio.run(executor.execute_plan(plan, target_instances))
@@ -727,4 +728,3 @@ def clean_command(
 
 if __name__ == "__main__":
     app()
-

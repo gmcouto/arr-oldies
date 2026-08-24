@@ -54,7 +54,9 @@ def resolve_target_instances(
                     raise InstanceConflictError(
                         f"Conflicting target flags: Instance '{inst.name}' is Sonarr, but --radarr flag was specified."
                     )
-        selected_instances = [inst for inst in selected_instances if inst.type == InstanceType.RADARR]
+        selected_instances = [
+            inst for inst in selected_instances if inst.type == InstanceType.RADARR
+        ]
     elif sonarr and not radarr:
         if has_explicit_names:
             for inst in selected_instances:
@@ -62,7 +64,9 @@ def resolve_target_instances(
                     raise InstanceConflictError(
                         f"Conflicting target flags: Instance '{inst.name}' is Radarr, but --sonarr flag was specified."
                     )
-        selected_instances = [inst for inst in selected_instances if inst.type == InstanceType.SONARR]
+        selected_instances = [
+            inst for inst in selected_instances if inst.type == InstanceType.SONARR
+        ]
 
     # Step 3: Check empty results
     if not selected_instances:

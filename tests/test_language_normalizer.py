@@ -22,7 +22,12 @@ def test_extract_languages_compound_delimiters(normalizer: LanguageNormalizer):
     assert normalizer.extract_languages("Japanese, English") == ["Japanese", "English"]
     assert normalizer.extract_languages("deu+ita") == ["German", "Italian"]
     assert normalizer.extract_languages("[EN+DE]") == ["English", "German"]
-    assert normalizer.extract_languages("rus|spa;por\\kor") == ["Russian", "Spanish", "Portuguese", "Korean"]
+    assert normalizer.extract_languages("rus|spa;por\\kor") == [
+        "Russian",
+        "Spanish",
+        "Portuguese",
+        "Korean",
+    ]
 
 
 def test_extract_languages_none_or_empty(normalizer: LanguageNormalizer):
@@ -63,6 +68,8 @@ def test_extract_languages_unknown_fallback(normalizer: LanguageNormalizer):
         ("   ", ["English"], False),
     ],
 )
-def test_language_matching(normalizer: LanguageNormalizer, query: str, item_langs: list[str], expected: bool):
+def test_language_matching(
+    normalizer: LanguageNormalizer, query: str, item_langs: list[str], expected: bool
+):
     """Verify bidirectional ISO code, synonym, and name matching."""
     assert normalizer.matches(item_langs, query) is expected

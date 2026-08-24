@@ -144,9 +144,13 @@ def test_cli_clean_missing_action_flag(config_file_path: Path) -> None:
 def test_cli_clean_dry_run_default_table(config_file_path: Path) -> None:
     """Verify clean defaults to dry-run simulation mode without issuing mutation requests."""
     mock_radarr_sonarr_instances()
-    delete_route = respx.delete("http://localhost:7878/api/v3/moviefile/101").respond(status_code=200)
+    delete_route = respx.delete("http://localhost:7878/api/v3/moviefile/101").respond(
+        status_code=200
+    )
 
-    result = runner.invoke(app, ["clean", "--delete", "--radarr", "--config", str(config_file_path)])
+    result = runner.invoke(
+        app, ["clean", "--delete", "--radarr", "--config", str(config_file_path)]
+    )
     assert result.exit_code == 0
     assert "Arr-Oldies Dry-Run Action Simulation" in result.output
     assert "The Matrix" in result.output
@@ -189,7 +193,9 @@ def test_cli_clean_execute_non_interactive_without_yes_fails(config_file_path: P
 def test_cli_clean_execute_interactive_declined(config_file_path: Path) -> None:
     """Verify clean --execute with interactive confirmation 'n' aborts cleanly."""
     mock_radarr_sonarr_instances()
-    delete_route = respx.delete("http://localhost:7878/api/v3/moviefile/101").respond(status_code=200)
+    delete_route = respx.delete("http://localhost:7878/api/v3/moviefile/101").respond(
+        status_code=200
+    )
 
     with (
         patch("typer.testing._NamedTextIOWrapper.isatty", return_value=True),
@@ -208,7 +214,9 @@ def test_cli_clean_execute_interactive_declined(config_file_path: Path) -> None:
 def test_cli_clean_execute_interactive_confirmed(config_file_path: Path) -> None:
     """Verify clean --execute with interactive confirmation 'y' executes mutations."""
     mock_radarr_sonarr_instances()
-    delete_route = respx.delete("http://localhost:7878/api/v3/moviefile/101").respond(status_code=200)
+    delete_route = respx.delete("http://localhost:7878/api/v3/moviefile/101").respond(
+        status_code=200
+    )
 
     with (
         patch("typer.testing._NamedTextIOWrapper.isatty", return_value=True),
@@ -224,12 +232,13 @@ def test_cli_clean_execute_interactive_confirmed(config_file_path: Path) -> None
         assert delete_route.called
 
 
-
 @respx.mock
 def test_cli_clean_execute_yes_bypass(config_file_path: Path) -> None:
     """Verify clean --execute --yes bypasses interactive prompt and executes mutations immediately."""
     mock_radarr_sonarr_instances()
-    delete_route = respx.delete("http://localhost:7878/api/v3/moviefile/101").respond(status_code=200)
+    delete_route = respx.delete("http://localhost:7878/api/v3/moviefile/101").respond(
+        status_code=200
+    )
 
     result = runner.invoke(
         app,
@@ -245,12 +254,27 @@ def test_cli_clean_execute_yes_bypass(config_file_path: Path) -> None:
 def test_cli_clean_unmonitor_actions(config_file_path: Path) -> None:
     """Verify --unmonitor triggers movie and series unmonitoring."""
     mock_radarr_sonarr_instances()
-    route_radarr_unmonitor = respx.put("http://localhost:7878/api/v3/movie/editor").respond(status_code=202)
-    route_sonarr_unmonitor = respx.put("https://sonarr.local:8989/api/v3/series/editor").respond(status_code=202)
+    route_radarr_unmonitor = respx.put("http://localhost:7878/api/v3/movie/editor").respond(
+        status_code=202
+    )
+    route_sonarr_unmonitor = respx.put("https://sonarr.local:8989/api/v3/series/editor").respond(
+        status_code=202
+    )
 
     result = runner.invoke(
         app,
-        ["clean", "--unmonitor", "--execute", "--yes", "-i", "radarr-main", "-i", "sonarr-tv", "--config", str(config_file_path)],
+        [
+            "clean",
+            "--unmonitor",
+            "--execute",
+            "--yes",
+            "-i",
+            "radarr-main",
+            "-i",
+            "sonarr-tv",
+            "--config",
+            str(config_file_path),
+        ],
     )
     assert result.exit_code == 0
     assert route_radarr_unmonitor.called
@@ -261,11 +285,21 @@ def test_cli_clean_unmonitor_actions(config_file_path: Path) -> None:
 def test_cli_clean_unmonitor_episode_action(config_file_path: Path) -> None:
     """Verify --unmonitor-episode triggers episode unmonitoring for Sonarr."""
     mock_radarr_sonarr_instances()
-    route_episodes = respx.put("https://sonarr.local:8989/api/v3/episode/monitor").respond(status_code=200)
+    route_episodes = respx.put("https://sonarr.local:8989/api/v3/episode/monitor").respond(
+        status_code=200
+    )
 
     result = runner.invoke(
         app,
-        ["clean", "--unmonitor-episode", "--execute", "--yes", "--sonarr", "--config", str(config_file_path)],
+        [
+            "clean",
+            "--unmonitor-episode",
+            "--execute",
+            "--yes",
+            "--sonarr",
+            "--config",
+            str(config_file_path),
+        ],
     )
     assert result.exit_code == 0
     assert route_episodes.called
@@ -296,7 +330,17 @@ def test_cli_clean_json_output_purity_execute(config_file_path: Path) -> None:
 
     result = runner.invoke(
         app,
-        ["clean", "--delete", "--execute", "--yes", "--radarr", "--format", "json", "--config", str(config_file_path)],
+        [
+            "clean",
+            "--delete",
+            "--execute",
+            "--yes",
+            "--radarr",
+            "--format",
+            "json",
+            "--config",
+            str(config_file_path),
+        ],
     )
     assert result.exit_code == 0
     parsed = json.loads(result.stdout)
@@ -311,13 +355,26 @@ def test_cli_clean_partial_failure_handling(config_file_path: Path) -> None:
     """Verify partial failure during execution logs failed status but finishes cleanly."""
     mock_radarr_sonarr_instances()
     # Radarr delete fails with 500
-    respx.delete("http://localhost:7878/api/v3/moviefile/101").respond(status_code=500, text="Internal Error")
+    respx.delete("http://localhost:7878/api/v3/moviefile/101").respond(
+        status_code=500, text="Internal Error"
+    )
     # Sonarr delete succeeds with 204
     respx.delete("https://sonarr.local:8989/api/v3/episodefile/201").respond(status_code=204)
 
     result = runner.invoke(
         app,
-        ["clean", "--delete", "--execute", "--yes", "-i", "radarr-main", "-i", "sonarr-tv", "--config", str(config_file_path)],
+        [
+            "clean",
+            "--delete",
+            "--execute",
+            "--yes",
+            "-i",
+            "radarr-main",
+            "-i",
+            "sonarr-tv",
+            "--config",
+            str(config_file_path),
+        ],
     )
     assert result.exit_code == 0
     assert "SUCCESS" in result.output
@@ -342,8 +399,12 @@ def test_cli_clean_no_matching_items(config_file_path: Path) -> None:
 def test_cli_clean_combined_actions_with_filtering_and_sorting(config_file_path: Path) -> None:
     """Verify combined --delete --unmonitor with language filter, age cutoff, and sorting."""
     mock_radarr_sonarr_instances()
-    route_radarr_unmonitor = respx.put("http://localhost:7878/api/v3/movie/editor").respond(status_code=202)
-    route_radarr_delete = respx.delete("http://localhost:7878/api/v3/moviefile/101").respond(status_code=200)
+    route_radarr_unmonitor = respx.put("http://localhost:7878/api/v3/movie/editor").respond(
+        status_code=202
+    )
+    route_radarr_delete = respx.delete("http://localhost:7878/api/v3/moviefile/101").respond(
+        status_code=200
+    )
 
     result = runner.invoke(
         app,
@@ -385,4 +446,3 @@ def test_cli_clean_all_instances_fetch_failure(config_file_path: Path) -> None:
     )
     assert result.exit_code == 1
     assert "All target instances failed to fetch data" in result.output
-

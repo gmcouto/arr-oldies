@@ -1,6 +1,7 @@
 """Unit tests for SonarrClient mutation API endpoints (delete, unmonitor series/episodes, remove)."""
 
 import json
+
 import pytest
 import respx
 from pydantic import SecretStr

@@ -83,9 +83,7 @@ def test_select_specific_instances_by_name(multi_instance_config: AppConfig) -> 
 def test_unknown_instance_raises_not_found(multi_instance_config: AppConfig) -> None:
     """Verify selecting an unknown instance name raises InstanceNotFoundError with available names."""
     with pytest.raises(InstanceNotFoundError) as exc_info:
-        resolve_target_instances(
-            multi_instance_config, instance_names=["non-existent-instance"]
-        )
+        resolve_target_instances(multi_instance_config, instance_names=["non-existent-instance"])
     assert "Instance 'non-existent-instance' not found in configuration" in str(exc_info.value)
     assert "radarr-hd" in str(exc_info.value)
 
@@ -95,9 +93,7 @@ def test_conflicting_radarr_flag_with_sonarr_instance(
 ) -> None:
     """Verify selecting Sonarr instance alongside --radarr raises InstanceConflictError (D-10)."""
     with pytest.raises(InstanceConflictError) as exc_info:
-        resolve_target_instances(
-            multi_instance_config, radarr=True, instance_names=["sonarr-tv"]
-        )
+        resolve_target_instances(multi_instance_config, radarr=True, instance_names=["sonarr-tv"])
     assert "Conflicting target flags" in str(exc_info.value)
     assert "Instance 'sonarr-tv' is Sonarr, but --radarr flag was specified" in str(exc_info.value)
 
@@ -107,9 +103,7 @@ def test_conflicting_sonarr_flag_with_radarr_instance(
 ) -> None:
     """Verify selecting Radarr instance alongside --sonarr raises InstanceConflictError (D-10)."""
     with pytest.raises(InstanceConflictError) as exc_info:
-        resolve_target_instances(
-            multi_instance_config, sonarr=True, instance_names=["radarr-hd"]
-        )
+        resolve_target_instances(multi_instance_config, sonarr=True, instance_names=["radarr-hd"])
     assert "Conflicting target flags" in str(exc_info.value)
     assert "Instance 'radarr-hd' is Radarr, but --sonarr flag was specified" in str(exc_info.value)
 

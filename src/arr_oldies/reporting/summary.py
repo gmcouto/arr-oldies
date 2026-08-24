@@ -56,8 +56,7 @@ def render_summary_panel(
 
     # Row 3: Legacy Items and Instance Breakdown
     instances_str = (
-        ", ".join(f"{name}: {cnt:,}" for name, cnt in summary.instances_breakdown.items())
-        or "None"
+        ", ".join(f"{name}: {cnt:,}" for name, cnt in summary.instances_breakdown.items()) or "None"
     )
     grid.add_row(
         "Legacy (No History):",

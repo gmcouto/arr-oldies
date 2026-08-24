@@ -21,10 +21,15 @@ def render_confirmation_panel(plan: ActionPlan) -> Panel:
     grid.add_column(style="bold yellow", justify="left")
     grid.add_column(style="bold white", justify="right")
 
-    actions_str = ", ".join(f"[bold red]{act.value.upper()}[/bold red]" for act in plan.target_actions)
+    actions_str = ", ".join(
+        f"[bold red]{act.value.upper()}[/bold red]" for act in plan.target_actions
+    )
     grid.add_row("Actions to Perform:", actions_str or "[dim]None[/dim]")
     grid.add_row("Total Items Affected:", f"{plan.total_items:,} items")
-    grid.add_row("Potential Space to be Freed:", f"[bold green]{format_size(plan.total_size_bytes)}[/bold green]")
+    grid.add_row(
+        "Potential Space to be Freed:",
+        f"[bold green]{format_size(plan.total_size_bytes)}[/bold green]",
+    )
 
     breakdown_str = (
         ", ".join(f"{inst}: {cnt:,}" for inst, cnt in plan.instances_breakdown.items())
@@ -60,7 +65,9 @@ def render_dry_run_table(plan: ActionPlan) -> Table:
 
     for idx, action_item in enumerate(plan.items):
         item = action_item.item
-        actions_str = ", ".join(f"[bold cyan]{act.value.upper()}[/bold cyan]" for act in action_item.action_types)
+        actions_str = ", ".join(
+            f"[bold cyan]{act.value.upper()}[/bold cyan]" for act in action_item.action_types
+        )
         table.add_row(
             str(idx + 1),
             format_instance_badge(item.instance_name, item.instance_type),
@@ -92,12 +99,14 @@ def render_execution_report_table(report: ExecutionReport) -> Table:
     table.add_column("Details / Error", style="white")
 
     for idx, result in enumerate(report.results):
-        status_str = "[bold green]SUCCESS[/bold green]" if result.success else "[bold red]FAILED[/bold red]"
-        freed_str = format_size(result.freed_bytes) if result.success and result.freed_bytes > 0 else "-"
+        status_str = (
+            "[bold green]SUCCESS[/bold green]" if result.success else "[bold red]FAILED[/bold red]"
+        )
+        freed_str = (
+            format_size(result.freed_bytes) if result.success and result.freed_bytes > 0 else "-"
+        )
         details_str = (
-            f"[red]{result.error_message}[/red]"
-            if result.error_message
-            else "[dim]Completed[/dim]"
+            f"[red]{result.error_message}[/red]" if result.error_message else "[dim]Completed[/dim]"
         )
 
         table.add_row(

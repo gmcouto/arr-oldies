@@ -10,9 +10,7 @@ from pydantic import SecretStr
 from arr_oldies.actions.executor import ActionExecutor
 from arr_oldies.actions.models import ActionItem, ActionPlan, ActionType
 from arr_oldies.inventory.models import HistoryStatus, MediaInventoryItem, MediaType
-
 from arr_oldies.models import InstanceConfig, InstanceType
-
 
 
 def create_test_items() -> list[MediaInventoryItem]:
@@ -113,11 +111,19 @@ def test_export_plan_json() -> None:
 @respx.mock
 async def test_execute_plan_deletions_and_unmonitoring() -> None:
     """Verify execute_plan executes unmonitor before delete, deduplicates unmonitors, and calculates freed space."""
-    route_radarr_unmonitor = respx.put("http://radarr.local:7878/api/v3/movie/editor").respond(status_code=202)
-    route_radarr_delete = respx.delete("http://radarr.local:7878/api/v3/moviefile/50").respond(status_code=200)
+    route_radarr_unmonitor = respx.put("http://radarr.local:7878/api/v3/movie/editor").respond(
+        status_code=202
+    )
+    route_radarr_delete = respx.delete("http://radarr.local:7878/api/v3/moviefile/50").respond(
+        status_code=200
+    )
 
-    route_sonarr_unmonitor = respx.put("http://sonarr.local:8989/api/v3/series/editor").respond(status_code=202)
-    route_sonarr_delete1 = respx.delete("http://sonarr.local:8989/api/v3/episodefile/200").respond(status_code=204)
+    route_sonarr_unmonitor = respx.put("http://sonarr.local:8989/api/v3/series/editor").respond(
+        status_code=202
+    )
+    route_sonarr_delete1 = respx.delete("http://sonarr.local:8989/api/v3/episodefile/200").respond(
+        status_code=204
+    )
 
     items = create_test_items()
     # Add a second episode from the same series to test deduplication
@@ -138,7 +144,9 @@ async def test_execute_plan_deletions_and_unmonitoring() -> None:
         import_date=datetime(2023, 1, 2, tzinfo=UTC),
         history_status=HistoryStatus.IMPORTED,
     )
-    route_sonarr_delete2 = respx.delete("http://sonarr.local:8989/api/v3/episodefile/201").respond(status_code=204)
+    route_sonarr_delete2 = respx.delete("http://sonarr.local:8989/api/v3/episodefile/201").respond(
+        status_code=204
+    )
     items.append(ep2)
 
     instances = [
@@ -157,12 +165,16 @@ async def test_execute_plan_deletions_and_unmonitoring() -> None:
     ]
 
     executor = ActionExecutor()
-    plan = executor.build_plan(items=items, actions=[ActionType.UNMONITOR, ActionType.DELETE], dry_run=False)
+    plan = executor.build_plan(
+        items=items, actions=[ActionType.UNMONITOR, ActionType.DELETE], dry_run=False
+    )
 
     report = await executor.execute_plan(plan, instances)
 
     assert report.mode == "execute"
-    assert report.total_attempted == 6  # 3 unmonitors (1 movie, 2 eps with deduplicated series unmonitor) + 3 deletes
+    assert (
+        report.total_attempted == 6
+    )  # 3 unmonitors (1 movie, 2 eps with deduplicated series unmonitor) + 3 deletes
     assert report.successful_count == 6
     assert report.failed_count == 0
     assert report.total_freed_bytes == 15 * 1024 * 1024 * 1024
@@ -179,7 +191,9 @@ async def test_execute_plan_deletions_and_unmonitoring() -> None:
 @respx.mock
 async def test_execute_plan_unmonitor_episodes() -> None:
     """Verify episode-specific unmonitoring."""
-    route_episodes = respx.put("http://sonarr.local:8989/api/v3/episode/monitor").respond(status_code=200)
+    route_episodes = respx.put("http://sonarr.local:8989/api/v3/episode/monitor").respond(
+        status_code=200
+    )
 
     items = [create_test_items()[1]]  # episode item
     instances = [
@@ -198,12 +212,13 @@ async def test_execute_plan_unmonitor_episodes() -> None:
     assert route_episodes.called
 
 
-
 @pytest.mark.asyncio
 @respx.mock
 async def test_execute_plan_error_resilience() -> None:
     """Verify execute_plan isolates single-item errors and reports both successes and failures."""
-    respx.delete("http://radarr.local:7878/api/v3/moviefile/50").respond(status_code=500, text="Disk error")
+    respx.delete("http://radarr.local:7878/api/v3/moviefile/50").respond(
+        status_code=500, text="Disk error"
+    )
     respx.delete("http://sonarr.local:8989/api/v3/episodefile/200").respond(status_code=204)
 
     items = create_test_items()
@@ -288,5 +303,3 @@ async def test_execute_plan_remove_library_entry() -> None:
     assert route_movie.called
     assert route_series.called
     assert report.total_freed_bytes == items[0].size_bytes
-
-

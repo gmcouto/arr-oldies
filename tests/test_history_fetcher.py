@@ -1,8 +1,5 @@
 """Integration tests for create_client factory and MultiInstanceFetcher with error isolation."""
 
-from unittest.mock import patch
-
-import httpx
 import pytest
 import respx
 from pydantic import SecretStr
@@ -169,7 +166,16 @@ async def test_fetch_all_instances_data_concurrency_and_error_isolation(
     """Verify concurrent multi-instance fetching where one instance fails without affecting healthy instances."""
     # radarr-hd succeeds
     respx.get("http://radarr-hd.local:7878/api/v3/movie").respond(
-        json=[{"id": 1, "title": "Movie 1", "year": 2020, "path": "/m/1", "monitored": True, "hasFile": False}]
+        json=[
+            {
+                "id": 1,
+                "title": "Movie 1",
+                "year": 2020,
+                "path": "/m/1",
+                "monitored": True,
+                "hasFile": False,
+            }
+        ]
     )
     respx.get("http://radarr-hd.local:7878/api/v3/moviefile").respond(json=[])
     respx.get("http://radarr-hd.local:7878/api/v3/history").respond(
@@ -177,11 +183,15 @@ async def test_fetch_all_instances_data_concurrency_and_error_isolation(
     )
 
     # sonarr-anime fails with 401 Unauthorized
-    respx.get("http://sonarr-anime.local:8989/api/v3/series").respond(status_code=401, text="Unauthorized API Key")
+    respx.get("http://sonarr-anime.local:8989/api/v3/series").respond(
+        status_code=401, text="Unauthorized API Key"
+    )
 
     progress_events: list[tuple[str, int, int, int, int]] = []
 
-    def on_progress(inst_name: str, page: int, total_pages: int, total_records: int, fetched: int) -> None:
+    def on_progress(
+        inst_name: str, page: int, total_pages: int, total_records: int, fetched: int
+    ) -> None:
         progress_events.append((inst_name, page, total_pages, total_records, fetched))
 
     fetcher = MultiInstanceFetcher()

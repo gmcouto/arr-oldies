@@ -54,7 +54,9 @@ def test_correlate_legacy_radarr_file_without_history():
 
 def test_correlate_legacy_sonarr_file_without_history():
     """Verify Sonarr files with no history events fall back to date_added and are tagged as legacy."""
-    series = SonarrSeries(id=50, title="Old Classic Series", year=1995, path="/tv/Old Classic Series")
+    series = SonarrSeries(
+        id=50, title="Old Classic Series", year=1995, path="/tv/Old Classic Series"
+    )
     ep_file = SonarrEpisodeFile(
         id=801,
         series_id=50,

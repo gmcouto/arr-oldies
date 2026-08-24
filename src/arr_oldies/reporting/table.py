@@ -37,7 +37,11 @@ def render_inventory_table(
     table.add_column("Audio", style="white", no_wrap=True)
 
     for idx, item in enumerate(items, start=1):
-        type_str = "[blue]Movie[/blue]" if item.media_type == MediaType.MOVIE else "[purple]Episode[/purple]"
+        type_str = (
+            "[blue]Movie[/blue]"
+            if item.media_type == MediaType.MOVIE
+            else "[purple]Episode[/purple]"
+        )
         inst_badge = format_instance_badge(item.instance_name, item.instance_type)
         title_str = format_media_title(item)
         size_str = format_size(item.size_bytes)

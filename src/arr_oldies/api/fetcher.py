@@ -3,7 +3,6 @@
 import asyncio
 import time
 from collections.abc import Callable
-from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -17,6 +16,8 @@ from arr_oldies.api.models import (
     SonarrHistoryRecord,
     SonarrSeries,
 )
+from arr_oldies.api.radarr import RadarrClient
+from arr_oldies.api.sonarr import SonarrClient
 from arr_oldies.constants import DEFAULT_HISTORY_PAGE_SIZE
 from arr_oldies.exceptions import ArrClientError
 from arr_oldies.models import InstanceConfig, InstanceType
@@ -32,7 +33,9 @@ class InstanceMediaData(BaseModel):
     series: list[SonarrSeries] = Field(default_factory=list)
     episode_files: list[SonarrEpisodeFile] = Field(default_factory=list)
     episodes: list[SonarrEpisode] = Field(default_factory=list)
-    history_records: list[RadarrHistoryRecord | SonarrHistoryRecord] = Field(default_factory=list)
+    history_records: list[RadarrHistoryRecord] | list[SonarrHistoryRecord] = Field(
+        default_factory=list
+    )
 
 
 class InstanceFetchResult(BaseModel):
@@ -61,17 +64,19 @@ class MultiInstanceFetcher:
         """Fetch media library and history records for a single instance with error isolation."""
         start_time = time.perf_counter()
 
-        def _history_progress(page: int, total_pages: int, total_records: int, fetched: int) -> None:
+        def _history_progress(
+            page: int, total_pages: int, total_records: int, fetched: int
+        ) -> None:
             if progress_callback is not None:
                 progress_callback(instance.name, page, total_pages, total_records, fetched)
 
         try:
             client = create_client(instance)
             async with client:
-                if instance.type == InstanceType.RADARR:
-                    movies = await client.get_movies()  # type: ignore[union-attr]
-                    movie_files = await client.get_movie_files()  # type: ignore[union-attr]
-                    history = await client.fetch_all_history(  # type: ignore[union-attr]
+                if isinstance(client, RadarrClient):
+                    movies = await client.get_movies()
+                    movie_files = await client.get_movie_files()
+                    radarr_history = await client.fetch_all_history(
                         page_size=history_page_size,
                         progress_callback=_history_progress,
                     )
@@ -80,14 +85,14 @@ class MultiInstanceFetcher:
                         instance_type=instance.type,
                         movies=movies,
                         movie_files=movie_files,
-                        history_records=history,
+                        history_records=radarr_history,
                     )
                     item_count = len(movie_files) or len(movies)
 
-                elif instance.type == InstanceType.SONARR:
-                    series = await client.get_series()  # type: ignore[union-attr]
-                    episode_files = await client.get_all_episode_files()  # type: ignore[union-attr]
-                    history = await client.fetch_all_history(  # type: ignore[union-attr]
+                elif isinstance(client, SonarrClient):
+                    series = await client.get_series()
+                    episode_files = await client.get_all_episode_files()
+                    sonarr_history = await client.fetch_all_history(
                         page_size=history_page_size,
                         progress_callback=_history_progress,
                     )
@@ -96,11 +101,11 @@ class MultiInstanceFetcher:
                         instance_type=instance.type,
                         series=series,
                         episode_files=episode_files,
-                        history_records=history,
+                        history_records=sonarr_history,
                     )
                     item_count = len(episode_files) or len(series)
                 else:
-                    raise ValueError(f"Unknown instance type '{instance.type}'")
+                    raise TypeError(f"Unknown instance type '{instance.type}'")
 
             latency_ms = (time.perf_counter() - start_time) * 1000.0
             return InstanceFetchResult(
@@ -123,7 +128,7 @@ class MultiInstanceFetcher:
                 error_message=str(exc),
                 latency_ms=round(latency_ms, 2),
             )
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001
             latency_ms = (time.perf_counter() - start_time) * 1000.0
             return InstanceFetchResult(
                 instance_name=instance.name,
@@ -140,10 +145,7 @@ class MultiInstanceFetcher:
         history_page_size: int = DEFAULT_HISTORY_PAGE_SIZE,
         progress_callback: Callable[[str, int, int, int, int], None] | None = None,
     ) -> list[InstanceFetchResult]:
-        """Fetch media library and history records across all instances concurrently."""
-        if not instances:
-            return []
-
+        """Fetch media and history records from all configured instances concurrently."""
         tasks = [
             self.fetch_instance_data(
                 instance=inst,
@@ -157,7 +159,7 @@ class MultiInstanceFetcher:
 
         final_results: list[InstanceFetchResult] = []
         for i, result in enumerate(results):
-            if isinstance(result, Exception):
+            if isinstance(result, BaseException):
                 inst = instances[i]
                 final_results.append(
                     InstanceFetchResult(

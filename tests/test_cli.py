@@ -52,9 +52,7 @@ def test_validate_config_all_healthy(tmp_path: Path, sample_valid_yaml: str) -> 
 
 
 @respx.mock
-def test_validate_config_subcommand_config_flag(
-    tmp_path: Path, sample_valid_yaml: str
-) -> None:
+def test_validate_config_subcommand_config_flag(tmp_path: Path, sample_valid_yaml: str) -> None:
     """Verify validate-config works when --config is passed after the subcommand."""
     cfg = tmp_path / "config.yaml"
     cfg.write_text(sample_valid_yaml, encoding="utf-8")
@@ -69,9 +67,7 @@ def test_validate_config_subcommand_config_flag(
 
 
 @respx.mock
-def test_validate_config_partial_failure_exits_1(
-    tmp_path: Path, sample_valid_yaml: str
-) -> None:
+def test_validate_config_partial_failure_exits_1(tmp_path: Path, sample_valid_yaml: str) -> None:
     """Verify validate-config with a failing instance exits with code 1."""
     cfg = tmp_path / "config.yaml"
     cfg.write_text(sample_valid_yaml, encoding="utf-8")
@@ -79,9 +75,7 @@ def test_validate_config_partial_failure_exits_1(
     respx.get("http://localhost:7878/api/v3/system/status").respond(
         status_code=200, json={"version": "5.3.6"}
     )
-    respx.get("https://sonarr.local:8989/api/v3/system/status").respond(
-        status_code=401
-    )
+    respx.get("https://sonarr.local:8989/api/v3/system/status").respond(status_code=401)
     respx.get("http://192.168.1.100:7878/api/v3/system/status").respond(
         status_code=200, json={"version": "5.3.6"}
     )
@@ -114,24 +108,18 @@ def test_validate_config_invalid_yaml_exits_2(
     assert "Invalid YAML syntax" in result.output
 
 
-def test_validate_config_unknown_instance_exits_2(
-    tmp_path: Path, sample_valid_yaml: str
-) -> None:
+def test_validate_config_unknown_instance_exits_2(tmp_path: Path, sample_valid_yaml: str) -> None:
     """Verify selecting unknown instance name writes error to stderr and exits with code 2."""
     cfg = tmp_path / "config.yaml"
     cfg.write_text(sample_valid_yaml, encoding="utf-8")
 
-    result = runner.invoke(
-        app, ["--config", str(cfg), "validate-config", "-i", "nonexistent"]
-    )
+    result = runner.invoke(app, ["--config", str(cfg), "validate-config", "-i", "nonexistent"])
     assert result.exit_code == 2
     assert "Error:" in result.output
     assert "Instance 'nonexistent' not found in configuration" in result.output
 
 
-def test_validate_config_conflicting_flags_exits_2(
-    tmp_path: Path, sample_valid_yaml: str
-) -> None:
+def test_validate_config_conflicting_flags_exits_2(tmp_path: Path, sample_valid_yaml: str) -> None:
     """Verify conflicting targeting flags (--radarr + sonarr instance) writes error to stderr and exits with code 2."""
     cfg = tmp_path / "config.yaml"
     cfg.write_text(sample_valid_yaml, encoding="utf-8")

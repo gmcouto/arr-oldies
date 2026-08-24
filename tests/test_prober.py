@@ -104,9 +104,7 @@ async def test_probe_all_instances_concurrent(
     respx.get("http://localhost:7878/api/v3/system/status").respond(
         status_code=200, json={"version": "5.3.6"}
     )
-    respx.get("https://sonarr.local:8989/api/v3/system/status").respond(
-        status_code=401
-    )
+    respx.get("https://sonarr.local:8989/api/v3/system/status").respond(status_code=401)
 
     results = await probe_all_instances([radarr_instance, sonarr_instance])
     assert len(results) == 2

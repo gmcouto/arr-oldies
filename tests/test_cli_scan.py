@@ -150,16 +150,50 @@ def test_cli_scan_format_json_pure_stdout(tmp_path: Path, sample_valid_yaml: str
     cfg.write_text(sample_valid_yaml, encoding="utf-8")
 
     respx.get("http://localhost:7878/api/v3/movie").respond(
-        json=[{"id": 1, "title": "Inception", "year": 2010, "path": "/m/1", "monitored": True, "hasFile": True}]
+        json=[
+            {
+                "id": 1,
+                "title": "Inception",
+                "year": 2010,
+                "path": "/m/1",
+                "monitored": True,
+                "hasFile": True,
+            }
+        ]
     )
     respx.get("http://localhost:7878/api/v3/moviefile").respond(
-        json=[{"id": 10, "movieId": 1, "relativePath": "1.mkv", "path": "/m/1/1.mkv", "size": 10_000_000_000, "dateAdded": "2022-01-01T00:00:00Z"}]
+        json=[
+            {
+                "id": 10,
+                "movieId": 1,
+                "relativePath": "1.mkv",
+                "path": "/m/1/1.mkv",
+                "size": 10_000_000_000,
+                "dateAdded": "2022-01-01T00:00:00Z",
+            }
+        ]
     )
     respx.get("http://localhost:7878/api/v3/history").respond(
-        json={"page": 1, "pageSize": 1000, "totalRecords": 1, "records": [{"id": 1, "movieId": 1, "sourceTitle": "Inc", "eventType": "downloadFolderImported", "date": "2022-01-01T10:00:00Z", "data": {"fileId": "10"}}]}
+        json={
+            "page": 1,
+            "pageSize": 1000,
+            "totalRecords": 1,
+            "records": [
+                {
+                    "id": 1,
+                    "movieId": 1,
+                    "sourceTitle": "Inc",
+                    "eventType": "downloadFolderImported",
+                    "date": "2022-01-01T10:00:00Z",
+                    "data": {"fileId": "10"},
+                }
+            ],
+        }
     )
 
-    result = runner.invoke(app, ["--config", str(cfg), "scan", "-i", "radarr-main", "--format", "json"])
+    result = runner.invoke(
+        app, ["--config", str(cfg), "scan", "-i", "radarr-main", "--format", "json"]
+    )
     assert result.exit_code == 0
 
     parsed = json.loads(result.stdout)
@@ -180,16 +214,58 @@ def test_cli_scan_limit_flag(tmp_path: Path, sample_valid_yaml: str) -> None:
 
     respx.get("http://localhost:7878/api/v3/movie").respond(
         json=[
-            {"id": 1, "title": "Movie 1", "year": 2020, "path": "/m/1", "monitored": True, "hasFile": True},
-            {"id": 2, "title": "Movie 2", "year": 2021, "path": "/m/2", "monitored": True, "hasFile": True},
-            {"id": 3, "title": "Movie 3", "year": 2022, "path": "/m/3", "monitored": True, "hasFile": True},
+            {
+                "id": 1,
+                "title": "Movie 1",
+                "year": 2020,
+                "path": "/m/1",
+                "monitored": True,
+                "hasFile": True,
+            },
+            {
+                "id": 2,
+                "title": "Movie 2",
+                "year": 2021,
+                "path": "/m/2",
+                "monitored": True,
+                "hasFile": True,
+            },
+            {
+                "id": 3,
+                "title": "Movie 3",
+                "year": 2022,
+                "path": "/m/3",
+                "monitored": True,
+                "hasFile": True,
+            },
         ]
     )
     respx.get("http://localhost:7878/api/v3/moviefile").respond(
         json=[
-            {"id": 10, "movieId": 1, "relativePath": "1.mkv", "path": "/m/1/1.mkv", "size": 1_000_000_000, "dateAdded": "2021-01-01T00:00:00Z"},
-            {"id": 20, "movieId": 2, "relativePath": "2.mkv", "path": "/m/2/2.mkv", "size": 2_000_000_000, "dateAdded": "2022-01-01T00:00:00Z"},
-            {"id": 30, "movieId": 3, "relativePath": "3.mkv", "path": "/m/3/3.mkv", "size": 3_000_000_000, "dateAdded": "2023-01-01T00:00:00Z"},
+            {
+                "id": 10,
+                "movieId": 1,
+                "relativePath": "1.mkv",
+                "path": "/m/1/1.mkv",
+                "size": 1_000_000_000,
+                "dateAdded": "2021-01-01T00:00:00Z",
+            },
+            {
+                "id": 20,
+                "movieId": 2,
+                "relativePath": "2.mkv",
+                "path": "/m/2/2.mkv",
+                "size": 2_000_000_000,
+                "dateAdded": "2022-01-01T00:00:00Z",
+            },
+            {
+                "id": 30,
+                "movieId": 3,
+                "relativePath": "3.mkv",
+                "path": "/m/3/3.mkv",
+                "size": 3_000_000_000,
+                "dateAdded": "2023-01-01T00:00:00Z",
+            },
         ]
     )
     respx.get("http://localhost:7878/api/v3/history").respond(
@@ -198,21 +274,46 @@ def test_cli_scan_limit_flag(tmp_path: Path, sample_valid_yaml: str) -> None:
             "pageSize": 1000,
             "totalRecords": 3,
             "records": [
-                {"id": 1, "movieId": 1, "sourceTitle": "M1", "eventType": "downloadFolderImported", "date": "2021-01-01T00:00:00Z", "data": {"fileId": "10"}},
-                {"id": 2, "movieId": 2, "sourceTitle": "M2", "eventType": "downloadFolderImported", "date": "2022-01-01T00:00:00Z", "data": {"fileId": "20"}},
-                {"id": 3, "movieId": 3, "sourceTitle": "M3", "eventType": "downloadFolderImported", "date": "2023-01-01T00:00:00Z", "data": {"fileId": "30"}},
+                {
+                    "id": 1,
+                    "movieId": 1,
+                    "sourceTitle": "M1",
+                    "eventType": "downloadFolderImported",
+                    "date": "2021-01-01T00:00:00Z",
+                    "data": {"fileId": "10"},
+                },
+                {
+                    "id": 2,
+                    "movieId": 2,
+                    "sourceTitle": "M2",
+                    "eventType": "downloadFolderImported",
+                    "date": "2022-01-01T00:00:00Z",
+                    "data": {"fileId": "20"},
+                },
+                {
+                    "id": 3,
+                    "movieId": 3,
+                    "sourceTitle": "M3",
+                    "eventType": "downloadFolderImported",
+                    "date": "2023-01-01T00:00:00Z",
+                    "data": {"fileId": "30"},
+                },
             ],
         }
     )
 
     # Test limit=1 in table mode
-    result_table = runner.invoke(app, ["--config", str(cfg), "scan", "-i", "radarr-main", "--limit", "1"])
+    result_table = runner.invoke(
+        app, ["--config", str(cfg), "scan", "-i", "radarr-main", "--limit", "1"]
+    )
     assert result_table.exit_code == 0
     assert "Showing top 1 of 3 items" in result_table.output
     assert "Movie 1" in result_table.output
 
     # Test limit=2 in JSON mode
-    result_json = runner.invoke(app, ["--config", str(cfg), "scan", "-i", "radarr-main", "--limit", "2", "--format", "json"])
+    result_json = runner.invoke(
+        app, ["--config", str(cfg), "scan", "-i", "radarr-main", "--limit", "2", "--format", "json"]
+    )
     assert result_json.exit_code == 0
     parsed = json.loads(result_json.stdout)
     assert parsed["metadata"]["total_matched_items"] == 3
@@ -228,8 +329,22 @@ def test_cli_scan_filtering_options(tmp_path: Path, sample_valid_yaml: str) -> N
 
     respx.get("http://localhost:7878/api/v3/movie").respond(
         json=[
-            {"id": 1, "title": "Old Large Japanese Movie", "year": 2015, "path": "/m/1", "monitored": True, "hasFile": True},
-            {"id": 2, "title": "New Small English Movie", "year": 2024, "path": "/m/2", "monitored": True, "hasFile": True},
+            {
+                "id": 1,
+                "title": "Old Large Japanese Movie",
+                "year": 2015,
+                "path": "/m/1",
+                "monitored": True,
+                "hasFile": True,
+            },
+            {
+                "id": 2,
+                "title": "New Small English Movie",
+                "year": 2024,
+                "path": "/m/2",
+                "monitored": True,
+                "hasFile": True,
+            },
         ]
     )
     respx.get("http://localhost:7878/api/v3/moviefile").respond(
@@ -260,27 +375,47 @@ def test_cli_scan_filtering_options(tmp_path: Path, sample_valid_yaml: str) -> N
             "pageSize": 1000,
             "totalRecords": 2,
             "records": [
-                {"id": 1, "movieId": 1, "sourceTitle": "M1", "eventType": "downloadFolderImported", "date": "2018-01-01T00:00:00Z", "data": {"fileId": "10"}},
-                {"id": 2, "movieId": 2, "sourceTitle": "M2", "eventType": "downloadFolderImported", "date": "2026-08-01T00:00:00Z", "data": {"fileId": "20"}},
+                {
+                    "id": 1,
+                    "movieId": 1,
+                    "sourceTitle": "M1",
+                    "eventType": "downloadFolderImported",
+                    "date": "2018-01-01T00:00:00Z",
+                    "data": {"fileId": "10"},
+                },
+                {
+                    "id": 2,
+                    "movieId": 2,
+                    "sourceTitle": "M2",
+                    "eventType": "downloadFolderImported",
+                    "date": "2026-08-01T00:00:00Z",
+                    "data": {"fileId": "20"},
+                },
             ],
         }
     )
 
     # Filter by audio-lang ja
-    res_ja = runner.invoke(app, ["--config", str(cfg), "scan", "-i", "radarr-main", "-l", "ja", "--no-summary"])
+    res_ja = runner.invoke(
+        app, ["--config", str(cfg), "scan", "-i", "radarr-main", "-l", "ja", "--no-summary"]
+    )
     assert res_ja.exit_code == 0
     assert "Old Large Japanese Movie" in res_ja.output
     assert "New Small English Movie" not in res_ja.output
     assert "Scan Summary & Storage Metrics" not in res_ja.output
 
     # Filter by min-size 5GB
-    res_size = runner.invoke(app, ["--config", str(cfg), "scan", "-i", "radarr-main", "--min-size", "5GB"])
+    res_size = runner.invoke(
+        app, ["--config", str(cfg), "scan", "-i", "radarr-main", "--min-size", "5GB"]
+    )
     assert res_size.exit_code == 0
     assert "Old Large Japanese Movie" in res_size.output
     assert "New Small English Movie" not in res_size.output
 
     # Filter by older-than 1y
-    res_age = runner.invoke(app, ["--config", str(cfg), "scan", "-i", "radarr-main", "--older-than", "1y"])
+    res_age = runner.invoke(
+        app, ["--config", str(cfg), "scan", "-i", "radarr-main", "--older-than", "1y"]
+    )
     assert res_age.exit_code == 0
     assert "Old Large Japanese Movie" in res_age.output
     assert "New Small English Movie" not in res_age.output
@@ -328,19 +463,55 @@ def test_cli_scan_partial_failure_continues(tmp_path: Path, sample_valid_yaml: s
 
     # radarr-main succeeds
     respx.get("http://localhost:7878/api/v3/movie").respond(
-        json=[{"id": 1, "title": "Survivor Movie", "year": 2020, "path": "/m/1", "monitored": True, "hasFile": True}]
+        json=[
+            {
+                "id": 1,
+                "title": "Survivor Movie",
+                "year": 2020,
+                "path": "/m/1",
+                "monitored": True,
+                "hasFile": True,
+            }
+        ]
     )
     respx.get("http://localhost:7878/api/v3/moviefile").respond(
-        json=[{"id": 10, "movieId": 1, "relativePath": "1.mkv", "path": "/m/1/1.mkv", "size": 1_000_000_000, "dateAdded": "2020-01-01T00:00:00Z"}]
+        json=[
+            {
+                "id": 10,
+                "movieId": 1,
+                "relativePath": "1.mkv",
+                "path": "/m/1/1.mkv",
+                "size": 1_000_000_000,
+                "dateAdded": "2020-01-01T00:00:00Z",
+            }
+        ]
     )
     respx.get("http://localhost:7878/api/v3/history").respond(
-        json={"page": 1, "pageSize": 1000, "totalRecords": 1, "records": [{"id": 1, "movieId": 1, "sourceTitle": "S", "eventType": "downloadFolderImported", "date": "2020-01-01T00:00:00Z", "data": {"fileId": "10"}}]}
+        json={
+            "page": 1,
+            "pageSize": 1000,
+            "totalRecords": 1,
+            "records": [
+                {
+                    "id": 1,
+                    "movieId": 1,
+                    "sourceTitle": "S",
+                    "eventType": "downloadFolderImported",
+                    "date": "2020-01-01T00:00:00Z",
+                    "data": {"fileId": "10"},
+                }
+            ],
+        }
     )
 
     # radarr-4k fails
-    respx.get("http://192.168.1.100:7878/api/v3/movie").respond(status_code=503, text="Service Unavailable")
+    respx.get("http://192.168.1.100:7878/api/v3/movie").respond(
+        status_code=503, text="Service Unavailable"
+    )
 
-    result = runner.invoke(app, ["--config", str(cfg), "scan", "-i", "radarr-main", "-i", "radarr-4k"])
+    result = runner.invoke(
+        app, ["--config", str(cfg), "scan", "-i", "radarr-main", "-i", "radarr-4k"]
+    )
     assert result.exit_code == 0
     assert "Survivor Movie" in result.output
     assert "Warning:" in result.output
@@ -354,22 +525,59 @@ def test_cli_scan_empty_match(tmp_path: Path, sample_valid_yaml: str) -> None:
     cfg.write_text(sample_valid_yaml, encoding="utf-8")
 
     respx.get("http://localhost:7878/api/v3/movie").respond(
-        json=[{"id": 1, "title": "Movie 1", "year": 2020, "path": "/m/1", "monitored": True, "hasFile": True}]
+        json=[
+            {
+                "id": 1,
+                "title": "Movie 1",
+                "year": 2020,
+                "path": "/m/1",
+                "monitored": True,
+                "hasFile": True,
+            }
+        ]
     )
     respx.get("http://localhost:7878/api/v3/moviefile").respond(
-        json=[{"id": 10, "movieId": 1, "relativePath": "1.mkv", "path": "/m/1/1.mkv", "size": 1_000_000_000, "dateAdded": "2020-01-01T00:00:00Z"}]
+        json=[
+            {
+                "id": 10,
+                "movieId": 1,
+                "relativePath": "1.mkv",
+                "path": "/m/1/1.mkv",
+                "size": 1_000_000_000,
+                "dateAdded": "2020-01-01T00:00:00Z",
+            }
+        ]
     )
     respx.get("http://localhost:7878/api/v3/history").respond(
-        json={"page": 1, "pageSize": 1000, "totalRecords": 1, "records": [{"id": 1, "movieId": 1, "sourceTitle": "M", "eventType": "downloadFolderImported", "date": "2020-01-01T00:00:00Z", "data": {"fileId": "10"}}]}
+        json={
+            "page": 1,
+            "pageSize": 1000,
+            "totalRecords": 1,
+            "records": [
+                {
+                    "id": 1,
+                    "movieId": 1,
+                    "sourceTitle": "M",
+                    "eventType": "downloadFolderImported",
+                    "date": "2020-01-01T00:00:00Z",
+                    "data": {"fileId": "10"},
+                }
+            ],
+        }
     )
 
     # Filter with non-matching language
-    res_table = runner.invoke(app, ["--config", str(cfg), "scan", "-i", "radarr-main", "-l", "klingon"])
+    res_table = runner.invoke(
+        app, ["--config", str(cfg), "scan", "-i", "radarr-main", "-l", "klingon"]
+    )
     assert res_table.exit_code == 0
     assert "No media items matched the specified criteria." in res_table.output
 
     # JSON mode empty match
-    res_json = runner.invoke(app, ["--config", str(cfg), "scan", "-i", "radarr-main", "-l", "klingon", "--format", "json"])
+    res_json = runner.invoke(
+        app,
+        ["--config", str(cfg), "scan", "-i", "radarr-main", "-l", "klingon", "--format", "json"],
+    )
     assert res_json.exit_code == 0
     parsed = json.loads(res_json.stdout)
     assert parsed["metadata"]["total_matched_items"] == 0
@@ -385,16 +593,58 @@ def test_cli_scan_sorting_options(tmp_path: Path, sample_valid_yaml: str) -> Non
 
     respx.get("http://localhost:7878/api/v3/movie").respond(
         json=[
-            {"id": 1, "title": "B Movie", "year": 2020, "path": "/m/1", "monitored": True, "hasFile": True},
-            {"id": 2, "title": "A Movie", "year": 2021, "path": "/m/2", "monitored": True, "hasFile": True},
-            {"id": 3, "title": "C Movie", "year": 2022, "path": "/m/3", "monitored": True, "hasFile": True},
+            {
+                "id": 1,
+                "title": "B Movie",
+                "year": 2020,
+                "path": "/m/1",
+                "monitored": True,
+                "hasFile": True,
+            },
+            {
+                "id": 2,
+                "title": "A Movie",
+                "year": 2021,
+                "path": "/m/2",
+                "monitored": True,
+                "hasFile": True,
+            },
+            {
+                "id": 3,
+                "title": "C Movie",
+                "year": 2022,
+                "path": "/m/3",
+                "monitored": True,
+                "hasFile": True,
+            },
         ]
     )
     respx.get("http://localhost:7878/api/v3/moviefile").respond(
         json=[
-            {"id": 10, "movieId": 1, "relativePath": "1.mkv", "path": "/m/1/1.mkv", "size": 3_000_000_000, "dateAdded": "2021-01-01T00:00:00Z"},
-            {"id": 20, "movieId": 2, "relativePath": "2.mkv", "path": "/m/2/2.mkv", "size": 1_000_000_000, "dateAdded": "2022-01-01T00:00:00Z"},
-            {"id": 30, "movieId": 3, "relativePath": "3.mkv", "path": "/m/3/3.mkv", "size": 5_000_000_000, "dateAdded": "2023-01-01T00:00:00Z"},
+            {
+                "id": 10,
+                "movieId": 1,
+                "relativePath": "1.mkv",
+                "path": "/m/1/1.mkv",
+                "size": 3_000_000_000,
+                "dateAdded": "2021-01-01T00:00:00Z",
+            },
+            {
+                "id": 20,
+                "movieId": 2,
+                "relativePath": "2.mkv",
+                "path": "/m/2/2.mkv",
+                "size": 1_000_000_000,
+                "dateAdded": "2022-01-01T00:00:00Z",
+            },
+            {
+                "id": 30,
+                "movieId": 3,
+                "relativePath": "3.mkv",
+                "path": "/m/3/3.mkv",
+                "size": 5_000_000_000,
+                "dateAdded": "2023-01-01T00:00:00Z",
+            },
         ]
     )
     respx.get("http://localhost:7878/api/v3/history").respond(
@@ -403,21 +653,72 @@ def test_cli_scan_sorting_options(tmp_path: Path, sample_valid_yaml: str) -> Non
             "pageSize": 1000,
             "totalRecords": 3,
             "records": [
-                {"id": 1, "movieId": 1, "sourceTitle": "M1", "eventType": "downloadFolderImported", "date": "2021-01-01T00:00:00Z", "data": {"fileId": "10"}},
-                {"id": 2, "movieId": 2, "sourceTitle": "M2", "eventType": "downloadFolderImported", "date": "2022-01-01T00:00:00Z", "data": {"fileId": "20"}},
-                {"id": 3, "movieId": 3, "sourceTitle": "M3", "eventType": "downloadFolderImported", "date": "2023-01-01T00:00:00Z", "data": {"fileId": "30"}},
+                {
+                    "id": 1,
+                    "movieId": 1,
+                    "sourceTitle": "M1",
+                    "eventType": "downloadFolderImported",
+                    "date": "2021-01-01T00:00:00Z",
+                    "data": {"fileId": "10"},
+                },
+                {
+                    "id": 2,
+                    "movieId": 2,
+                    "sourceTitle": "M2",
+                    "eventType": "downloadFolderImported",
+                    "date": "2022-01-01T00:00:00Z",
+                    "data": {"fileId": "20"},
+                },
+                {
+                    "id": 3,
+                    "movieId": 3,
+                    "sourceTitle": "M3",
+                    "eventType": "downloadFolderImported",
+                    "date": "2023-01-01T00:00:00Z",
+                    "data": {"fileId": "30"},
+                },
             ],
         }
     )
 
     # Sort by size descending
-    res_size = runner.invoke(app, ["--config", str(cfg), "scan", "-i", "radarr-main", "--sort", "size", "--sort-dir", "desc", "--format", "json"])
+    res_size = runner.invoke(
+        app,
+        [
+            "--config",
+            str(cfg),
+            "scan",
+            "-i",
+            "radarr-main",
+            "--sort",
+            "size",
+            "--sort-dir",
+            "desc",
+            "--format",
+            "json",
+        ],
+    )
     assert res_size.exit_code == 0
     parsed_size = json.loads(res_size.stdout)
     assert [item["title"] for item in parsed_size["items"]] == ["C Movie", "B Movie", "A Movie"]
 
     # Sort by title ascending
-    res_title = runner.invoke(app, ["--config", str(cfg), "scan", "-i", "radarr-main", "--sort", "title", "--sort-dir", "asc", "--format", "json"])
+    res_title = runner.invoke(
+        app,
+        [
+            "--config",
+            str(cfg),
+            "scan",
+            "-i",
+            "radarr-main",
+            "--sort",
+            "title",
+            "--sort-dir",
+            "asc",
+            "--format",
+            "json",
+        ],
+    )
     assert res_title.exit_code == 0
     parsed_title = json.loads(res_title.stdout)
     assert [item["title"] for item in parsed_title["items"]] == ["A Movie", "B Movie", "C Movie"]
@@ -431,16 +732,58 @@ def test_cli_scan_date_cutoffs(tmp_path: Path, sample_valid_yaml: str) -> None:
 
     respx.get("http://localhost:7878/api/v3/movie").respond(
         json=[
-            {"id": 1, "title": "2019 Film", "year": 2019, "path": "/m/1", "monitored": True, "hasFile": True},
-            {"id": 2, "title": "2021 Film", "year": 2021, "path": "/m/2", "monitored": True, "hasFile": True},
-            {"id": 3, "title": "2023 Film", "year": 2023, "path": "/m/3", "monitored": True, "hasFile": True},
+            {
+                "id": 1,
+                "title": "2019 Film",
+                "year": 2019,
+                "path": "/m/1",
+                "monitored": True,
+                "hasFile": True,
+            },
+            {
+                "id": 2,
+                "title": "2021 Film",
+                "year": 2021,
+                "path": "/m/2",
+                "monitored": True,
+                "hasFile": True,
+            },
+            {
+                "id": 3,
+                "title": "2023 Film",
+                "year": 2023,
+                "path": "/m/3",
+                "monitored": True,
+                "hasFile": True,
+            },
         ]
     )
     respx.get("http://localhost:7878/api/v3/moviefile").respond(
         json=[
-            {"id": 10, "movieId": 1, "relativePath": "1.mkv", "path": "/m/1/1.mkv", "size": 1_000_000_000, "dateAdded": "2019-06-01T00:00:00Z"},
-            {"id": 20, "movieId": 2, "relativePath": "2.mkv", "path": "/m/2/2.mkv", "size": 1_000_000_000, "dateAdded": "2021-06-01T00:00:00Z"},
-            {"id": 30, "movieId": 3, "relativePath": "3.mkv", "path": "/m/3/3.mkv", "size": 1_000_000_000, "dateAdded": "2023-06-01T00:00:00Z"},
+            {
+                "id": 10,
+                "movieId": 1,
+                "relativePath": "1.mkv",
+                "path": "/m/1/1.mkv",
+                "size": 1_000_000_000,
+                "dateAdded": "2019-06-01T00:00:00Z",
+            },
+            {
+                "id": 20,
+                "movieId": 2,
+                "relativePath": "2.mkv",
+                "path": "/m/2/2.mkv",
+                "size": 1_000_000_000,
+                "dateAdded": "2021-06-01T00:00:00Z",
+            },
+            {
+                "id": 30,
+                "movieId": 3,
+                "relativePath": "3.mkv",
+                "path": "/m/3/3.mkv",
+                "size": 1_000_000_000,
+                "dateAdded": "2023-06-01T00:00:00Z",
+            },
         ]
     )
     respx.get("http://localhost:7878/api/v3/history").respond(
@@ -449,21 +792,68 @@ def test_cli_scan_date_cutoffs(tmp_path: Path, sample_valid_yaml: str) -> None:
             "pageSize": 1000,
             "totalRecords": 3,
             "records": [
-                {"id": 1, "movieId": 1, "sourceTitle": "M1", "eventType": "downloadFolderImported", "date": "2019-06-01T00:00:00Z", "data": {"fileId": "10"}},
-                {"id": 2, "movieId": 2, "sourceTitle": "M2", "eventType": "downloadFolderImported", "date": "2021-06-01T00:00:00Z", "data": {"fileId": "20"}},
-                {"id": 3, "movieId": 3, "sourceTitle": "M3", "eventType": "downloadFolderImported", "date": "2023-06-01T00:00:00Z", "data": {"fileId": "30"}},
+                {
+                    "id": 1,
+                    "movieId": 1,
+                    "sourceTitle": "M1",
+                    "eventType": "downloadFolderImported",
+                    "date": "2019-06-01T00:00:00Z",
+                    "data": {"fileId": "10"},
+                },
+                {
+                    "id": 2,
+                    "movieId": 2,
+                    "sourceTitle": "M2",
+                    "eventType": "downloadFolderImported",
+                    "date": "2021-06-01T00:00:00Z",
+                    "data": {"fileId": "20"},
+                },
+                {
+                    "id": 3,
+                    "movieId": 3,
+                    "sourceTitle": "M3",
+                    "eventType": "downloadFolderImported",
+                    "date": "2023-06-01T00:00:00Z",
+                    "data": {"fileId": "30"},
+                },
             ],
         }
     )
 
     # Before 2022-01-01
-    res_before = runner.invoke(app, ["--config", str(cfg), "scan", "-i", "radarr-main", "--before", "2022-01-01", "--format", "json"])
+    res_before = runner.invoke(
+        app,
+        [
+            "--config",
+            str(cfg),
+            "scan",
+            "-i",
+            "radarr-main",
+            "--before",
+            "2022-01-01",
+            "--format",
+            "json",
+        ],
+    )
     assert res_before.exit_code == 0
     parsed_before = json.loads(res_before.stdout)
     assert [item["title"] for item in parsed_before["items"]] == ["2019 Film", "2021 Film"]
 
     # After 2020-01-01
-    res_after = runner.invoke(app, ["--config", str(cfg), "scan", "-i", "radarr-main", "--after", "2020-01-01", "--format", "json"])
+    res_after = runner.invoke(
+        app,
+        [
+            "--config",
+            str(cfg),
+            "scan",
+            "-i",
+            "radarr-main",
+            "--after",
+            "2020-01-01",
+            "--format",
+            "json",
+        ],
+    )
     assert res_after.exit_code == 0
     parsed_after = json.loads(res_after.stdout)
     assert [item["title"] for item in parsed_after["items"]] == ["2021 Film", "2023 Film"]
@@ -477,14 +867,42 @@ def test_cli_scan_complex_combined_query(tmp_path: Path, sample_valid_yaml: str)
 
     respx.get("http://localhost:7878/api/v3/movie").respond(
         json=[
-            {"id": 1, "title": "Match Film", "year": 2018, "path": "/m/1", "monitored": True, "hasFile": True},
-            {"id": 2, "title": "Small Film", "year": 2018, "path": "/m/2", "monitored": True, "hasFile": True},
+            {
+                "id": 1,
+                "title": "Match Film",
+                "year": 2018,
+                "path": "/m/1",
+                "monitored": True,
+                "hasFile": True,
+            },
+            {
+                "id": 2,
+                "title": "Small Film",
+                "year": 2018,
+                "path": "/m/2",
+                "monitored": True,
+                "hasFile": True,
+            },
         ]
     )
     respx.get("http://localhost:7878/api/v3/moviefile").respond(
         json=[
-            {"id": 10, "movieId": 1, "relativePath": "1.mkv", "path": "/m/1/1.mkv", "size": 10_000_000_000, "dateAdded": "2018-01-01T00:00:00Z"},
-            {"id": 20, "movieId": 2, "relativePath": "2.mkv", "path": "/m/2/2.mkv", "size": 500_000_000, "dateAdded": "2018-01-01T00:00:00Z"},
+            {
+                "id": 10,
+                "movieId": 1,
+                "relativePath": "1.mkv",
+                "path": "/m/1/1.mkv",
+                "size": 10_000_000_000,
+                "dateAdded": "2018-01-01T00:00:00Z",
+            },
+            {
+                "id": 20,
+                "movieId": 2,
+                "relativePath": "2.mkv",
+                "path": "/m/2/2.mkv",
+                "size": 500_000_000,
+                "dateAdded": "2018-01-01T00:00:00Z",
+            },
         ]
     )
     respx.get("http://localhost:7878/api/v3/history").respond(
@@ -493,8 +911,22 @@ def test_cli_scan_complex_combined_query(tmp_path: Path, sample_valid_yaml: str)
             "pageSize": 1000,
             "totalRecords": 2,
             "records": [
-                {"id": 1, "movieId": 1, "sourceTitle": "M1", "eventType": "downloadFolderImported", "date": "2018-01-01T00:00:00Z", "data": {"fileId": "10"}},
-                {"id": 2, "movieId": 2, "sourceTitle": "M2", "eventType": "downloadFolderImported", "date": "2018-01-01T00:00:00Z", "data": {"fileId": "20"}},
+                {
+                    "id": 1,
+                    "movieId": 1,
+                    "sourceTitle": "M1",
+                    "eventType": "downloadFolderImported",
+                    "date": "2018-01-01T00:00:00Z",
+                    "data": {"fileId": "10"},
+                },
+                {
+                    "id": 2,
+                    "movieId": 2,
+                    "sourceTitle": "M2",
+                    "eventType": "downloadFolderImported",
+                    "date": "2018-01-01T00:00:00Z",
+                    "data": {"fileId": "20"},
+                },
             ],
         }
     )
@@ -526,4 +958,3 @@ def test_cli_scan_complex_combined_query(tmp_path: Path, sample_valid_yaml: str)
     parsed = json.loads(res.stdout)
     assert parsed["metadata"]["total_matched_items"] == 1
     assert parsed["items"][0]["title"] == "Match Film"
-

@@ -133,6 +133,7 @@ async def test_radarr_get_movie_history(radarr_instance: InstanceConfig):
 @respx.mock
 async def test_radarr_batch_history_pagination(radarr_instance: InstanceConfig):
     """Verify multi-page batch history pagination and progress callbacks."""
+
     # Side-effect function to return page 1 or page 2 based on query params
     def history_side_effect(request: httpx.Request):
         page = request.url.params.get("page")

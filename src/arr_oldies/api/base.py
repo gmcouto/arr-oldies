@@ -56,7 +56,9 @@ class BaseArrClient:
                 keepalive_expiry=DEFAULT_KEEPALIVE_EXPIRY,
             )
             timeout = httpx.Timeout(
-                timeout=self.instance.timeout if self.instance.timeout is not None else DEFAULT_TIMEOUT,
+                timeout=self.instance.timeout
+                if self.instance.timeout is not None
+                else DEFAULT_TIMEOUT,
                 connect=DEFAULT_CONNECT_TIMEOUT,
             )
             headers = {
@@ -85,7 +87,7 @@ class BaseArrClient:
         self,
         exc_type: type[BaseException] | None,
         exc_val: BaseException | None,
-        exc_tb: Any,
+        exc_tb: object,
     ) -> None:
         """Async context manager exit."""
         await self.close()
@@ -106,9 +108,7 @@ class BaseArrClient:
             )
         return False
 
-    def _calculate_backoff(
-        self, attempt: int, response: httpx.Response | None = None
-    ) -> float:
+    def _calculate_backoff(self, attempt: int, response: httpx.Response | None = None) -> float:
         """Calculate exponential backoff delay with random jitter and Retry-After support."""
         if response is not None and response.status_code == 429:
             retry_after = response.headers.get("Retry-After")
@@ -120,7 +120,7 @@ class BaseArrClient:
                     pass
 
         delay = DEFAULT_BACKOFF_FACTOR * (2**attempt) + random.uniform(0.0, 0.2)
-        return min(delay, DEFAULT_MAX_BACKOFF)
+        return float(min(delay, DEFAULT_MAX_BACKOFF))
 
     def _handle_http_error(self, response: httpx.Response) -> None:
         """Translate HTTP error responses into typed domain exceptions."""
@@ -133,9 +133,7 @@ class BaseArrClient:
                 f"Resource not found (404) on '{self.instance.name}': {response.url.path}"
             )
         if self._is_sqlite_lock(response):
-            raise ArrDatabaseLockedError(
-                f"SQLite database is locked on '{self.instance.name}'"
-            )
+            raise ArrDatabaseLockedError(f"SQLite database is locked on '{self.instance.name}'")
         raise ArrResponseError(
             status_code=response.status_code,
             message=f"Request to '{self.instance.name}' ({response.url.path}) returned HTTP {response.status_code}: {response.text[:200]}",
@@ -209,7 +207,9 @@ class BaseArrClient:
 
         if last_exception is not None:
             raise last_exception
-        raise ArrClientError(f"Request to '{self.instance.name}' failed after {max_attempts} attempts")
+        raise ArrClientError(
+            f"Request to '{self.instance.name}' failed after {max_attempts} attempts"
+        )
 
     async def get(
         self,

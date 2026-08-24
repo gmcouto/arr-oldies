@@ -51,9 +51,7 @@ def test_discovery_cwd_precedence(tmp_path: Path, monkeypatch: pytest.MonkeyPatc
     assert found == cfg2.resolve()
 
 
-def test_discovery_home_directory(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_discovery_home_directory(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """Verify fallback to ~/.config/arr-oldies/ when CWD has no config file."""
     cwd_dir = tmp_path / "cwd"
     cwd_dir.mkdir()
@@ -71,9 +69,7 @@ def test_discovery_home_directory(
     assert found == home_cfg.resolve()
 
 
-def test_discovery_not_found_anywhere(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_discovery_not_found_anywhere(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """Verify ConfigNotFoundError lists searched locations when no file exists."""
     empty_cwd = tmp_path / "empty_cwd"
     empty_cwd.mkdir()
@@ -119,9 +115,7 @@ def test_load_non_mapping_yaml(tmp_path: Path) -> None:
     assert "Root configuration must be a mapping" in str(exc_info.value)
 
 
-def test_load_schema_validation_error(
-    tmp_path: Path, sample_schema_invalid_yaml: str
-) -> None:
+def test_load_schema_validation_error(tmp_path: Path, sample_schema_invalid_yaml: str) -> None:
     """Verify schema violations raise ConfigValidationError with diagnostic detail."""
     invalid_cfg = tmp_path / "invalid_schema.yaml"
     invalid_cfg.write_text(sample_schema_invalid_yaml, encoding="utf-8")

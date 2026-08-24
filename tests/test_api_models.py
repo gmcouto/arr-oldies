@@ -1,20 +1,14 @@
 """Unit tests for Radarr and Sonarr Pydantic v2 API data models."""
 
-from datetime import datetime, timezone
-
-import pytest
+from datetime import UTC, datetime
 
 from arr_oldies.api.models import (
     MediaInfo,
     RadarrHistoryPage,
-    RadarrHistoryRecord,
     RadarrMovie,
-    RadarrMovieFile,
     SonarrEpisode,
     SonarrEpisodeFile,
     SonarrHistoryPage,
-    SonarrHistoryRecord,
-    SonarrSeason,
     SonarrSeries,
 )
 
@@ -94,7 +88,7 @@ def test_radarr_movie_and_file_parsing():
     assert movie.movie_file.id == 101
     assert movie.movie_file.movie_id == 42
     assert movie.movie_file.relative_path == "Inception (2010).mkv"
-    assert movie.movie_file.date_added == datetime(2024, 1, 15, 14, 30, 0, tzinfo=timezone.utc)
+    assert movie.movie_file.date_added == datetime(2024, 1, 15, 14, 30, 0, tzinfo=UTC)
     assert movie.movie_file.media_info is not None
     assert movie.movie_file.media_info.audio_codec == "DTS-HD MA"
     assert movie.movie_file.media_info.audio_channels == 7.1
@@ -132,7 +126,7 @@ def test_radarr_history_parsing():
     assert rec.movie_id == 42
     assert rec.source_title == "Inception.2010.1080p.BluRay.x264"
     assert rec.event_type == "downloadFolderImported"
-    assert rec.date == datetime(2024, 1, 15, 14, 35, 0, tzinfo=timezone.utc)
+    assert rec.date == datetime(2024, 1, 15, 14, 35, 0, tzinfo=UTC)
     assert rec.download_id == "torrent_12345"
     assert rec.data["fileId"] == "101"
 
@@ -178,7 +172,7 @@ def test_sonarr_series_and_episodes_parsing():
     assert ep_file.id == 201
     assert ep_file.series_id == 10
     assert ep_file.season_number == 1
-    assert ep_file.date_added == datetime(2024, 2, 1, 10, 0, 0, tzinfo=timezone.utc)
+    assert ep_file.date_added == datetime(2024, 2, 1, 10, 0, 0, tzinfo=UTC)
     assert ep_file.media_info is not None
     assert ep_file.media_info.audio_languages == "eng/spa"
 
@@ -200,7 +194,7 @@ def test_sonarr_series_and_episodes_parsing():
     assert episode.season_number == 1
     assert episode.episode_number == 1
     assert episode.title == "Pilot"
-    assert episode.air_date_utc == datetime(2008, 1, 20, 0, 0, 0, tzinfo=timezone.utc)
+    assert episode.air_date_utc == datetime(2008, 1, 20, 0, 0, 0, tzinfo=UTC)
     assert episode.has_file is True
 
 

@@ -1,6 +1,7 @@
 """History API timestamp correlation engine for Radarr and Sonarr libraries."""
 
 from collections import defaultdict
+from collections.abc import Sequence
 from datetime import UTC, datetime
 from typing import Any
 
@@ -8,9 +9,7 @@ from arr_oldies.api.fetcher import InstanceMediaData
 from arr_oldies.api.models import (
     RadarrHistoryRecord,
     RadarrMovie,
-    RadarrMovieFile,
     SonarrEpisode,
-    SonarrEpisodeFile,
     SonarrHistoryRecord,
     SonarrSeries,
 )
@@ -22,7 +21,7 @@ from arr_oldies.models import InstanceType
 class RadarrHistoryIndex:
     """In-memory multi-key hash index for Radarr history records (O(N+M) lookup)."""
 
-    def __init__(self, records: list[RadarrHistoryRecord | Any]) -> None:
+    def __init__(self, records: Sequence[RadarrHistoryRecord | Any]) -> None:
         self.imports_by_file_id: dict[int, list[RadarrHistoryRecord]] = defaultdict(list)
         self.imports_by_path: dict[str, list[RadarrHistoryRecord]] = defaultdict(list)
         self.imports_by_movie_id: dict[int, list[RadarrHistoryRecord]] = defaultdict(list)
@@ -65,7 +64,7 @@ class RadarrHistoryIndex:
 class SonarrHistoryIndex:
     """In-memory multi-key hash index for Sonarr history records (O(N+M) lookup)."""
 
-    def __init__(self, records: list[SonarrHistoryRecord | Any]) -> None:
+    def __init__(self, records: Sequence[SonarrHistoryRecord | Any]) -> None:
         self.imports_by_file_id: dict[int, list[SonarrHistoryRecord]] = defaultdict(list)
         self.imports_by_episode_id: dict[int, list[SonarrHistoryRecord]] = defaultdict(list)
         self.imports_by_path: dict[str, list[SonarrHistoryRecord]] = defaultdict(list)
@@ -145,12 +144,18 @@ class HistoryCorrelator:
 
         for movie_file in instance_data.movie_files:
             movie = movies_by_id.get(movie_file.movie_id)
-            title = movie.title if movie else (movie_file.relative_path or f"Movie {movie_file.movie_id}")
+            title = (
+                movie.title
+                if movie
+                else (movie_file.relative_path or f"Movie {movie_file.movie_id}")
+            )
             year = movie.year if movie else None
 
             # Audio languages extraction
             raw_audio = movie_file.media_info.audio_languages if movie_file.media_info else None
-            audio_languages = self.normalizer.extract_languages(raw_audio) if movie_file.media_info else []
+            audio_languages = (
+                self.normalizer.extract_languages(raw_audio) if movie_file.media_info else []
+            )
             video_codec = movie_file.media_info.video_codec if movie_file.media_info else None
             resolution = movie_file.media_info.resolution if movie_file.media_info else None
 
@@ -178,7 +183,8 @@ class HistoryCorrelator:
                     grab_event = index.grabs_by_download_id[download_id]
                 else:
                     movie_grabs = [
-                        r for r in index.grabs_by_movie_id.get(movie_file.movie_id, [])
+                        r
+                        for r in index.grabs_by_movie_id.get(movie_file.movie_id, [])
                         if r.date <= import_date
                     ]
                     if movie_grabs:
@@ -255,7 +261,9 @@ class HistoryCorrelator:
 
         for ep_file in instance_data.episode_files:
             series = series_by_id.get(ep_file.series_id)
-            title = series.title if series else (ep_file.relative_path or f"Series {ep_file.series_id}")
+            title = (
+                series.title if series else (ep_file.relative_path or f"Series {ep_file.series_id}")
+            )
             year = series.year if series else None
 
             episodes = episodes_by_file_id.get(ep_file.id, [])
@@ -263,17 +271,23 @@ class HistoryCorrelator:
             ep_ids = [e.id for e in episodes]
 
             if len(ep_numbers) > 1:
-                formatted_episode = f"S{ep_file.season_number:02d}E{ep_numbers[0]:02d}-E{ep_numbers[-1]:02d}"
+                formatted_episode = (
+                    f"S{ep_file.season_number:02d}E{ep_numbers[0]:02d}-E{ep_numbers[-1]:02d}"
+                )
             elif ep_numbers:
                 formatted_episode = f"S{ep_file.season_number:02d}E{ep_numbers[0]:02d}"
             else:
                 formatted_episode = f"S{ep_file.season_number:02d}"
 
-            episode_title = episodes[0].title if (len(episodes) == 1 and episodes[0].title) else None
+            episode_title = (
+                episodes[0].title if (len(episodes) == 1 and episodes[0].title) else None
+            )
 
             # Audio languages extraction
             raw_audio = ep_file.media_info.audio_languages if ep_file.media_info else None
-            audio_languages = self.normalizer.extract_languages(raw_audio) if ep_file.media_info else []
+            audio_languages = (
+                self.normalizer.extract_languages(raw_audio) if ep_file.media_info else []
+            )
             video_codec = ep_file.media_info.video_codec if ep_file.media_info else None
             resolution = ep_file.media_info.resolution if ep_file.media_info else None
 
@@ -297,7 +311,6 @@ class HistoryCorrelator:
                 if not ep_ids and import_event.episode_id:
                     ep_ids = [import_event.episode_id]
 
-
                 # Correlate grab event
                 grab_event: SonarrHistoryRecord | None = None
                 if download_id and download_id in index.grabs_by_download_id:
@@ -311,14 +324,16 @@ class HistoryCorrelator:
                         grab_event = max(valid_grabs, key=lambda r: r.date)
                     else:
                         series_grabs = [
-                            r for r in index.grabs_by_series_id.get(ep_file.series_id, [])
+                            r
+                            for r in index.grabs_by_series_id.get(ep_file.series_id, [])
                             if r.date <= import_date
                         ]
                         if series_grabs:
                             grab_event = max(series_grabs, key=lambda r: r.date)
                 else:
                     series_grabs = [
-                        r for r in index.grabs_by_series_id.get(ep_file.series_id, [])
+                        r
+                        for r in index.grabs_by_series_id.get(ep_file.series_id, [])
                         if r.date <= import_date
                     ]
                     if series_grabs:

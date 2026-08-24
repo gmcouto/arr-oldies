@@ -30,7 +30,9 @@ def parse_size(size_str: str) -> int:
     """Parse human size string (e.g., '500MB', '2GB', '1.5GiB', '100M') into integer bytes."""
     match = SIZE_REGEX.match(size_str)
     if not match:
-        raise ParseError(f"Invalid size specification: '{size_str}'. Examples: '500MB', '2GB', '1.5GiB'.")
+        raise ParseError(
+            f"Invalid size specification: '{size_str}'. Examples: '500MB', '2GB', '1.5GiB'."
+        )
 
     val_str, unit_raw = match.groups()
     unit = unit_raw.lower()
@@ -48,7 +50,9 @@ def parse_age_cutoff(age_str: str) -> int:
     """Parse human age interval (e.g., '30d', '6m', '1y', '2w', '90') into integer days."""
     match = AGE_REGEX.match(age_str)
     if not match:
-        raise ParseError(f"Invalid age specification: '{age_str}'. Examples: '30d', '6m', '1y', '2w'.")
+        raise ParseError(
+            f"Invalid age specification: '{age_str}'. Examples: '30d', '6m', '1y', '2w'."
+        )
 
     val_str, unit_raw = match.groups()
     val = int(val_str)
@@ -80,5 +84,6 @@ def parse_date_cutoff(date_str: str) -> datetime:
             dt = dt.replace(tzinfo=UTC)
         return dt.astimezone(UTC)
     except (ValueError, TypeError) as exc:
-        raise ParseError(f"Invalid date format: '{date_str}'. Expected 'YYYY-MM-DD' or ISO-8601 format.") from exc
-
+        raise ParseError(
+            f"Invalid date format: '{date_str}'. Expected 'YYYY-MM-DD' or ISO-8601 format."
+        ) from exc

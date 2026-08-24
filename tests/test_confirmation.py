@@ -149,7 +149,6 @@ def test_render_execution_report_table() -> None:
     assert "2.45s" in output
 
 
-
 def test_prompt_confirmation_accepted() -> None:
     """Verify prompt_confirmation renders panel and returns True when user confirms."""
     plan = create_sample_plan()

@@ -107,8 +107,22 @@ def test_correlate_sonarr_multi_episode_file():
         media_info=MediaInfo(audio_languages="Japanese, English"),
     )
     episodes = [
-        SonarrEpisode(id=301, series_id=10, episode_file_id=202, season_number=1, episode_number=1, title="Pilot"),
-        SonarrEpisode(id=302, series_id=10, episode_file_id=202, season_number=1, episode_number=2, title="Cat's in the Bag"),
+        SonarrEpisode(
+            id=301,
+            series_id=10,
+            episode_file_id=202,
+            season_number=1,
+            episode_number=1,
+            title="Pilot",
+        ),
+        SonarrEpisode(
+            id=302,
+            series_id=10,
+            episode_file_id=202,
+            season_number=1,
+            episode_number=2,
+            title="Cat's in the Bag",
+        ),
     ]
     history = [
         SonarrHistoryRecord(

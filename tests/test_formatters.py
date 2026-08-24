@@ -130,4 +130,3 @@ def test_format_media_title() -> None:
     assert "[bold yellow]S01E01[/bold yellow]" in ep_title
     assert r'"Pilot \[green\]"' in ep_title or r'"Pilot \[green]"' in ep_title
     assert "[dim]· 2160p[/dim]" in ep_title
-

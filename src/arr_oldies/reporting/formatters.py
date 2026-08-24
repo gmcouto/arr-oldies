@@ -90,7 +90,9 @@ def format_media_title(item: MediaInventoryItem) -> str:
         quality_str = f" [dim]· {item.resolution}[/dim]" if item.resolution else ""
         return f"[bold white]{escaped_title}[/bold white]{year_str}{quality_str}"
 
-    ep_str = f" [bold yellow]{item.formatted_episode}[/bold yellow]" if item.formatted_episode else ""
+    ep_str = (
+        f" [bold yellow]{item.formatted_episode}[/bold yellow]" if item.formatted_episode else ""
+    )
     ep_title = f' [dim]"{escape(item.episode_title)}"[/dim]' if item.episode_title else ""
     quality_str = f" [dim]· {item.resolution}[/dim]" if item.resolution else ""
     return f"[bold white]{escaped_title}[/bold white]{ep_str}{ep_title}{quality_str}"

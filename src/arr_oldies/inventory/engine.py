@@ -1,6 +1,6 @@
 """Inventory processing engine: composable filtering, deterministic sorting, and metrics generation."""
 
-from datetime import UTC, datetime
+from datetime import UTC
 from typing import Any
 
 from arr_oldies.inventory.languages import LanguageNormalizer
@@ -54,7 +54,10 @@ class InventoryEngine:
                 continue
 
             # 2. Instance Filter
-            if norm_instances is not None and item.instance_name.strip().lower() not in norm_instances:
+            if (
+                norm_instances is not None
+                and item.instance_name.strip().lower() not in norm_instances
+            ):
                 continue
 
             # 3. Size Bounds Filter (bytes)
@@ -82,9 +85,10 @@ class InventoryEngine:
                 continue
 
             # 7. Audio Language Filter
-            if criteria.audio_langs:
-                if not any(self.normalizer.matches(item.audio_languages, q) for q in criteria.audio_langs):
-                    continue
+            if criteria.audio_langs and not any(
+                self.normalizer.matches(item.audio_languages, q) for q in criteria.audio_langs
+            ):
+                continue
 
             filtered.append(item)
 
@@ -130,7 +134,9 @@ class InventoryEngine:
 
         instances_breakdown: dict[str, int] = {}
         for item in items:
-            instances_breakdown[item.instance_name] = instances_breakdown.get(item.instance_name, 0) + 1
+            instances_breakdown[item.instance_name] = (
+                instances_breakdown.get(item.instance_name, 0) + 1
+            )
 
         return InventorySummary(
             total_items=len(items),

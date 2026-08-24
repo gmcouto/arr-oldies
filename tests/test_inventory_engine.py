@@ -158,17 +158,23 @@ def test_filter_by_media_type_and_instance(sample_items: list[MediaInventoryItem
     engine = InventoryEngine()
 
     # Only movies
-    filtered_movies = engine.filter_inventory(sample_items, InventoryFilter(media_types=[MediaType.MOVIE]))
+    filtered_movies = engine.filter_inventory(
+        sample_items, InventoryFilter(media_types=[MediaType.MOVIE])
+    )
     assert len(filtered_movies) == 2
     assert {i.title for i in filtered_movies} == {"Old Anime Movie", "Legacy Movie"}
 
     # Only episodes
-    filtered_eps = engine.filter_inventory(sample_items, InventoryFilter(media_types=[MediaType.EPISODE]))
+    filtered_eps = engine.filter_inventory(
+        sample_items, InventoryFilter(media_types=[MediaType.EPISODE])
+    )
     assert len(filtered_eps) == 1
     assert filtered_eps[0].title == "New Drama Show"
 
     # Instance name (case-insensitive)
-    filtered_inst = engine.filter_inventory(sample_items, InventoryFilter(instance_names=["RADARR-MAIN"]))
+    filtered_inst = engine.filter_inventory(
+        sample_items, InventoryFilter(instance_names=["RADARR-MAIN"])
+    )
     assert len(filtered_inst) == 1
     assert filtered_inst[0].title == "Old Anime Movie"
 
@@ -194,11 +200,21 @@ def test_sort_inventory_keys_and_directions(sample_items: list[MediaInventoryIte
 
     # 1. Oldest import date (default ASC)
     sorted_import_asc = engine.sort_inventory(sample_items, SortKey.IMPORT_DATE, SortDirection.ASC)
-    assert [i.title for i in sorted_import_asc] == ["Legacy Movie", "Old Anime Movie", "New Drama Show"]
+    assert [i.title for i in sorted_import_asc] == [
+        "Legacy Movie",
+        "Old Anime Movie",
+        "New Drama Show",
+    ]
 
     # 2. Newest import date (DESC)
-    sorted_import_desc = engine.sort_inventory(sample_items, SortKey.IMPORT_DATE, SortDirection.DESC)
-    assert [i.title for i in sorted_import_desc] == ["New Drama Show", "Old Anime Movie", "Legacy Movie"]
+    sorted_import_desc = engine.sort_inventory(
+        sample_items, SortKey.IMPORT_DATE, SortDirection.DESC
+    )
+    assert [i.title for i in sorted_import_desc] == [
+        "New Drama Show",
+        "Old Anime Movie",
+        "Legacy Movie",
+    ]
 
     # 3. Oldest grab date (fallback to import_date for legacy items without grab_date)
     sorted_grab = engine.sort_inventory(sample_items, SortKey.GRAB_DATE, SortDirection.ASC)
@@ -206,7 +222,11 @@ def test_sort_inventory_keys_and_directions(sample_items: list[MediaInventoryIte
 
     # 4. Size descending
     sorted_size_desc = engine.sort_inventory(sample_items, SortKey.SIZE, SortDirection.DESC)
-    assert [i.title for i in sorted_size_desc] == ["Legacy Movie", "New Drama Show", "Old Anime Movie"]
+    assert [i.title for i in sorted_size_desc] == [
+        "Legacy Movie",
+        "New Drama Show",
+        "Old Anime Movie",
+    ]
 
     # 5. Title ascending
     sorted_title = engine.sort_inventory(sample_items, SortKey.TITLE, SortDirection.ASC)
@@ -214,7 +234,11 @@ def test_sort_inventory_keys_and_directions(sample_items: list[MediaInventoryIte
 
     # 6. Age ascending (youngest to oldest)
     sorted_age_asc = engine.sort_inventory(sample_items, SortKey.AGE, SortDirection.ASC)
-    assert [i.title for i in sorted_age_asc] == ["New Drama Show", "Old Anime Movie", "Legacy Movie"]
+    assert [i.title for i in sorted_age_asc] == [
+        "New Drama Show",
+        "Old Anime Movie",
+        "Legacy Movie",
+    ]
 
 
 def test_generate_summary_metrics(sample_items: list[MediaInventoryItem]):

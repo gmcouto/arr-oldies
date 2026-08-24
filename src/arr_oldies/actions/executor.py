@@ -12,8 +12,10 @@ from arr_oldies.actions.models import (
     ExecutionReport,
 )
 from arr_oldies.api.factory import create_client
+from arr_oldies.api.radarr import RadarrClient
+from arr_oldies.api.sonarr import SonarrClient
 from arr_oldies.inventory.models import MediaInventoryItem, MediaType
-from arr_oldies.models import InstanceConfig, InstanceType
+from arr_oldies.models import InstanceConfig
 from arr_oldies.reporting.formatters import format_size
 
 
@@ -38,7 +40,9 @@ class ActionExecutor:
                 if not (act == ActionType.UNMONITOR_EPISODE and item.media_type == MediaType.MOVIE)
             ]
             action_items.append(ActionItem(item=item, action_types=applicable_actions))
-            instances_breakdown[item.instance_name] = instances_breakdown.get(item.instance_name, 0) + 1
+            instances_breakdown[item.instance_name] = (
+                instances_breakdown.get(item.instance_name, 0) + 1
+            )
             total_size_bytes += item.size_bytes
 
         return ActionPlan(
@@ -106,7 +110,7 @@ class ActionExecutor:
 
                 # Step 1: Unmonitor Movie or entire Series (D-04, ACT-03)
                 if ActionType.UNMONITOR in action_item.action_types:
-                    if item.instance_type == InstanceType.RADARR and item.movie_id is not None:
+                    if isinstance(client, RadarrClient) and item.movie_id is not None:
                         try:
                             ok = await client.unmonitor_movie(item.movie_id)
                             results.append(
@@ -119,7 +123,7 @@ class ActionExecutor:
                                     error_message=None if ok else "Unmonitor movie failed",
                                 )
                             )
-                        except Exception as exc:
+                        except Exception as exc:  # noqa: BLE001
                             results.append(
                                 ActionResult(
                                     item_id=item.id,
@@ -130,7 +134,7 @@ class ActionExecutor:
                                     error_message=str(exc),
                                 )
                             )
-                    elif item.instance_type == InstanceType.SONARR and item.series_id is not None:
+                    elif isinstance(client, SonarrClient) and item.series_id is not None:
                         series_key = (item.instance_name, item.series_id)
                         if series_key not in unmonitored_series:
                             try:
@@ -147,7 +151,7 @@ class ActionExecutor:
                                         error_message=None if ok else "Unmonitor series failed",
                                     )
                                 )
-                            except Exception as exc:
+                            except Exception as exc:  # noqa: BLE001
                                 results.append(
                                     ActionResult(
                                         item_id=item.id,
@@ -174,7 +178,7 @@ class ActionExecutor:
                 # Step 2: Unmonitor specific Episode(s) (ACT-04)
                 if (
                     ActionType.UNMONITOR_EPISODE in action_item.action_types
-                    and item.instance_type == InstanceType.SONARR
+                    and isinstance(client, SonarrClient)
                     and item.episode_ids
                 ):
                     try:
@@ -189,7 +193,7 @@ class ActionExecutor:
                                 error_message=None if ok else "Unmonitor episodes failed",
                             )
                         )
-                    except Exception as exc:
+                    except Exception as exc:  # noqa: BLE001
                         results.append(
                             ActionResult(
                                 item_id=item.id,
@@ -206,7 +210,7 @@ class ActionExecutor:
                     ActionType.DELETE in action_item.action_types
                     and ActionType.REMOVE not in action_item.action_types
                 ):
-                    if item.instance_type == InstanceType.RADARR and item.movie_file_id is not None:
+                    if isinstance(client, RadarrClient) and item.movie_file_id is not None:
                         try:
                             ok = await client.delete_movie_file(item.movie_file_id)
                             results.append(
@@ -219,7 +223,7 @@ class ActionExecutor:
                                     error_message=None if ok else "Delete movie file failed",
                                 )
                             )
-                        except Exception as exc:
+                        except Exception as exc:  # noqa: BLE001
                             results.append(
                                 ActionResult(
                                     item_id=item.id,
@@ -230,7 +234,7 @@ class ActionExecutor:
                                     error_message=str(exc),
                                 )
                             )
-                    elif item.instance_type == InstanceType.SONARR and item.episode_file_id is not None:
+                    elif isinstance(client, SonarrClient) and item.episode_file_id is not None:
                         try:
                             ok = await client.delete_episode_file(item.episode_file_id)
                             results.append(
@@ -243,7 +247,7 @@ class ActionExecutor:
                                     error_message=None if ok else "Delete episode file failed",
                                 )
                             )
-                        except Exception as exc:
+                        except Exception as exc:  # noqa: BLE001
                             results.append(
                                 ActionResult(
                                     item_id=item.id,
@@ -258,7 +262,7 @@ class ActionExecutor:
                 # Step 4: Remove library entry (ACT-05)
                 if ActionType.REMOVE in action_item.action_types:
                     delete_files = ActionType.DELETE in action_item.action_types
-                    if item.instance_type == InstanceType.RADARR and item.movie_id is not None:
+                    if isinstance(client, RadarrClient) and item.movie_id is not None:
                         try:
                             ok = await client.delete_movie(item.movie_id, delete_files=delete_files)
                             results.append(
@@ -271,7 +275,7 @@ class ActionExecutor:
                                     error_message=None if ok else "Remove movie failed",
                                 )
                             )
-                        except Exception as exc:
+                        except Exception as exc:  # noqa: BLE001
                             results.append(
                                 ActionResult(
                                     item_id=item.id,
@@ -282,9 +286,11 @@ class ActionExecutor:
                                     error_message=str(exc),
                                 )
                             )
-                    elif item.instance_type == InstanceType.SONARR and item.series_id is not None:
+                    elif isinstance(client, SonarrClient) and item.series_id is not None:
                         try:
-                            ok = await client.delete_series(item.series_id, delete_files=delete_files)
+                            ok = await client.delete_series(
+                                item.series_id, delete_files=delete_files
+                            )
                             results.append(
                                 ActionResult(
                                     item_id=item.id,
@@ -295,7 +301,7 @@ class ActionExecutor:
                                     error_message=None if ok else "Remove series failed",
                                 )
                             )
-                        except Exception as exc:
+                        except Exception as exc:  # noqa: BLE001
                             results.append(
                                 ActionResult(
                                     item_id=item.id,
@@ -306,6 +312,7 @@ class ActionExecutor:
                                     error_message=str(exc),
                                 )
                             )
+
         finally:
             for c in clients.values():
                 await c.close()

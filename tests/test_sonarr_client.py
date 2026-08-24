@@ -67,6 +67,7 @@ async def test_sonarr_get_series(sonarr_instance: InstanceConfig):
 @respx.mock
 async def test_sonarr_get_episode_files_and_throttled_all(sonarr_instance: InstanceConfig):
     """Verify get_episode_files and get_all_episode_files concurrency throttling."""
+
     def episode_file_side_effect(request: httpx.Request):
         series_id = request.url.params.get("seriesId")
         if series_id == "1":
@@ -101,7 +102,9 @@ async def test_sonarr_get_episode_files_and_throttled_all(sonarr_instance: Insta
             )
         return httpx.Response(200, json=[])
 
-    respx.get("http://sonarr.local:8989/api/v3/episodefile").mock(side_effect=episode_file_side_effect)
+    respx.get("http://sonarr.local:8989/api/v3/episodefile").mock(
+        side_effect=episode_file_side_effect
+    )
 
     async with SonarrClient(sonarr_instance) as client:
         # Test single series episode file
@@ -177,6 +180,7 @@ async def test_sonarr_get_series_history(sonarr_instance: InstanceConfig):
 @respx.mock
 async def test_sonarr_batch_history_pagination(sonarr_instance: InstanceConfig):
     """Verify multi-page batch history pagination and progress callbacks."""
+
     def history_side_effect(request: httpx.Request):
         page = request.url.params.get("page")
         if page == "1":

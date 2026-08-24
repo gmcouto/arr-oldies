@@ -24,7 +24,6 @@ def test_media_inventory_item_instantiation_and_utc_normalization():
     """Verify MediaInventoryItem creation, UTC normalization for naive/aware datetimes, and field defaults."""
     naive_dt = datetime(2024, 1, 1, 12, 0, 0)  # noqa: DTZ001 - testing naive conversion
     item = MediaInventoryItem(
-
         id="radarr:101",
         instance_name="radarr-main",
         instance_type=InstanceType.RADARR,
