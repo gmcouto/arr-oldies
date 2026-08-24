@@ -56,12 +56,12 @@ Plans:
   2. History API queries use optimized batch pagination (500–1000 items/page) to prevent *arr database lock timeouts.
   3. Unreachable or failing instances log warnings gracefully without terminating scans of healthy instances.
 
-**Plans**: 0/2 plans executed
+**Plans**: 1/2 plans executed
 
 Plans:
 **Wave 1**
 
-- [ ] 02-01-PLAN.md: Base Async Client, API Models & Resilience Infrastructure
+- [x] 02-01-PLAN.md: Base Async Client, API Models & Resilience Infrastructure
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -134,7 +134,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation, Multi-Instance Configuration & CLI Scaffolding | 2/2 | Complete    | 2026-08-23 |
-| 2. Async *arr API Clients & Batch History Fetcher | 0/2 | Not started | - |
+| 2. Async *arr API Clients & Batch History Fetcher | 1/2 | In Progress|  |
 | 3. Media Inventory & History Timestamp Correlator | 0/2 | Not started | - |
 | 4. Rich CLI Visualization & Reporting | 0/2 | Not started | - |
 | 5. Safe Action Engine (Dry-Run, Deletion & Unmonitoring) | 0/2 | Not started | - |
