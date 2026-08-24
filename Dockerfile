@@ -11,14 +11,15 @@ ENV PATH="/opt/venv/bin:$PATH"
 RUN pip install --no-cache-dir --upgrade pip
 
 # Copy project manifest first to maximize layer caching of dependencies
-COPY pyproject.toml README.md ./
+COPY pyproject.toml ./
 
 # Install third-party dependencies using standard library tomllib before copying source code
 RUN python3 -c "import tomllib; data=tomllib.load(open('pyproject.toml','rb')); print('\n'.join(data['project']['dependencies']))" > /tmp/requirements.txt && \
     pip install --no-cache-dir -r /tmp/requirements.txt && \
     rm /tmp/requirements.txt
 
-# Copy application source code and install arr-oldies package
+# Copy README and application source code, then install arr-oldies package
+COPY README.md ./
 COPY src/ ./src/
 RUN pip install --no-cache-dir --no-deps .
 
@@ -48,6 +49,8 @@ COPY --from=builder /opt/venv /opt/venv
 # Copy and configure entrypoint script
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+COPY README.md ./
 
 # Run as unprivileged user
 USER arruser
