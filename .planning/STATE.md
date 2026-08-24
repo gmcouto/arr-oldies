@@ -110,6 +110,7 @@ None.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260824-fwt | add option --unmonitor-season for unmonitoring the whole season | 2026-08-24 | 3f9de5e | [260824-fwt-add-option-unmonitor-season-for-unmonito](./quick/260824-fwt-add-option-unmonitor-season-for-unmonito/) |
+| 260824-utd | include -t flag in README docker examples for colored Rich output | 2026-08-24 | e483602 | [260824-utd-include-t-flag-in-readme-docker-examples](./quick/260824-utd-include-t-flag-in-readme-docker-examples/) |
 
 ## Deferred Items
 

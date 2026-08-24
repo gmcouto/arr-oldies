@@ -44,24 +44,24 @@ ghcr.io/gmcouto/arr-oldies:latest
 ```
 
 #### Volume Mounting & Configuration Discovery
-Arr-Oldies automatically searches `/app/config.yaml` inside the container. Mounting your host configuration to `/app/config.yaml:ro` allows zero-flag execution.
+Arr-Oldies automatically searches `/app/config.yaml` inside the container. Mounting your host configuration to `/app/config.yaml:ro` allows zero-flag execution. Passing `-t` allocates a pseudo-TTY so Rich formats tables and summary cards in full ANSI color.
 
 1. **Validate Config**:
    ```bash
-   docker run --rm \
+   docker run -t --rm \
      -v $(pwd)/config.yaml:/app/config.yaml:ro \
      ghcr.io/gmcouto/arr-oldies validate-config
    ```
 
 2. **Scan Media**:
    ```bash
-   docker run --rm \
+   docker run -t --rm \
      -v $(pwd)/config.yaml:/app/config.yaml:ro \
      ghcr.io/gmcouto/arr-oldies scan --older-than 90d --format table
    ```
 
 3. **Interactive Clean (Requires `-it`)**:
-   When running interactive deletions/unmonitoring with confirmation prompts, pass `-it` to allocate a pseudo-TTY:
+   When running interactive deletions/unmonitoring with confirmation prompts, pass `-it` to allocate a pseudo-TTY and attach stdin:
    ```bash
    docker run -it --rm \
      -v $(pwd)/config.yaml:/app/config.yaml:ro \
@@ -71,14 +71,14 @@ Arr-Oldies automatically searches `/app/config.yaml` inside the container. Mount
 4. **Automated / Headless Clean (Cron & Scripts)**:
    For automated scripts or cron jobs, supply `-y`/`--yes` alongside `--execute`:
    ```bash
-   docker run --rm \
+   docker run -t --rm \
      -v $(pwd)/config.yaml:/app/config.yaml:ro \
      ghcr.io/gmcouto/arr-oldies clean --unmonitor --only-monitored --older-than 6m --execute --yes
    ```
 
 5. **Custom Config Path / Volume**:
    ```bash
-   docker run --rm \
+   docker run -t --rm \
      -v /path/to/custom-config.yaml:/config/config.yaml:ro \
      ghcr.io/gmcouto/arr-oldies --config /config/config.yaml scan
    ```
@@ -89,6 +89,7 @@ Arr-Oldies automatically searches `/app/config.yaml` inside the container. Mount
      arr-oldies:
        image: ghcr.io/gmcouto/arr-oldies:latest
        container_name: arr-oldies
+       tty: true
        volumes:
          - ./config.yaml:/app/config.yaml:ro
        command: scan --older-than 90d
