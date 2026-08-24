@@ -21,6 +21,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 7: Scope unmonitor to episodes and add unmonitor-series option** - Scope unmonitor to individual media items and add full series unmonitoring option (completed 2026-08-24)
 - [x] **Phase 8: Support --monitored and --unmonitored filter for scan and clean** - Filter inventory by monitored status to inspect or unmonitor only monitored items (completed 2026-08-24)
 - [x] **Phase 9: Docker Packaging and GitHub Actions Release Workflow** - Containerize arr-oldies and automate multi-platform Docker image build/publish to GHCR upon version release tags (completed 2026-08-24)
+- [ ] **Phase 10: Negative Language, Title, and Tag Filtering** - Filter media by excluding languages (`--!l`/`--not-audio-lang`), matching title substrings case-insensitively (`--title`), and including/excluding named tags (`--tag`, `--!tag`) with dynamic tag label resolution
 
 ## Phase Details
 
@@ -144,7 +145,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -157,6 +158,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 7. Scope unmonitor to episodes and add unmonitor-series option | 1/1 | Complete   | 2026-08-24 |
 | 8. Support --monitored and --unmonitored filter for scan and clean | 1/1 | Complete    | 2026-08-24 |
 | 9. Docker Packaging and GitHub Actions Release Workflow | 1/1 | Complete   | 2026-08-24 |
+| 10. Negative Language, Title, and Tag Filtering | 0/2 | Not started | - |
 
 ### Phase 6: Support Composite Time Formats for Age Filters
 
@@ -238,3 +240,28 @@ Plans:
 **Wave 1**
 
 - [x] 09-01-PLAN.md: Multi-Stage Docker Packaging, Entrypoint, GitHub Actions CI/CD Release Pipeline & User Documentation
+
+### Phase 10: Negative Language, Title, and Tag Filtering
+
+**Goal:** Enable negative audio language exclusion (`--!l` / `--not-audio-lang`), case-insensitive title substring filtering (`--title` with `ILIKE %...%` matching semantics), and named tag inclusion/exclusion (`--tag` and `--!tag`) with dynamic tag label-to-ID resolution per instance in both `scan` and `clean` commands.
+**Mode:** mvp
+**Depends on:** Phase 9
+**Requirements**: INVT-07, INVT-08, INVT-09
+**Success Criteria** (what must be TRUE):
+
+  1. Negative language filter `--!l` (with aliases `--not-audio-lang`, `--exclude-audio-lang`, `--not-lang`) filters out any media files containing the specified audio language (e.g. `--!l pt-br` returns files that do not have Portuguese audio).
+  2. Title filter `--title` filters media items using case-insensitive substring matching (`ILIKE %query%`) across movie titles, TV series titles, and episode titles.
+  3. Tag filters `--tag` and `--!tag` (or `--exclude-tag`) accept alphanumeric tag labels (e.g. `--tag 4k` or `--!tag archive`), resolve them dynamically to instance-specific tag IDs via Radarr/Sonarr `/api/v3/tag` endpoints, and filter media accordingly.
+  4. All new filters are seamlessly available and consistent across both `scan` and `clean` commands.
+  5. CLI table visualization, JSON export, dry-run simulation, and action execution accurately apply the new filtering criteria.
+
+**Plans**: 0/2 plans executed
+
+Plans:
+**Wave 1**
+
+- [ ] 10-01-PLAN.md: Tag API Models, Client Endpoints, Resilient Fetcher & Dynamic Correlator Tag Resolution
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 10-02-PLAN.md: Inventory Engine Multi-Filtering, CLI Scan/Clean Integration, Docs & End-to-End Test Suite

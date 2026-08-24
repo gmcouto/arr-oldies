@@ -1,19 +1,19 @@
 ---
 gsd_state_version: 1.0
-current_phase: 09
-current_phase_name: Docker Packaging and GitHub Actions Release Workflow
-status: complete
+current_phase: 10
+current_phase_name: negative-language-keyword-and-tag-filtering
+status: executing
 stopped_at: Completed 09-01-PLAN.md
-last_updated: "2026-08-24T18:29:00.000Z"
+last_updated: "2026-08-24T19:39:25.177Z"
 last_activity: 2026-08-24
 last_activity_desc: Phase 09 completed
-state_head: c72d17f
+state_head: a0e0425045cba1a3aa034c73dcf560f42bf57ace
 progress:
-  total_phases: 9
+  total_phases: 10
   completed_phases: 9
-  total_plans: 14
+  total_plans: 16
   completed_plans: 14
-  percent: 100
+  percent: 88
 ---
 
 # Project State
@@ -27,9 +27,9 @@ See: .planning/PROJECT.md (updated 2026-08-23)
 
 ## Current Position
 
-Phase: 09 (Docker Packaging and GitHub Actions Release Workflow) — COMPLETE
+Phase: 10 (negative-language-keyword-and-tag-filtering) — READY TO EXECUTE
 Plan: 1 of 1
-Status: Complete
+Status: Ready to execute
 Last activity: 2026-08-24 — Phase 09 completed
 
 Progress: [██████████] 100%
@@ -96,6 +96,7 @@ Recent decisions affecting current work:
 - Phase 7 added: Scope unmonitor to episodes and add unmonitor-series option (remove --unmonitor-episode)
 - Phase 8 added: Support --monitored and --unmonitored filter for scan and clean
 - Phase 9 added: Docker Packaging and GitHub Actions Release Workflow
+- Phase 10 added: Negative Language, Title, and Tag Filtering (--!l, --title with ILIKE matching, --tag, --!tag with label-to-id resolution)
 
 ### Pending Todos
 
