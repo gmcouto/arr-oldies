@@ -1,0 +1,28 @@
+# Git & GitHub
+.git
+.github
+
+# Planning & Agent docs
+.planning
+.agents
+.cursor
+.codex
+
+# Tests
+tests/
+
+# Virtual environments & Python cache
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Logs & OS artifacts
+*.log
+.DS_Store
