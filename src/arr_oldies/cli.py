@@ -215,6 +215,39 @@ def scan_command(
             help="Filter by audio language (repeatable, e.g. -l ja -l en).",
         ),
     ] = None,
+    not_audio_lang: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--!l",
+            "--not-audio-lang",
+            "--exclude-audio-lang",
+            "--not-lang",
+            help="Exclude media items containing specified audio language (repeatable, e.g. --!l pt-br).",
+        ),
+    ] = None,
+    title: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--title",
+            help="Filter by case-insensitive title substring matching across movie, series, and episode titles (repeatable).",
+        ),
+    ] = None,
+    tag: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--tag",
+            help="Filter media items having the specified tag label (repeatable, e.g. --tag 4k).",
+        ),
+    ] = None,
+    not_tag: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--!tag",
+            "--exclude-tag",
+            "--not-tag",
+            help="Exclude media items having the specified tag label (repeatable, e.g. --!tag archive).",
+        ),
+    ] = None,
     min_size: Annotated[
         str | None,
         typer.Option("--min-size", help="Minimum file size (e.g. '500MB', '2GB')."),
@@ -363,6 +396,10 @@ def scan_command(
     criteria = InventoryFilter(
         media_types=[media_type] if media_type else None,
         audio_langs=audio_lang,
+        not_audio_langs=not_audio_lang,
+        titles=title,
+        tags=tag,
+        not_tags=not_tag,
         min_size_bytes=min_size_bytes,
         max_size_bytes=max_size_bytes,
         min_age_days=min_age_days,
@@ -530,6 +567,39 @@ def clean_command(
             help="Filter by audio language (repeatable, e.g. -l ja -l en).",
         ),
     ] = None,
+    not_audio_lang: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--!l",
+            "--not-audio-lang",
+            "--exclude-audio-lang",
+            "--not-lang",
+            help="Exclude media items containing specified audio language (repeatable, e.g. --!l pt-br).",
+        ),
+    ] = None,
+    title: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--title",
+            help="Filter by case-insensitive title substring matching across movie, series, and episode titles (repeatable).",
+        ),
+    ] = None,
+    tag: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--tag",
+            help="Filter media items having the specified tag label (repeatable, e.g. --tag 4k).",
+        ),
+    ] = None,
+    not_tag: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--!tag",
+            "--exclude-tag",
+            "--not-tag",
+            help="Exclude media items having the specified tag label (repeatable, e.g. --!tag archive).",
+        ),
+    ] = None,
     min_size: Annotated[
         str | None,
         typer.Option("--min-size", help="Minimum file size (e.g. '500MB', '2GB')."),
@@ -690,6 +760,10 @@ def clean_command(
     criteria = InventoryFilter(
         media_types=[media_type] if media_type else None,
         audio_langs=audio_lang,
+        not_audio_langs=not_audio_lang,
+        titles=title,
+        tags=tag,
+        not_tags=not_tag,
         min_size_bytes=min_size_bytes,
         max_size_bytes=max_size_bytes,
         min_age_days=min_age_days,

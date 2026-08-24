@@ -1202,3 +1202,218 @@ def test_cli_scan_monitored_filters(tmp_path: Path, sample_valid_yaml: str) -> N
     )
     assert res_mutex.exit_code == 2
     assert "Cannot specify both --monitored and --unmonitored filter flags." in res_mutex.output
+
+
+@respx.mock
+def test_cli_scan_negative_language_and_title_filter(tmp_path: Path, sample_valid_yaml: str) -> None:
+    """Verify scan with --!l and --title filtering flags in table and JSON modes."""
+    cfg = tmp_path / "config.yaml"
+    cfg.write_text(sample_valid_yaml, encoding="utf-8")
+
+    respx.get("http://localhost:7878/api/v3/movie").respond(
+        json=[
+            {
+                "id": 1,
+                "title": "The Matrix",
+                "year": 1999,
+                "path": "/movies/Matrix",
+                "monitored": True,
+                "hasFile": True,
+            },
+            {
+                "id": 2,
+                "title": "The Matrix Reloaded",
+                "year": 2003,
+                "path": "/movies/Matrix2",
+                "monitored": True,
+                "hasFile": True,
+            },
+            {
+                "id": 3,
+                "title": "Inception",
+                "year": 2010,
+                "path": "/movies/Inception",
+                "monitored": True,
+                "hasFile": True,
+            },
+        ]
+    )
+    respx.get("http://localhost:7878/api/v3/moviefile").respond(
+        json=[
+            {
+                "id": 101,
+                "movieId": 1,
+                "relativePath": "1.mkv",
+                "path": "/movies/Matrix/1.mkv",
+                "size": 5_000_000_000,
+                "dateAdded": "2023-01-01T00:00:00Z",
+                "mediaInfo": {"audioLanguages": "English"},
+            },
+            {
+                "id": 102,
+                "movieId": 2,
+                "relativePath": "2.mkv",
+                "path": "/movies/Matrix2/2.mkv",
+                "size": 5_000_000_000,
+                "dateAdded": "2023-01-02T00:00:00Z",
+                "mediaInfo": {"audioLanguages": "Portuguese, English"},
+            },
+            {
+                "id": 103,
+                "movieId": 3,
+                "relativePath": "3.mkv",
+                "path": "/movies/Inception/3.mkv",
+                "size": 5_000_000_000,
+                "dateAdded": "2023-01-03T00:00:00Z",
+                "mediaInfo": {"audioLanguages": "English"},
+            },
+        ]
+    )
+    respx.get("http://localhost:7878/api/v3/history").respond(
+        json={"page": 1, "pageSize": 1000, "totalRecords": 0, "records": []}
+    )
+    respx.get("http://localhost:7878/api/v3/tag").respond(json=[])
+
+    # 1. Filter by title "matrix" (matches Matrix 1 and 2, excludes Inception)
+    res_title = runner.invoke(
+        app, ["--config", str(cfg), "scan", "-i", "radarr-main", "--title", "matrix"]
+    )
+    assert res_title.exit_code == 0
+    assert "The Matrix" in res_title.output
+    assert "The Matrix Reloaded" in res_title.output
+    assert "Inception" not in res_title.output
+
+    # 2. Filter by title "matrix" AND exclude Portuguese via --!l pt-br
+    res_neg_lang = runner.invoke(
+        app,
+        [
+            "--config",
+            str(cfg),
+            "scan",
+            "-i",
+            "radarr-main",
+            "--title",
+            "matrix",
+            "--!l",
+            "pt-br",
+        ],
+    )
+    assert res_neg_lang.exit_code == 0
+    assert "The Matrix" in res_neg_lang.output
+    assert "The Matrix Reloaded" not in res_neg_lang.output
+    assert "Inception" not in res_neg_lang.output
+
+
+@respx.mock
+def test_cli_scan_tag_and_not_tag_filters(tmp_path: Path, sample_valid_yaml: str) -> None:
+    """Verify scan with --tag and --!tag (and alias --exclude-tag) filtering flags."""
+    cfg = tmp_path / "config.yaml"
+    cfg.write_text(sample_valid_yaml, encoding="utf-8")
+
+    respx.get("http://localhost:7878/api/v3/movie").respond(
+        json=[
+            {
+                "id": 1,
+                "title": "Movie 4K",
+                "year": 2020,
+                "path": "/movies/M1",
+                "monitored": True,
+                "hasFile": True,
+                "tags": [1],
+            },
+            {
+                "id": 2,
+                "title": "Movie 4K Archive",
+                "year": 2021,
+                "path": "/movies/M2",
+                "monitored": True,
+                "hasFile": True,
+                "tags": [1, 2],
+            },
+            {
+                "id": 3,
+                "title": "Movie Standard",
+                "year": 2022,
+                "path": "/movies/M3",
+                "monitored": True,
+                "hasFile": True,
+                "tags": [],
+            },
+        ]
+    )
+    respx.get("http://localhost:7878/api/v3/moviefile").respond(
+        json=[
+            {
+                "id": 101,
+                "movieId": 1,
+                "relativePath": "1.mkv",
+                "path": "/movies/M1/1.mkv",
+                "size": 1_000_000_000,
+                "dateAdded": "2023-01-01T00:00:00Z",
+            },
+            {
+                "id": 102,
+                "movieId": 2,
+                "relativePath": "2.mkv",
+                "path": "/movies/M2/2.mkv",
+                "size": 1_000_000_000,
+                "dateAdded": "2023-01-02T00:00:00Z",
+            },
+            {
+                "id": 103,
+                "movieId": 3,
+                "relativePath": "3.mkv",
+                "path": "/movies/M3/3.mkv",
+                "size": 1_000_000_000,
+                "dateAdded": "2023-01-03T00:00:00Z",
+            },
+        ]
+    )
+    respx.get("http://localhost:7878/api/v3/history").respond(
+        json={"page": 1, "pageSize": 1000, "totalRecords": 0, "records": []}
+    )
+    respx.get("http://localhost:7878/api/v3/tag").respond(
+        json=[
+            {"id": 1, "label": "4k"},
+            {"id": 2, "label": "archive"},
+        ]
+    )
+
+    # 1. Include tag "4k" -> matches Movie 4K and Movie 4K Archive
+    res_tag = runner.invoke(
+        app, ["--config", str(cfg), "scan", "-i", "radarr-main", "--tag", "4k"]
+    )
+    assert res_tag.exit_code == 0
+    assert "Movie 4K" in res_tag.output
+    assert "Movie 4K Archive" in res_tag.output
+    assert "Movie Standard" not in res_tag.output
+
+    # 2. Include tag "4k" AND exclude tag "archive" via --!tag -> matches only Movie 4K
+    res_both = runner.invoke(
+        app,
+        ["--config", str(cfg), "scan", "-i", "radarr-main", "--tag", "4k", "--!tag", "archive"],
+    )
+    assert res_both.exit_code == 0
+    assert "Movie 4K" in res_both.output
+    assert "Movie 4K Archive" not in res_both.output
+
+    # 3. JSON format outputs tags list in payload
+    res_json = runner.invoke(
+        app,
+        [
+            "--config",
+            str(cfg),
+            "scan",
+            "-i",
+            "radarr-main",
+            "--tag",
+            "4k",
+            "--format",
+            "json",
+        ],
+    )
+    assert res_json.exit_code == 0
+    parsed = json.loads(res_json.stdout)
+    assert len(parsed["items"]) == 2
+    assert "tags" in parsed["items"][0]
+    assert parsed["items"][0]["tags"] == ["4k"]

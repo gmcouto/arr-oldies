@@ -100,6 +100,10 @@ class InventoryFilter(BaseModel):
     media_types: list[MediaType] | None = None
     instance_names: list[str] | None = None
     audio_langs: list[str] | None = None
+    not_audio_langs: list[str] | None = None
+    titles: list[str] | None = None
+    tags: list[str] | None = None
+    not_tags: list[str] | None = None
     min_size_bytes: int | None = None
     max_size_bytes: int | None = None
     min_age_days: int | None = None

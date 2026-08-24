@@ -18,7 +18,10 @@ It enables self-hosters and media server administrators to inspect media age dis
 - **History API Correlation**: Correlates media files with exact `downloadFolderImported` / `movieFileImported` and `grabbed` events from the *arr History API, calculating exact age in days.
 - **Legacy Fallback**: Gracefully flags and tracks legacy unindexed items added before history retention windows or via manual file imports.
 - **Rich Terminal UI**: High-contrast tables and summary cards with color-coded age tiers, instance badges, audio language highlighting, and potential disk space reclamation metrics.
-- **Audio Language Filtering & Normalization**: Filter media by audio track language supporting ISO 639-1, ISO 639-2, standard language names, and common aliases (e.g. `-l ja`, `-l japanese`, `-l en`, `-l pt-br`).
+- **Audio Language Filtering & Normalization**: Filter media by audio track language supporting ISO 639-1, ISO 639-2, standard language names, and common aliases (e.g. `-l ja`, `-l japanese`, `-l en`, `-l pt-br`). Exclude media items with negative language filtering (e.g. `--!l pt-br`, `--not-audio-lang por`).
+- **Title Substring & Tag Filtering**:
+  - Filter items by case-insensitive title keyword matching across movie, series, and episode titles (`--title "matrix"`).
+  - Include or exclude media items by *arr tag labels (`--tag 4k`, `--!tag archive`, `--exclude-tag anime`).
 - **Flexible Filters & Sorting**:
   - Filter by media type (`movie`, `episode`), monitored status (`--monitored`, `--unmonitored`), size range (`--min-size 2GB`, `--max-size 10GB`), compound age cutoff (`--older-than 1y1m1d`, `--newer-than 90d`, `6m2w`), or calendar dates (`--before 2023-01-01`).
   - Sort by `import_date`, `grab_date`, `size`, `title`, or `age` in ascending or descending order.
@@ -226,6 +229,9 @@ arr-oldies scan --radarr --older-than 1y1m1d
 # Filter only monitored items with Portuguese/Brazilian audio larger than 1GB
 arr-oldies scan --only-monitored -l pt-br --min-size 1GB -s size --order desc
 
+# Exclude items with Portuguese audio and filter by title substring and tags
+arr-oldies scan --!l pt-br --title "matrix" --tag 4k --!tag archive
+
 # Target top 20 oldest TV episodes imported before 2023
 arr-oldies scan --sonarr --type episode --before 2023-01-01 --limit 20
 
@@ -238,6 +244,10 @@ arr-oldies scan --format json > audit.json
 - `-i, --instance <name>`: Target specific instance name(s) (repeatable).
 - `-t, --type <movie|episode>`: Filter by media type.
 - `-l, --audio-lang <lang>`: Filter by audio language (repeatable, e.g. `-l ja -l en -l pt-br`).
+- `--!l, --not-audio-lang, --exclude-audio-lang, --not-lang <lang>`: Exclude items with specified audio language (repeatable, e.g. `--!l pt-br`).
+- `--title <query>`: Case-insensitive substring matching against movie, series, and episode titles (repeatable).
+- `--tag <tag>`: Filter items having the specified tag label (repeatable, e.g. `--tag 4k`).
+- `--!tag, --exclude-tag, --not-tag <tag>`: Exclude items having the specified tag label (repeatable, e.g. `--!tag archive`).
 - `--monitored` / `--only-monitored`: Filter only monitored media items.
 - `--unmonitored` / `--only-unmonitored`: Filter only unmonitored media items.
 - `--min-size <size>` / `--max-size <size>`: File size bounds (e.g. `500MB`, `2GiB`, `1.5TB`).
@@ -263,23 +273,27 @@ Safely execute targeted write actions (`--delete`, `--unmonitor`, `--unmonitor-s
 # Simulates deletion of all movies older than 2 years with Japanese audio
 arr-oldies clean --delete --radarr --older-than 2y -l ja
 
-# 2. UNMONITOR ONLY ACTIVE / MONITORED EPISODES
+# 2. FILTER BY TITLE, EXCLUDE LANGUAGE, AND TARGET TAGS
+# Identifies 4K items without Portuguese audio matching "Star Wars"
+arr-oldies clean --delete --title "star wars" --!l pt-br --tag 4k --older-than 1y
+
+# 3. UNMONITOR ONLY ACTIVE / MONITORED EPISODES
 # Identifies and unmonitors only monitored episodes older than 180 days (skipping already unmonitored)
 arr-oldies clean --unmonitor --only-monitored --sonarr --older-than 180d --execute
 
-# 3. UNMONITOR WHOLE SEASON IN SONARR
+# 4. UNMONITOR WHOLE SEASON IN SONARR
 # Unmonitors the entire season for matched old episode items
 arr-oldies clean --unmonitor-season --sonarr --older-than 1y --execute
 
-# 4. UNMONITOR ENTIRE SERIES IN SONARR
+# 5. UNMONITOR ENTIRE SERIES IN SONARR
 # Unmonitors full parent series for matched old episode items
 arr-oldies clean --unmonitor-series --sonarr --older-than 2y --execute
 
-# 5. INTERACTIVE DELETION
+# 6. INTERACTIVE DELETION
 # Prompts with a confirmation warning modal [y/N] before making changes
 arr-oldies clean --delete --unmonitor --older-than 3y --execute
 
-# 6. HEADLESS AUTOMATION / CRON EXECUTION
+# 7. HEADLESS AUTOMATION / CRON EXECUTION
 # Bypasses interactive confirmation with --yes
 arr-oldies clean --delete --unmonitor --older-than 2y --limit 50 --execute --yes
 ```
@@ -295,7 +309,7 @@ arr-oldies clean --delete --unmonitor --older-than 2y --limit 50 --execute --yes
 - `--monitored` / `--only-monitored`: Target only monitored media items.
 - `--unmonitored` / `--only-unmonitored`: Target only unmonitored media items.
 - `--older-than` / `--newer-than`: Relative age cutoffs (e.g. `30d`, `6m`, `1y1m1d`).
-- Other filters (`--radarr`, `--sonarr`, `-i`, `-t`, `-l`, `--min-size`, `--max-size`, `--before`, `--after`, `-s`, `-n`, `-f`) identical to `scan`.
+- Other filters (`--radarr`, `--sonarr`, `-i`, `-t`, `-l`, `--!l`, `--title`, `--tag`, `--!tag`, `--min-size`, `--max-size`, `--before`, `--after`, `-s`, `-n`, `-f`) identical to `scan`.
 
 #### Safety Flags:
 - `--execute`: Execute the mutations on the *arr instance (defaults to dry-run simulation).

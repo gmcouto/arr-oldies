@@ -90,11 +90,48 @@ class InventoryEngine:
             if criteria.unmonitored_only and item.monitored:
                 continue
 
-            # 8. Audio Language Filter
+            # 8. Audio Language Filter (Positive)
             if criteria.audio_langs and not any(
                 self.normalizer.matches(item.audio_languages, q) for q in criteria.audio_langs
             ):
                 continue
+
+            # 9. Negative Audio Language Filter (INVT-07)
+            if criteria.not_audio_langs and any(
+                self.normalizer.matches(item.audio_languages, q) for q in criteria.not_audio_langs
+            ):
+                continue
+
+            # 10. Title Substring Filter (INVT-08)
+            if criteria.titles:
+                title_queries = [t.strip().lower() for t in criteria.titles if t.strip()]
+                if title_queries:
+                    item_title_lower = item.title.lower()
+                    item_ep_title_lower = (
+                        item.episode_title.lower() if item.episode_title else ""
+                    )
+                    matched_title = any(
+                        q in item_title_lower or (item_ep_title_lower and q in item_ep_title_lower)
+                        for q in title_queries
+                    )
+                    if not matched_title:
+                        continue
+
+            # 11. Tag Inclusion Filter (INVT-09)
+            if criteria.tags:
+                tag_queries = [q.strip().lower() for q in criteria.tags if q.strip()]
+                if tag_queries:
+                    item_tags = {t.strip().lower() for t in item.tags}
+                    if not any(q in item_tags for q in tag_queries):
+                        continue
+
+            # 12. Tag Exclusion Filter (INVT-09)
+            if criteria.not_tags:
+                not_tag_queries = [q.strip().lower() for q in criteria.not_tags if q.strip()]
+                if not_tag_queries:
+                    item_tags = {t.strip().lower() for t in item.tags}
+                    if any(q in item_tags for q in not_tag_queries):
+                        continue
 
             filtered.append(item)
 

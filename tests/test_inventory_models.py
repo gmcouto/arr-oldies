@@ -217,6 +217,10 @@ def test_inventory_filter_defaults():
     assert f.media_types is None
     assert f.instance_names is None
     assert f.audio_langs is None
+    assert f.not_audio_langs is None
+    assert f.titles is None
+    assert f.tags is None
+    assert f.not_tags is None
     assert f.min_size_bytes is None
     assert f.max_size_bytes is None
     assert f.min_age_days is None
@@ -227,6 +231,20 @@ def test_inventory_filter_defaults():
     assert f.history_only is False
     assert f.monitored_only is False
     assert f.unmonitored_only is False
+
+
+def test_inventory_item_and_filter_new_fields():
+    """Verify InventoryFilter with not_audio_langs, titles, tags, and not_tags values."""
+    f = InventoryFilter(
+        not_audio_langs=["pt-br", "japanese"],
+        titles=["matrix", "pilot"],
+        tags=["4k", "favorite"],
+        not_tags=["archive", "temp"],
+    )
+    assert f.not_audio_langs == ["pt-br", "japanese"]
+    assert f.titles == ["matrix", "pilot"]
+    assert f.tags == ["4k", "favorite"]
+    assert f.not_tags == ["archive", "temp"]
 
 
 def test_inventory_summary_defaults():

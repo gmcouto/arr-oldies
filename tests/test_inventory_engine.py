@@ -94,6 +94,188 @@ def test_filter_by_audio_language(sample_items: list[MediaInventoryItem]):
     assert len(filtered_de) == 0
 
 
+def test_filter_negative_audio_language(sample_items: list[MediaInventoryItem]):
+    """Verify negative audio language filtering excludes items matching ISO codes or language names."""
+    engine = InventoryEngine()
+
+    # Exclude Japanese items
+    filtered_no_ja = engine.filter_inventory(sample_items, InventoryFilter(not_audio_langs=["ja"]))
+    assert len(filtered_no_ja) == 2
+    assert {i.title for i in filtered_no_ja} == {"New Drama Show", "Legacy Movie"}
+
+    # Exclude French items
+    filtered_no_fr = engine.filter_inventory(
+        sample_items, InventoryFilter(not_audio_langs=["french"])
+    )
+    assert len(filtered_no_fr) == 2
+    assert {i.title for i in filtered_no_fr} == {"Old Anime Movie", "Legacy Movie"}
+
+    # Exclude Portuguese (none have it, all retained)
+    filtered_no_pt = engine.filter_inventory(
+        sample_items, InventoryFilter(not_audio_langs=["pt-br"])
+    )
+    assert len(filtered_no_pt) == 3
+
+
+def test_filter_title_substring_matching():
+    """Verify case-insensitive substring matching across movie title, series title, and episode title."""
+    engine = InventoryEngine()
+    items = [
+        MediaInventoryItem(
+            id="radarr:1",
+            instance_name="radarr",
+            instance_type=InstanceType.RADARR,
+            media_type=MediaType.MOVIE,
+            title="The Matrix Reloaded",
+            file_path="/movies/Matrix.mkv",
+            import_date=datetime(2024, 1, 1, tzinfo=UTC),
+        ),
+        MediaInventoryItem(
+            id="sonarr:2",
+            instance_name="sonarr",
+            instance_type=InstanceType.SONARR,
+            media_type=MediaType.EPISODE,
+            title="Better Call Saul",
+            episode_title="Winner",
+            file_path="/tv/BCS/S04E10.mkv",
+            import_date=datetime(2024, 1, 1, tzinfo=UTC),
+        ),
+        MediaInventoryItem(
+            id="radarr:3",
+            instance_name="radarr",
+            instance_type=InstanceType.RADARR,
+            media_type=MediaType.MOVIE,
+            title="Inception",
+            file_path="/movies/Inception.mkv",
+            import_date=datetime(2024, 1, 1, tzinfo=UTC),
+        ),
+    ]
+
+    # Substring in movie title
+    filtered_matrix = engine.filter_inventory(items, InventoryFilter(titles=["matrix"]))
+    assert len(filtered_matrix) == 1
+    assert filtered_matrix[0].title == "The Matrix Reloaded"
+
+    # Substring in episode title
+    filtered_winner = engine.filter_inventory(items, InventoryFilter(titles=["win"]))
+    assert len(filtered_winner) == 1
+    assert filtered_winner[0].title == "Better Call Saul"
+
+    # Multiple titles criteria (OR match across queries)
+    filtered_multi = engine.filter_inventory(items, InventoryFilter(titles=["matrix", "inception"]))
+    assert len(filtered_multi) == 2
+    assert {i.title for i in filtered_multi} == {"The Matrix Reloaded", "Inception"}
+
+    # No match
+    filtered_none = engine.filter_inventory(items, InventoryFilter(titles=["star wars"]))
+    assert len(filtered_none) == 0
+
+
+def test_filter_tag_inclusion_and_exclusion():
+    """Verify tag inclusion and exclusion filters (case-insensitive)."""
+    engine = InventoryEngine()
+    items = [
+        MediaInventoryItem(
+            id="radarr:1",
+            instance_name="radarr",
+            instance_type=InstanceType.RADARR,
+            media_type=MediaType.MOVIE,
+            title="4K Movie",
+            file_path="/m/1.mkv",
+            import_date=datetime(2024, 1, 1, tzinfo=UTC),
+            tags=["4k", "favorite"],
+        ),
+        MediaInventoryItem(
+            id="radarr:2",
+            instance_name="radarr",
+            instance_type=InstanceType.RADARR,
+            media_type=MediaType.MOVIE,
+            title="Archive Movie",
+            file_path="/m/2.mkv",
+            import_date=datetime(2024, 1, 1, tzinfo=UTC),
+            tags=["4K", "archive"],
+        ),
+        MediaInventoryItem(
+            id="radarr:3",
+            instance_name="radarr",
+            instance_type=InstanceType.RADARR,
+            media_type=MediaType.MOVIE,
+            title="Standard Movie",
+            file_path="/m/3.mkv",
+            import_date=datetime(2024, 1, 1, tzinfo=UTC),
+            tags=[],
+        ),
+    ]
+
+    # Include tag "4k" (case-insensitive)
+    filtered_4k = engine.filter_inventory(items, InventoryFilter(tags=["4K"]))
+    assert len(filtered_4k) == 2
+    assert {i.title for i in filtered_4k} == {"4K Movie", "Archive Movie"}
+
+    # Exclude tag "archive"
+    filtered_no_archive = engine.filter_inventory(items, InventoryFilter(not_tags=["ARCHIVE"]))
+    assert len(filtered_no_archive) == 2
+    assert {i.title for i in filtered_no_archive} == {"4K Movie", "Standard Movie"}
+
+    # Combined: include "4k" AND exclude "archive"
+    filtered_combined = engine.filter_inventory(
+        items, InventoryFilter(tags=["4k"], not_tags=["archive"])
+    )
+    assert len(filtered_combined) == 1
+    assert filtered_combined[0].title == "4K Movie"
+
+
+def test_filter_combined_predicates():
+    """Verify combining positive language, negative language, title, and tag filters."""
+    engine = InventoryEngine()
+    items = [
+        MediaInventoryItem(
+            id="radarr:1",
+            instance_name="radarr",
+            instance_type=InstanceType.RADARR,
+            media_type=MediaType.MOVIE,
+            title="Star Wars: Episode IV",
+            audio_languages=["English"],
+            tags=["4k"],
+            file_path="/m/1.mkv",
+            import_date=datetime(2024, 1, 1, tzinfo=UTC),
+        ),
+        MediaInventoryItem(
+            id="radarr:2",
+            instance_name="radarr",
+            instance_type=InstanceType.RADARR,
+            media_type=MediaType.MOVIE,
+            title="Star Wars: Episode V",
+            audio_languages=["Portuguese", "English"],
+            tags=["4k"],
+            file_path="/m/2.mkv",
+            import_date=datetime(2024, 1, 1, tzinfo=UTC),
+        ),
+        MediaInventoryItem(
+            id="radarr:3",
+            instance_name="radarr",
+            instance_type=InstanceType.RADARR,
+            media_type=MediaType.MOVIE,
+            title="Star Trek",
+            audio_languages=["English"],
+            tags=["4k"],
+            file_path="/m/3.mkv",
+            import_date=datetime(2024, 1, 1, tzinfo=UTC),
+        ),
+    ]
+
+    # Filter: title contains "star wars", audio contains English, audio does NOT contain Portuguese, tag is "4k"
+    criteria = InventoryFilter(
+        titles=["star wars"],
+        audio_langs=["eng"],
+        not_audio_langs=["pt-br"],
+        tags=["4k"],
+    )
+    res = engine.filter_inventory(items, criteria)
+    assert len(res) == 1
+    assert res[0].title == "Star Wars: Episode IV"
+
+
 def test_filter_by_size_bounds(sample_items: list[MediaInventoryItem]):
     """Verify filtering by minimum and maximum file size in bytes."""
     engine = InventoryEngine()

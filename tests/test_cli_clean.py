@@ -731,3 +731,181 @@ def test_cli_clean_monitored_and_unmonitored_filters(config_file_path: Path) -> 
     )
     assert res_mutex.exit_code == 2
     assert "Cannot specify both --monitored and --unmonitored filter flags." in res_mutex.output
+
+
+@respx.mock
+def test_cli_clean_with_negative_language_and_tag_flags(config_file_path: Path) -> None:
+    """Verify clean command dry-run action planning with --!l, --title, --tag, and --!tag flags."""
+    respx.get("http://localhost:7878/api/v3/movie").respond(
+        json=[
+            {
+                "id": 1,
+                "title": "Star Wars: A New Hope",
+                "year": 1977,
+                "path": "/m/1",
+                "monitored": True,
+                "hasFile": True,
+                "tags": [1],
+            },
+            {
+                "id": 2,
+                "title": "Star Wars: The Empire Strikes Back",
+                "year": 1980,
+                "path": "/m/2",
+                "monitored": True,
+                "hasFile": True,
+                "tags": [1, 2],
+            },
+            {
+                "id": 3,
+                "title": "Star Trek",
+                "year": 2009,
+                "path": "/m/3",
+                "monitored": True,
+                "hasFile": True,
+                "tags": [1],
+            },
+        ]
+    )
+    respx.get("http://localhost:7878/api/v3/moviefile").respond(
+        json=[
+            {
+                "id": 101,
+                "movieId": 1,
+                "relativePath": "1.mkv",
+                "path": "/m/1/1.mkv",
+                "size": 1_000_000_000,
+                "dateAdded": "2020-01-01T00:00:00Z",
+                "mediaInfo": {"audioLanguages": "English"},
+            },
+            {
+                "id": 102,
+                "movieId": 2,
+                "relativePath": "2.mkv",
+                "path": "/m/2/2.mkv",
+                "size": 1_000_000_000,
+                "dateAdded": "2020-01-02T00:00:00Z",
+                "mediaInfo": {"audioLanguages": "Portuguese, English"},
+            },
+            {
+                "id": 103,
+                "movieId": 3,
+                "relativePath": "3.mkv",
+                "path": "/m/3/3.mkv",
+                "size": 1_000_000_000,
+                "dateAdded": "2020-01-03T00:00:00Z",
+                "mediaInfo": {"audioLanguages": "English"},
+            },
+        ]
+    )
+    respx.get("http://localhost:7878/api/v3/history").respond(
+        json={"page": 1, "pageSize": 1000, "totalRecords": 0, "records": []}
+    )
+    respx.get("http://localhost:7878/api/v3/tag").respond(
+        json=[
+            {"id": 1, "label": "4k"},
+            {"id": 2, "label": "archive"},
+        ]
+    )
+
+    # Clean with --title "star wars" --!l "pt-br" --tag "4k"
+    res = runner.invoke(
+        app,
+        [
+            "clean",
+            "--delete",
+            "--title",
+            "star wars",
+            "--!l",
+            "pt-br",
+            "--tag",
+            "4k",
+            "-i",
+            "radarr-main",
+            "--format",
+            "json",
+            "--config",
+            str(config_file_path),
+        ],
+    )
+    assert res.exit_code == 0
+    parsed = json.loads(res.stdout)
+    assert parsed["summary"]["total_items"] == 1
+    assert parsed["items"][0]["item"]["title"] == "Star Wars: A New Hope"
+
+
+@respx.mock
+def test_cli_clean_execution_with_tag_filter(config_file_path: Path) -> None:
+    """Verify clean execution with --delete --tag only mutates tagged items."""
+    respx.get("http://localhost:7878/api/v3/movie").respond(
+        json=[
+            {
+                "id": 1,
+                "title": "Movie 4K",
+                "path": "/m/1",
+                "monitored": True,
+                "hasFile": True,
+                "tags": [1],
+            },
+            {
+                "id": 2,
+                "title": "Movie 1080p",
+                "path": "/m/2",
+                "monitored": True,
+                "hasFile": True,
+                "tags": [],
+            },
+        ]
+    )
+    respx.get("http://localhost:7878/api/v3/moviefile").respond(
+        json=[
+            {
+                "id": 101,
+                "movieId": 1,
+                "relativePath": "1.mkv",
+                "path": "/m/1/1.mkv",
+                "size": 1_000_000_000,
+                "dateAdded": "2020-01-01T00:00:00Z",
+            },
+            {
+                "id": 102,
+                "movieId": 2,
+                "relativePath": "2.mkv",
+                "path": "/m/2/2.mkv",
+                "size": 1_000_000_000,
+                "dateAdded": "2020-01-02T00:00:00Z",
+            },
+        ]
+    )
+    respx.get("http://localhost:7878/api/v3/history").respond(
+        json={"page": 1, "pageSize": 1000, "totalRecords": 0, "records": []}
+    )
+    respx.get("http://localhost:7878/api/v3/tag").respond(json=[{"id": 1, "label": "4k"}])
+
+    route_delete_101 = respx.delete("http://localhost:7878/api/v3/moviefile/101").respond(
+        status_code=200
+    )
+    route_delete_102 = respx.delete("http://localhost:7878/api/v3/moviefile/102").respond(
+        status_code=200
+    )
+
+    res = runner.invoke(
+        app,
+        [
+            "clean",
+            "--delete",
+            "--tag",
+            "4k",
+            "--execute",
+            "--yes",
+            "-i",
+            "radarr-main",
+            "--config",
+            str(config_file_path),
+        ],
+    )
+    assert res.exit_code == 0
+    assert "Arr-Oldies Execution Report" in res.output
+    assert route_delete_101.called
+    assert not route_delete_102.called
+
