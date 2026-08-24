@@ -25,16 +25,17 @@ def render_inventory_table(
         header_style="bold bright_white on grey23",
         show_header=True,
         show_lines=False,
+        expand=True,
     )
 
     table.add_column("#", style="dim", justify="right", no_wrap=True)
     table.add_column("Instance", style="bold", no_wrap=True)
     table.add_column("Type", style="dim", no_wrap=True)
-    table.add_column("Title / Episode", style="bold white", min_width=25, overflow="ellipsis")
+    table.add_column("Title / Episode", style="bold white", ratio=3, min_width=20)
     table.add_column("Size", style="bright_yellow", justify="right", no_wrap=True)
     table.add_column("Import Date", style="white", justify="center", no_wrap=True)
     table.add_column("Age", justify="right", no_wrap=True)
-    table.add_column("Audio", style="white", no_wrap=True)
+    table.add_column("Audio", style="white", ratio=1)
 
     for idx, item in enumerate(items, start=1):
         type_str = (

@@ -130,3 +130,35 @@ def test_table_limit_caption() -> None:
     # Total count > items -> caption present
     table_cap = render_inventory_table(items, total_count=50, limit=1)
     assert table_cap.caption == "[dim]Showing top 1 of 50 items[/dim]"
+
+
+def test_table_rendering_narrow_terminal_and_multiple_languages() -> None:
+    """Verify media titles and episodes are not collapsed or hidden at various console widths."""
+    items = [
+        _make_movie(
+            title="Oppenheimer",
+            year=2023,
+            size_bytes=20_000_000_000,
+            age_days=365,
+            languages=["Portuguese", "English"],
+        ),
+        _make_episode(
+            title="Demon Slayer: Kimetsu no Yaiba",
+            season=5,
+            formatted_episode="S05E01",
+            episode_title="To Defeat Muzan Kibutsuji",
+            size_bytes=3_000_000_000,
+            age_days=728,
+            languages=["Portuguese", "Japanese"],
+        ),
+    ]
+    table = render_inventory_table(items)
+
+    for width in [80, 100, 120, 140, 160]:
+        console = Console(record=True, width=width)
+        console.print(table)
+        output = console.export_text()
+        assert "Oppenheimer" in output, f"Oppenheimer missing at width {width}"
+        assert "Demon Slayer" in output, f"Demon Slayer missing at width {width}"
+        assert "S05E01" in output, f"S05E01 missing at width {width}"
+
